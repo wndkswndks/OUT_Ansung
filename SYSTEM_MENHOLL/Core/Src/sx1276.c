@@ -284,7 +284,7 @@ void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
 	SPI_NSS_SET;
 }
 
-void SX1276_Init(uint64_t frequency)
+void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum)
 {
 	RESET_SX1276;
 
@@ -300,6 +300,46 @@ void SX1276_Init(uint64_t frequency)
 	freq_reg[2] = (uint8_t) (freq >> 0);
 	SX1276_BurstWrite(m_sx1276.s_FrMsb.FrfMsb, freq_reg, 3);///
 
-	
-	
+	SX1276_Write(m_sx1276.s_SyncWord.SyncWord,0x34);
+
+	//RegPaConfig //17-(15-15) = 17dbm
+	SX1276_Write(m_sx1276.s_PaConfig.PaSelect,PA_BOOST);
+	SX1276_Write(m_sx1276.s_PaConfig.MaxPower,0x07);
+	SX1276_Write(m_sx1276.s_PaConfig.OutputPower,0x0f);
+
+	//RegOcp// //CCP DISABLE
+	SX1276_Write(m_sx1276.s_Ocp.OcpOn,OCP_DISABLE);
+	SX1276_Write(m_sx1276.s_Ocp.OcpTrim,0x0b);
+
+	//RegLna
+	SX1276_Write(m_sx1276.s_Lna.LnaGain,G1);
+	SX1276_Write(m_sx1276.s_Lna.LnaBoostLf,0x00);
+	SX1276_Write(m_sx1276.s_Lna.LnaBoostHf,BOOST_ON_150_LNA_CURRENT);
+
+	//RegModemConfig1	
+	SX1276_Write(m_sx1276.s_ModemConfig1.Bw,Bw);
+	SX1276_Write(m_sx1276.s_ModemConfig1.CodingRate,CR);
+	SX1276_Write(m_sx1276.s_ModemConfig1.ImplicitHeaderModeOn, EXPLICIT_HEADER_MODE );
+
+	//RegModemConfig2
+	SX1276_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF);
+	SX1276_Write(m_sx1276.s_ModemConfig2.TxContinuousMode, NORMAL_MODE);
+	SX1276_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_sum);
+	SX1276_Write(m_sx1276.s_ModemConfig2.SymbTimeoutMsB,0x00);
+
+	//RegModemConfig3
+	SX1276_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE);
+	SX1276_Write(m_sx1276.s_ModemConfig3.AgcAutoOn,AGC_GAIN);
+
+	//RegSymbTimeoutLsb
+	SX1276_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08);
+	//RegPreambleMsb
+	SX1276_Write(m_sx1276.s_PreambleMsb.PreambleLengthMsb,0x00);
+	//RegPreambleLsb
+	SX1276_Write(m_sx1276.s_PreambleLsb.PreambleLengthLsb,0x08);
+	//RegDioMapping2
+	SX1276_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;
+
+	//Reg
+	SX1276_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);///
 }

@@ -610,8 +610,14 @@ void SX1276_Write(uint8_t * sx1276, uint8_t cmd);
 uint8_t SX1276_Read(uint8_t * sx1276);
 void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length);
 void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length);
+void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum);
 
 /*  			function end  			*/
+
+/*              extern start            */
+
+/*              extern end	            */
+
 extern SX1276_T m_sx1276;
 
 #endif
