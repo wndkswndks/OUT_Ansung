@@ -546,56 +546,56 @@ typedef struct
 
 typedef struct
 {
-	Fifo_t				  s_Fifo;	
-	OpMode_t			  s_OpMode;				
-	FrMsb_t 			  s_FrMsb;			   
-	FrMid_t 			  s_FrMid;			   
-	FrLsb_t 			  s_FrLsb;				
+	Fifo_t				  s_Fifo;	//0x00
+	OpMode_t			  s_OpMode;	//0x01			
+	FrMsb_t 			  s_FrMsb;	//0x06		   
+	FrMid_t 			  s_FrMid;	//0x07		   
+	FrLsb_t 			  s_FrLsb;	//0x08			
 						
-	PaConfig_t			  s_PaConfig; 		   
-	PaRamp_t			  s_PaRamp;			   
-	Ocp_t				  s_Ocp;				   
+	PaConfig_t			  s_PaConfig; //0x09		   
+	PaRamp_t			  s_PaRamp;	//0x0a		   
+	Ocp_t				  s_Ocp;	//0x0b			   
 						
-	Lna_t				  s_Lna;				   
+	Lna_t				  s_Lna;	//0x0c			   
 						
-	FifoAddrPtr_t		  s_FifoAddrPtr;			 
-	FifoTxBaseAddr_t	  s_FifoTxBaseAddr;		
-	FifoRxBaseAddr_t	  s_FifoRxBaseAddr;		
-	FifoRxCurrentaddr_t   s_FifoRxCurrentaddr;	
-	IrqFlagsMask_t		  s_IrqFlagsMask; 		
-	IrqFlags_t			  s_IrqFlags; 			
-	RxNbBytes_t 		  s_RxNbBytes;		   
-	RxHeaderCntValueMsb_t  s_RxHeaderCntValueMsb; 
-	RxHeaderCntValueLsb_t  s_RxHeaderCntValueLsb; 
-	RxPacketCntValueMsb_t  s_RxPacketCntValueMsb; 
-	RxPacketCntValueLsb_t  s_RxPacketCntValueLsb;	
-	ModemStat_t 		  s_ModemStat;		   
-	PktSnrValue_t		  s_PktSnrValue;			
-	PktRssiValue_t		  s_PktRssiValue;		   
-	RssiValue_t 		  s_RssiValue;			
-	HopChannel_t		  s_HopChannel;		   
-	ModemConfig1_t		  s_ModemConfig1; 	  
-	ModemConfig2_t		  s_ModemConfig2; 	  
-	SymbTimeoutLsb_t	  s_SymbTimeoutLsb;	   
-	PreambleMsb_t		  s_PreambleMsb;		   
-	PreambleLsb_t		  s_PreambleLsb;		   
-	PayloadLength_t 	  s_PayloadLength;	   
-	MaxPayloadLength_t	  s_MaxPayloadLength;    
-	HopPeriod_t 		  s_HopPeriod;		   
-	FifoRxByteAddr_t	  s_FifoRxByteAddr;		
-	ModemConfig3_t		  s_ModemConfig3; 
-	SyncWord_t 			  s_SyncWord;	
+	FifoAddrPtr_t		  s_FifoAddrPtr;	//0x0d			 
+	FifoTxBaseAddr_t	  s_FifoTxBaseAddr;	//0x0e	
+	FifoRxBaseAddr_t	  s_FifoRxBaseAddr;	//0x0f	
+	FifoRxCurrentaddr_t   s_FifoRxCurrentaddr;//0x10	
+	IrqFlagsMask_t		  s_IrqFlagsMask;   //0x11	
+	IrqFlags_t			  s_IrqFlags; 		//0x12	
+	RxNbBytes_t 		  s_RxNbBytes;		//0x13   
+	RxHeaderCntValueMsb_t  s_RxHeaderCntValueMsb; //0x14
+	RxHeaderCntValueLsb_t  s_RxHeaderCntValueLsb; //0x15
+	RxPacketCntValueMsb_t  s_RxPacketCntValueMsb; //0x16
+	RxPacketCntValueLsb_t  s_RxPacketCntValueLsb; //0x17
+	ModemStat_t 		  s_ModemStat;  //0x18	   
+	PktSnrValue_t		  s_PktSnrValue; //0x19			
+	PktRssiValue_t		  s_PktRssiValue; //0x1a		   
+	RssiValue_t 		  s_RssiValue;  //0x1b		
+	HopChannel_t		  s_HopChannel;	//0x1c	   
+	ModemConfig1_t		  s_ModemConfig1; 	//0x1d 
+	ModemConfig2_t		  s_ModemConfig2; 	//0x1e
+	SymbTimeoutLsb_t	  s_SymbTimeoutLsb;	//0x1f
+	PreambleMsb_t		  s_PreambleMsb;	//0x20 	   
+	PreambleLsb_t		  s_PreambleLsb;	//0x21 	   
+	PayloadLength_t 	  s_PayloadLength;	//0x22 	   
+	MaxPayloadLength_t	  s_MaxPayloadLength; //0x23    
+	HopPeriod_t 		  s_HopPeriod;		//0x24 	   
+	FifoRxByteAddr_t	  s_FifoRxByteAddr;	//0x25 		
+	ModemConfig3_t		  s_ModemConfig3; 	//0x26 
+	SyncWord_t 			  s_SyncWord;		//0x39 
 	
-	DioMapping1_t		  s_DioMapping1;		   
-	DioMapping2_t		  s_DioMapping2;		   						
-	Version_t			  s_Version;												   
-	Tcxo_t				  s_Tcxo; 			   
-	PaDac_t 			  s_PaDac;			   
-	FormerTemp_t		  s_FormerTemp;		   
-	AgcRef_t			  s_AgcRef;			   
-	AgcThresh1_t		  s_AgcThresh1;		   
-	AgcThresh2_t		  s_AgcThresh2;		   
-	AgcThresh3_t		  s_AgcThresh3;  
+	DioMapping1_t		  s_DioMapping1;	//0x40 	   
+	DioMapping2_t		  s_DioMapping2;	//0x41 		   						
+	Version_t			  s_Version;		//0x42 											   
+	Tcxo_t				  s_Tcxo; 			//0x4b 	   
+	PaDac_t 			  s_PaDac;			//0x4d 	   
+	FormerTemp_t		  s_FormerTemp;		//0x5b 	   
+	AgcRef_t			  s_AgcRef;			//0x61 	   
+	AgcThresh1_t		  s_AgcThresh1;		//0x62 	   
+	AgcThresh2_t		  s_AgcThresh2;		//0x63 	   
+	AgcThresh3_t		  s_AgcThresh3;  	//0x64 
 
 } SX1276_T;
 
