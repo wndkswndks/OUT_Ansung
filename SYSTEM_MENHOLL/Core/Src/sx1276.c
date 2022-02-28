@@ -241,7 +241,7 @@ void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length)
 	HAL_SPI_Transmit(&hspi2, &reg, 1, 1000);
 	while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 	
-	for(int i =0 ;i < length;i++)
+	for(uint8_t i =0 ;i < length;i++)
 	{
 		HAL_SPI_Transmit(&hspi2, txBuff+i, 1, 1000);
 		while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
@@ -268,16 +268,16 @@ uint8_t SX1276_Read(uint8_t * sx1276)
 void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
 {
 	uint8_t reg = sx1276[REGISTER_E];
-
+	uint8_t txByte = 0x00;
 	if(length<=1)return;
 	
 	SPI_NSS_RESET;
 	HAL_SPI_Transmit(&hspi2, &reg, 1, 1000);
 	while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 	
-	for(int i =0 ;i < length;i++)
+	for(uint8_t i =0 ;i < length;i++)
 	{
-		HAL_SPI_TransmitReceive(&hspi2, rxBuff+i, 1, 1000);
+		HAL_SPI_TransmitReceive(&hspi2, &txByte,rxBuff+i, 1, 1000);
 		while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 	}
 
