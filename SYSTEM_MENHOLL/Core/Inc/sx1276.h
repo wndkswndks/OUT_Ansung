@@ -54,6 +54,9 @@
 #define RegHopPeriod                             0x24
 #define RegFifoRxByteAddr                        0x25
 #define RegModemConfig3                          0x26
+
+#define  RegSyncWord_							0x39//사용됨
+
 // I/O settings
 #define RegDioMapping1                           0x40
 #define RegDioMapping2                           0x41
@@ -91,6 +94,8 @@
 
 #define SPI_NSS_RESET	HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_RESET); 
 #define SPI_NSS_SET		HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_SET); 
+
+#define RESET_SX1276	HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_SET); 
 
 
 
@@ -414,7 +419,11 @@ typedef struct
 typedef struct
 {
 	uint8_t RxCodingRate[4];
-	uint8_t ModemStatus[4];
+	uint8_t Modem_clear[4];
+	uint8_t Header_info_valid[4];
+	uint8_t RX_on_going[4];
+	uint8_t Signal_synchronized[4];
+	uint8_t Signal_detected[4];
 } ModemStat_t;
 typedef struct
 {
@@ -483,10 +492,18 @@ typedef struct
 } ModemConfig3_t;
 
 
+typedef struct
+{
+	uint8_t SyncWord[4];
+} SyncWord_t;
 
 typedef struct
 {
-	uint8_t DioMapping1[4];
+	//uint8_t DioMapping1[4];
+	uint8_t Dio0[4];
+	uint8_t Dio1[4];
+	uint8_t Dio2[4];
+	uint8_t Dio3[4];
 } DioMapping1_t;          
 typedef struct
 {
@@ -529,57 +546,56 @@ typedef struct
 
 typedef struct
 {
-	Fifo_t				  Fifo;	
-	OpMode_t			  OpMode;				
-	FrMsb_t 			  FrMsb;			   
-	FrMid_t 			  FrMid;			   
-	FrLsb_t 			  FrLsb;				
+	Fifo_t				  s_Fifo;	
+	OpMode_t			  s_OpMode;				
+	FrMsb_t 			  s_FrMsb;			   
+	FrMid_t 			  s_FrMid;			   
+	FrLsb_t 			  s_FrLsb;				
 						
-	PaConfig_t			  PaConfig; 		   
-	PaRamp_t			  PaRamp;			   
-	Ocp_t				  Ocp;				   
+	PaConfig_t			  s_PaConfig; 		   
+	PaRamp_t			  s_PaRamp;			   
+	Ocp_t				  s_Ocp;				   
 						
-	Lna_t				  Lna;				   
+	Lna_t				  s_Lna;				   
 						
-	FifoAddrPtr_t		  FifoAddrPtr;			 
-	FifoTxBaseAddr_t	  FifoTxBaseAddr;		
-	FifoRxBaseAddr_t	  FifoRxBaseAddr;		
-	FifoRxCurrentaddr_t   FifoRxCurrentaddr;	
-	IrqFlagsMask_t		  IrqFlagsMask; 		
-	IrqFlags_t			  IrqFlags; 			
-	RxNbBytes_t 		  RxNbBytes;		   
-	RxHeaderCntValueMsb_t  RxHeaderCntValueMsb; 
-	RxHeaderCntValueLsb_t  RxHeaderCntValueLsb; 
-	RxPacketCntValueMsb_t  RxPacketCntValueMsb; 
-	RxPacketCntValueLsb_t  RxPacketCntValueLsb;	
-	ModemStat_t 		  ModemStat;		   
-	PktSnrValue_t		  PktSnrValue;			
-	PktRssiValue_t		  PktRssiValue;		   
-	RssiValue_t 		  RssiValue;			
-	HopChannel_t		  HopChannel;		   
-	ModemConfig1_t		  ModemConfig1; 	  
-	ModemConfig2_t		  ModemConfig2; 	  
-	SymbTimeoutLsb_t	  SymbTimeoutLsb;	   
-	PreambleMsb_t		  PreambleMsb;		   
-	PreambleLsb_t		  PreambleLsb;		   
-	PayloadLength_t 	  PayloadLength;	   
-	MaxPayloadLength_t	  MaxPayloadLength;    
-	HopPeriod_t 		  HopPeriod;		   
-	FifoRxByteAddr_t	  FifoRxByteAddr;		
-	ModemConfig3_t		  ModemConfig3; 	  
-						
-	DioMapping1_t		  DioMapping1;		   
-	DioMapping2_t		  DioMapping2;		   
-						
-	Version_t			  Version;				
-								   
-	Tcxo_t				  Tcxo; 			   
-	PaDac_t 			  PaDac;			   
-	FormerTemp_t		  FormerTemp;		   
-	AgcRef_t			  AgcRef;			   
-	AgcThresh1_t		  AgcThresh1;		   
-	AgcThresh2_t		  AgcThresh2;		   
-	AgcThresh3_t		  AgcThresh3;  
+	FifoAddrPtr_t		  s_FifoAddrPtr;			 
+	FifoTxBaseAddr_t	  s_FifoTxBaseAddr;		
+	FifoRxBaseAddr_t	  s_FifoRxBaseAddr;		
+	FifoRxCurrentaddr_t   s_FifoRxCurrentaddr;	
+	IrqFlagsMask_t		  s_IrqFlagsMask; 		
+	IrqFlags_t			  s_IrqFlags; 			
+	RxNbBytes_t 		  s_RxNbBytes;		   
+	RxHeaderCntValueMsb_t  s_RxHeaderCntValueMsb; 
+	RxHeaderCntValueLsb_t  s_RxHeaderCntValueLsb; 
+	RxPacketCntValueMsb_t  s_RxPacketCntValueMsb; 
+	RxPacketCntValueLsb_t  s_RxPacketCntValueLsb;	
+	ModemStat_t 		  s_ModemStat;		   
+	PktSnrValue_t		  s_PktSnrValue;			
+	PktRssiValue_t		  s_PktRssiValue;		   
+	RssiValue_t 		  s_RssiValue;			
+	HopChannel_t		  s_HopChannel;		   
+	ModemConfig1_t		  s_ModemConfig1; 	  
+	ModemConfig2_t		  s_ModemConfig2; 	  
+	SymbTimeoutLsb_t	  s_SymbTimeoutLsb;	   
+	PreambleMsb_t		  s_PreambleMsb;		   
+	PreambleLsb_t		  s_PreambleLsb;		   
+	PayloadLength_t 	  s_PayloadLength;	   
+	MaxPayloadLength_t	  s_MaxPayloadLength;    
+	HopPeriod_t 		  s_HopPeriod;		   
+	FifoRxByteAddr_t	  s_FifoRxByteAddr;		
+	ModemConfig3_t		  s_ModemConfig3; 
+	SyncWord_t 			  s_SyncWord;	
+	
+	DioMapping1_t		  s_DioMapping1;		   
+	DioMapping2_t		  s_DioMapping2;		   						
+	Version_t			  s_Version;												   
+	Tcxo_t				  s_Tcxo; 			   
+	PaDac_t 			  s_PaDac;			   
+	FormerTemp_t		  s_FormerTemp;		   
+	AgcRef_t			  s_AgcRef;			   
+	AgcThresh1_t		  s_AgcThresh1;		   
+	AgcThresh2_t		  s_AgcThresh2;		   
+	AgcThresh3_t		  s_AgcThresh3;  
 
 } SX1276_T;
 
@@ -592,6 +608,8 @@ uint8_t SPI_Read(uint8_t reg);
 void SPI_Write(uint8_t reg, uint8_t cmd);
 void SX1276_Write(uint8_t * sx1276, uint8_t cmd);
 uint8_t SX1276_Read(uint8_t * sx1276);
+void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length);
+void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length);
 
 /*  			function end  			*/
 extern SX1276_T m_sx1276;

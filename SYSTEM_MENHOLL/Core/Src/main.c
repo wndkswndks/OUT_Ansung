@@ -146,9 +146,6 @@ int main(void)//uuuuyyyygggg
   #else
 
 	
-  //tmp = SX1276_Read(m_sx1276.AgcThresh3.AgcThresh3);
-
-
   #endif
 
 

@@ -5,41 +5,54 @@
 
 SX1276_T m_sx1276 = 
 {
+//	Fifo_t				  s_Fifo;
 {{0x00, 					RegFifo, 				MASK_8, MOVE_BIT_0}},//Fifo[4];
 
+//	OpMode_t			  s_OpMode;				
 {{FSK_OOK_MODE, 		   	RegOpMode, 				MASK_1, MOVE_BIT_7},//LongRangeMode[4];
  {ACCESS_LORA_PAGE, 		RegOpMode, 				MASK_1, MOVE_BIT_6},//AccessSharedReg[4];
  {LOW_FREQ_MODE, 			RegOpMode, 				MASK_1, MOVE_BIT_3},//LowFrequencyModeOn[4];
  {MODE_STDBY, 				RegOpMode, 				MASK_3, MOVE_BIT_0}},//Mode[4];
 
-
+//	FrMsb_t 			  s_FrMsb;	
 {{0x6c, 					RegFrMsb, 				MASK_8, MOVE_BIT_0}},//FrfMsb[4];
 
+//	FrMid_t 			  s_FrMid;	
 {{0x80, 					RegFrMid, 				MASK_8, MOVE_BIT_0}}, //FrfMid[4];
 
+//	FrLsb_t 			  s_FrLsb;	
 {{0x00, 					RegFrLsb, 				MASK_8, MOVE_BIT_0}}, //FrfLsb[4];
 
-{{PA_BOOST, 				RegPaConfig, 			MASK_1, MOVE_BIT_7}, //PaSelect[4];
+//	PaConfig_t			  s_PaConfig; 		   
+{{RFO_PIN, 					RegPaConfig, 			MASK_1, MOVE_BIT_7}, //PaSelect[4];
  {0x04, 					RegPaConfig, 			MASK_3, MOVE_BIT_4}, //MaxPower[4];
  {0x0f, 					RegPaConfig, 			MASK_4, MOVE_BIT_0}}, //OutputPower[4];
 
+//	PaRamp_t			  s_PaRamp;	
 {{US40, 					RegPaRamp, 				MASK_4, MOVE_BIT_0}}, //PaRamp[4];
 
+//	Ocp_t				  s_Ocp;
 {{OCP_ENABLE, 				RegOcp, 				MASK_1, MOVE_BIT_5}, //OcpOn[4];
  {0x0b, 					RegOcp, 				MASK_5, MOVE_BIT_0}}, //OcpTrim[4];
 
+//	Lna_t				  s_Lna;
 {{G1, 						RegLna, 				MASK_3, MOVE_BIT_5}, //LnaGain[4];
  {0x00, 					RegLna, 				MASK_2, MOVE_BIT_3}, //LnaBoostLf[4];
  {DEFAULT_LNA_CURRENT, 		RegLna, 				MASK_2, MOVE_BIT_0}}, //LnaBoostHf[4];
 
+//	FifoAddrPtr_t		  s_FifoAddrPtr;
 {{0x00, 					RegFifoAddrPtr, 		MASK_8, MOVE_BIT_0}}, //FifoAddrPtr[4];
 
+//	FifoTxBaseAddr_t	  s_FifoTxBaseAddr;	
 {{0x80, 					RegFifoTxBaseAddr, 		MASK_8, MOVE_BIT_0}}, //FifoTxBaseAddr[4];
 
+//	FifoRxBaseAddr_t	  s_FifoRxBaseAddr;
 {{0x00, 					RegFifoRxBaseAddr, 		MASK_8, MOVE_BIT_0}}, //FifoRxBaseAddr[4];
 
+//	FifoRxCurrentaddr_t   s_FifoRxCurrentaddr;	
 {{0x00, 					RegFifoRxCurrentaddr, 	MASK_8, MOVE_BIT_0}}, //FifoRxCurrentAddr[4];
 
+//	IrqFlagsMask_t		  s_IrqFlagsMask; 
 {{0x00, 					RegIrqFlagsMask, 		MASK_1, MOVE_BIT_7}, //RxTimeoutMask[4];
  {0x00, 					RegIrqFlagsMask, 		MASK_1, MOVE_BIT_6}, //RxDoneMask[4];
  {0x00, 					RegIrqFlagsMask, 		MASK_1, MOVE_BIT_5}, //PayloadCrcErrorMask[4];
@@ -49,6 +62,7 @@ SX1276_T m_sx1276 =
  {0x00, 					RegIrqFlagsMask, 		MASK_1, MOVE_BIT_1}, //FhssChangeChannelMask[4
  {0x00, 					RegIrqFlagsMask, 		MASK_1, MOVE_BIT_0}}, //CadDetectedMask[4];
 
+//	IrqFlags_t			  s_IrqFlags; 	
 {{0x00, 					RegIrqFlags, 			MASK_1, MOVE_BIT_7}, //RxTimeout[4];
  {0x00, 					RegIrqFlags, 			MASK_1, MOVE_BIT_6}, //RxDone[4];
  {0x00, 					RegIrqFlags, 			MASK_1, MOVE_BIT_5}, //PayloadCrcError[4];
@@ -58,73 +72,114 @@ SX1276_T m_sx1276 =
  {0x00, 					RegIrqFlags, 			MASK_1, MOVE_BIT_1}, //FhssChangeChannel[4];
  {0x00, 					RegIrqFlags, 			MASK_1, MOVE_BIT_0}}, //CadDetected[4];
 
-{{0x00, 					RegRxNbBytes, 			 MASK_8, MOVE_BIT_0}}, //FifoRxBytesNb[4];
+//	RxNbBytes_t 		  s_RxNbBytes;	
+{{0x00, 					RegRxNbBytes, 			MASK_8, MOVE_BIT_0}}, //FifoRxBytesNb[4];
 
-{{0x00, 					RegRxHeaderCntValueMsb,  MASK_8, MOVE_BIT_0}}, //ValidHeaderCntMsb[4];
+//	RxHeaderCntValueMsb_t  s_RxHeaderCntValueMsb; 
+{{0x00, 					RegRxHeaderCntValueMsb, MASK_8, MOVE_BIT_0}}, //ValidHeaderCntMsb[4];
 
+//	RxHeaderCntValueLsb_t  s_RxHeaderCntValueLsb; 
 {{0x00, 					RegRxHeaderCntValueLsb,  MASK_8, MOVE_BIT_0}}, //ValidHeaderCntLsb[4];
 
+//	RxPacketCntValueMsb_t  s_RxPacketCntValueMsb; 
 {{0x00, 					RegRxPacketCntValueMsb,  MASK_8, MOVE_BIT_0}}, //ValidPacketCntMsb[4];
 
+//	RxPacketCntValueLsb_t  s_RxPacketCntValueLsb;	
 {{0x00, 					RegRxPacketCntValueLsb,  MASK_8, MOVE_BIT_0}}, //ValidPacketCntLsb[4];
 
-{{0x00, 					RegModemStat, 			MASK_3, MOVE_BIT_5}, //RxCodingRate[4];
- {0x00, 					RegModemStat, 			MASK_5, MOVE_BIT_0}}, //ModemStatus[4];
+//	ModemStat_t 		  s_ModemStat;	
+{{0x00, 					RegModemStat, 			 MASK_3, MOVE_BIT_5}, //RxCodingRate[4];
+ {0x01, 				 	RegModemStat,			 MASK_1, MOVE_BIT_4},//
+ {0x00, 				 	RegModemStat,			 MASK_1, MOVE_BIT_3},//
+ {0x00, 				 	RegModemStat,			 MASK_1, MOVE_BIT_2},
+ {0x00, 				 	RegModemStat,			 MASK_1, MOVE_BIT_1},
+ {0x00, 					RegModemStat, 			 MASK_1, MOVE_BIT_0}}, //ModemStatus[4];
 
+//	PktSnrValue_t		  s_PktSnrValue;
 {{0x00, 					RegPktSnrValue, 		MASK_8, MOVE_BIT_0}}, //PacketSnr[4];
 
+//	PktRssiValue_t		  s_PktRssiValue;	
 {{0x00, 					RegPktRssiValue, 		MASK_8, MOVE_BIT_0}}, //PacketRssi[4];
 
-{0x00, 						RegRssiValue_, 			MASK_8, MOVE_BIT_0}, //Rssi[4];
+//	RssiValue_t 		  s_RssiValue;	
+{{0x00, 					RegRssiValue_, 			MASK_8, MOVE_BIT_0}}, //Rssi[4];
 
-{{PLL_DID_NOT_LOCK, 		RegHopChannel, 			MASK_1, MOVE_BIT_7}, //PllTimeout[4];
- {HEADER_CRC_ON, 			RegHopChannel, 			MASK_1, MOVE_BIT_6}, //CrcOnPayload
+//	HopChannel_t		  s_HopChannel;	
+{{PLL_DID_LOCK, 			RegHopChannel, 			MASK_1, MOVE_BIT_7}, //PllTimeout[4];
+ {HEADER_CRC_OFF, 			RegHopChannel, 			MASK_1, MOVE_BIT_6}, //CrcOnPayload
  {0x00, 					RegHopChannel, 			MASK_6, MOVE_BIT_0}}, //FhssPresentChannel[4];
 
+//	ModemConfig1_t		  s_ModemConfig1;
 {{KHZ_125, 					RegModemConfig1, 		MASK_4, MOVE_BIT_4}, //Bw[4];
  {RATE_4_5, 				RegModemConfig1, 		MASK_3, MOVE_BIT_1}, //CodingRate[4];
  {EXPLICIT_HEADER_MODE, 	RegModemConfig1, 		MASK_1, MOVE_BIT_0}}, //ImplicitHeaderModeOn[4]
 
+//	ModemConfig2_t		  s_ModemConfig2; 
 {{SF_07, 					RegModemConfig2, 		MASK_4, MOVE_BIT_4}, //SpreadingFactor[4];
  {NORMAL_MODE, 				RegModemConfig2, 		MASK_1, MOVE_BIT_3}, //TxContinuousMode[4];
- {CRC_ENABLE, 				RegModemConfig2, 		MASK_1, MOVE_BIT_2}, //RxPayloadCrcOn[4];
+ {CRC_DISABLE, 				RegModemConfig2, 		MASK_1, MOVE_BIT_2}, //RxPayloadCrcOn[4];
  {0x00, 					RegModemConfig2,		MASK_2, MOVE_BIT_0}}, //SymbTimeoutMsB[4];
 
+//	SymbTimeoutLsb_t	  s_SymbTimeoutLsb;
 {{0x64, 					RegSymbTimeoutLsb, 		MASK_8, MOVE_BIT_0}}, //SymbTimeoutLsb[4];
 
+//	PreambleMsb_t		  s_PreambleMsb;
 {{0x00, 					RegPreambleMsb, 		MASK_8, MOVE_BIT_0}}, //PreambleLengthMsb[4];
 
+//	PreambleLsb_t		  s_PreambleLsb;
 {{0x08, 					RegPreambleLsb, 		MASK_8, MOVE_BIT_0}}, //PreambleLengthLsb[4];
 
+//	PayloadLength_t 	  s_PayloadLength;	 
 {{0x01, 					RegPayloadLength, 		MASK_8, MOVE_BIT_0}}, //PayloadLength[4];
 
+//	MaxPayloadLength_t	  s_MaxPayloadLength; 
 {{0xff, 					RegMaxPayloadLength, 	MASK_8, MOVE_BIT_0}}, //PayloadMaxLength[4];
 
+//	HopPeriod_t 		  s_HopPeriod;		  
 {{0x00, 					RegHopPeriod, 			MASK_8, MOVE_BIT_0}}, //FreqHoppingPeriod[4];
 
+//	FifoRxByteAddr_t	  s_FifoRxByteAddr;	
 {{0x00, 					RegFifoRxByteAddr, 		MASK_8, MOVE_BIT_0}}, //FifoRxByteAddrPtr[4];
 
+//	ModemConfig3_t		  s_ModemConfig3; 
 {{OPTIMIZE_DISABLE, 		RegModemConfig3, 		MASK_1, MOVE_BIT_3}, //LowDataRateOptimize[4];
  {LNA_GAIN, 				RegModemConfig3, 		MASK_1, MOVE_BIT_2}}, //AgcAutoOn[4];
 
-{{0x00, 					RegDioMapping1, 			MASK_8, MOVE_BIT_0}},
-{{0x00, 					RegDioMapping2, 			MASK_8, MOVE_BIT_0}},  
+//	SyncWord_t 			  s_SyncWord;
+{{0x12, 					RegSyncWord_, 			MASK_8, MOVE_BIT_0}}, //SyncWord[4];
 
-{{0x12, 					RegVersion, 				MASK_8, MOVE_BIT_0}},        
+//	DioMapping1_t		  s_DioMapping1;
+{{0x00, 					RegDioMapping1, 		MASK_2, MOVE_BIT_6},//uint8_t Dio0[4];
+{0x00, 						RegDioMapping1, 		MASK_2, MOVE_BIT_4},//uint8_t Dio1[4];
+{0x00, 						RegDioMapping1, 		MASK_2, MOVE_BIT_2},//uint8_t Dio2[4];
+{0x00, 						RegDioMapping1, 		MASK_2, MOVE_BIT_0}},//uint8_t Dio3[4];
 
-{{CRYSTAL, 					RegTcxo, 				MASK_1, MOVE_BIT_4}},
+//	DioMapping2_t		  s_DioMapping2;
+{{0x00, 					RegDioMapping2, 		MASK_8, MOVE_BIT_0}}, //uint8_t DioMapping2[4];
 
-{{PA_DAC_DEFAULT, 			RegPaDac ,				MASK_3, MOVE_BIT_0}},       
+//	Version_t			  s_Version;
+{{0x12, 					RegVersion, 			MASK_8, MOVE_BIT_0}},//uint8_t Version[4];      
 
-{{0x00, 					RegFormerTemp, 			MASK_8, MOVE_BIT_0}},   
+//	Tcxo_t				  s_Tcxo; 
+{{CRYSTAL, 					RegTcxo, 				MASK_1, MOVE_BIT_4}}, //uint8_t Tcxo[4];
 
-{{0x13, 					RegAgcRef, 				MASK_6, MOVE_BIT_0}},     
+//	PaDac_t 			  s_PaDac;	
+{{PA_DAC_DEFAULT, 			RegPaDac ,				MASK_3, MOVE_BIT_0}},//uint8_t PaDac[4];      
 
-{{0x0e, 					RegAgcThresh1, 			MASK_8, MOVE_BIT_0}},    
+//	FormerTemp_t		  s_FormerTemp;	
+{{0x00, 					RegFormerTemp, 			MASK_8, MOVE_BIT_0}}, //uint8_t FormerTemp[4];
 
-{{0x5b, 					RegAgcThresh2, 			MASK_8, MOVE_BIT_0}},   
+//	AgcRef_t			  s_AgcRef;
+{{0x13, 					RegAgcRef, 				MASK_6, MOVE_BIT_0}},//uint8_t AgcRef[4];     
 
-{{0xdb, 					RegAgcThresh3, 			MASK_8, MOVE_BIT_0}}    
+//	AgcThresh1_t		  s_AgcThresh1;	
+{{0x0e, 					RegAgcThresh1, 			MASK_8, MOVE_BIT_0}},//uint8_t AgcThresh1[4];    
+
+//	AgcThresh2_t		  s_AgcThresh2;	
+{{0x5b, 					RegAgcThresh2, 			MASK_8, MOVE_BIT_0}},//uint8_t AgcThresh2[4];   
+
+//	AgcThresh3_t		  s_AgcThresh3;  
+{{0xdb, 					RegAgcThresh3, 			MASK_8, MOVE_BIT_0}}//uint8_t AgcThresh3[4];    
 };
 
 
@@ -175,6 +230,26 @@ void SX1276_Write(uint8_t * sx1276, uint8_t cmd)
 	sx1276[VALUE_E] = cmd;
 
 }
+
+void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length)
+{
+	uint8_t reg = sx1276[REGISTER_E];
+
+	if(length<=1)return;
+	
+	SPI_NSS_RESET;
+	HAL_SPI_Transmit(&hspi2, &reg, 1, 1000);
+	while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
+	
+	for(int i =0 ;i < length;i++)
+	{
+		HAL_SPI_Transmit(&hspi2, txBuff+i, 1, 1000);
+		while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
+	}
+
+	SPI_NSS_SET;
+}
+
 uint8_t SX1276_Read(uint8_t * sx1276)
 {
 	uint8_t rxByte = 0x00;
@@ -190,4 +265,41 @@ uint8_t SX1276_Read(uint8_t * sx1276)
 	
 }
 
+void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
+{
+	uint8_t reg = sx1276[REGISTER_E];
 
+	if(length<=1)return;
+	
+	SPI_NSS_RESET;
+	HAL_SPI_Transmit(&hspi2, &reg, 1, 1000);
+	while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
+	
+	for(int i =0 ;i < length;i++)
+	{
+		HAL_SPI_TransmitReceive(&hspi2, rxBuff+i, 1, 1000);
+		while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
+	}
+
+	SPI_NSS_SET;
+}
+
+void SX1276_Init(uint64_t frequency)
+{
+	RESET_SX1276;
+
+	SX1276_Write(m_sx1276.s_OpMode.Mode,MODE_SLEEP);///
+	HAL_Delay(15);
+	SX1276_Write(m_sx1276.s_OpMode.LongRangeMode,LORA_MODE);///
+	SX1276_Write(m_sx1276.s_OpMode.LowFrequencyModeOn,LOW_FREQ_MODE);///
+
+	uint64_t freq = ((uint64_t)frequency << 19) / 32000000;
+	uint8_t freq_reg[3];
+	freq_reg[0] = (uint8_t) (freq >> 16);
+	freq_reg[1] = (uint8_t) (freq >> 8);
+	freq_reg[2] = (uint8_t) (freq >> 0);
+	SX1276_BurstWrite(m_sx1276.s_FrMsb.FrfMsb, freq_reg, 3);///
+
+	
+	
+}
