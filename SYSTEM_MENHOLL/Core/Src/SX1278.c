@@ -128,7 +128,7 @@ void SX1278_entryLoRa(SX1278_t *module) {
 }
 
 void SX1278_clearLoRaIrq(SX1278_t *module) {
-	//SX1278_SPIWrite(module, LR_RegIrqFlags, 0xFF);
+	SX1278_SPIWrite(module, LR_RegIrqFlags, 0xFF);
 }
 
 int SX1278_LoRaEntryRx(SX1278_t *module, uint8_t length, uint32_t timeout) {
