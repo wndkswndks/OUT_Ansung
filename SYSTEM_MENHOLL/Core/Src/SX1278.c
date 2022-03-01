@@ -113,7 +113,7 @@ void SX1278_config(SX1278_t *module) {
 	if(master)
 	{
 		SX1278_SPIWrite(module, REG_LR_PADAC, 0x87);	//Tx for 20dBm
-		SX1278_SPIWrite(module, LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
+		//SX1278_SPIWrite(module, LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
 		SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x41); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
 		SX1278_SPIWrite(module, LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
 	}
@@ -121,7 +121,7 @@ void SX1278_config(SX1278_t *module) {
 	{
 
 		SX1278_SPIWrite(module, REG_LR_PADAC, 0x84);	//Normal and RX
-		SX1278_SPIWrite(module, LR_RegHopPeriod, 0xFF);	//No FHSS
+		//SX1278_SPIWrite(module, LR_RegHopPeriod, 0xFF);	//No FHSS
 		SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x01);//DIO=00,DIO1=00,DIO2=00, DIO3=01
 		SX1278_SPIWrite(module, LR_RegIrqFlagsMask, 0x3F);//Open RxDone interrupt & Timeout
 	}
@@ -153,13 +153,8 @@ int SX1278_LoRaEntryRx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 
 	module->packetLength = length;
 
-	//SX1278_config(module);		//Setting base parameter
-	//SX1278_SPIWrite(module, REG_LR_PADAC, 0x84);	//Normal and RX
-	//SX1278_SPIWrite(module, LR_RegHopPeriod, 0xFF);	//No FHSS
-	//SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x01);//DIO=00,DIO1=00,DIO2=00, DIO3=01
-	//SX1278_SPIWrite(module, LR_RegIrqFlagsMask, 0x3F);//Open RxDone interrupt & Timeout
 	SX1278_clearLoRaIrq(module);
-	//SX1278_SPIWrite(module, LR_RegPayloadLength, length);//Payload Length 21byte(this register must difine when the data long of one byte in SF is 6)
+	
 	addr = SX1278_SPIRead(module, LR_RegFifoRxBaseAddr); //Read RxBaseAddr
 	SX1278_SPIWrite(module, LR_RegFifoAddrPtr, addr); //RxBaseAddr->FiFoAddrPtr
 	SX1278_SPIWrite(module, LR_RegOpMode, 0x8d);	//Mode//Low Frequency Mode
@@ -209,12 +204,8 @@ int SX1278_LoRaEntryTx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 
 	module->packetLength = length;
 
-	//SX1278_config(module); //setting base parameter
-	//SX1278_SPIWrite(module, REG_LR_PADAC, 0x87);	//Tx for 20dBm
-	//SX1278_SPIWrite(module, LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
-	//SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x41); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
+
 	SX1278_clearLoRaIrq(module);
-	//SX1278_SPIWrite(module, LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
 	SX1278_SPIWrite(module, LR_RegPayloadLength, length); //RegPayloadLength 21byte
 	addr = SX1278_SPIRead(module, LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
 	SX1278_SPIWrite(module, LR_RegFifoAddrPtr, addr); //RegFifoAddrPtr
