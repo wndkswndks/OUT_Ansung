@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "SX1278.h"
+#include "sx1276.h"
 
 /* USER CODE END Includes */
 
@@ -64,7 +65,7 @@ char buffer[512];
 
 int message;
 int message_length;
-
+ 
 uint8_t tmp = 0;
 
 /* USER CODE END PV */
@@ -144,9 +145,27 @@ int main(void)//uuuuyyyygggg//
   }
 
   #else
+  
+  SPI_NSS_SET;
+  SET_SX1276;
+  SPI_Write(0x01,0x89);
+uint8_t txByte = 0;
 
-	
+
+ tmp = SPI_Read(0x06);
+
+ SX1276_Byte_Write(0x06, 0x44);
+
+ //tmp = SX1276_Read(m_sx1276.s_ModemConfig1.Bw);
+ tmp = SPI_Read(0x06);
+
+
+
+			
+
+
   #endif
+
 
 
   /* USER CODE END 2 */
