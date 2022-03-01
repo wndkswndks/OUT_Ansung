@@ -119,9 +119,10 @@ void SX1278_config(SX1278_t *module) {
 	}
 	else
 	{
-		SX1278_SPIWrite(module, REG_LR_PADAC, 0x87);	//Tx for 20dBm
-		SX1278_SPIWrite(module, LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
-		SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x41); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
+
+		SX1278_SPIWrite(module, REG_LR_PADAC, 0x84);	//Normal and RX
+		SX1278_SPIWrite(module, LR_RegHopPeriod, 0xFF);	//No FHSS
+		SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x01);//DIO=00,DIO1=00,DIO2=00, DIO3=01
 		SX1278_SPIWrite(module, LR_RegIrqFlagsMask, 0x3F);//Open RxDone interrupt & Timeout
 	}
 	
