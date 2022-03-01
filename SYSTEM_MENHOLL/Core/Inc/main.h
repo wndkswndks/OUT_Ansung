@@ -61,6 +61,10 @@ void Error_Handler(void);
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI15_10_IRQn
+#define DIP_OUT_Pin GPIO_PIN_2
+#define DIP_OUT_GPIO_Port GPIOC
+#define DIP_IN_Pin GPIO_PIN_3
+#define DIP_IN_GPIO_Port GPIOC
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3

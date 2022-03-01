@@ -99,7 +99,11 @@
 #define SET_SX1276		HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_SET); 
 
 
+#define GET_IO0			HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin); 
 
+#define ALL_IRQ_CLEAR	0xFF
+#define OPEN_TXDONE_IRQ	0xF7
+#define OPEN_RXDONE_IRQ	0x3F
 
 
 
@@ -193,8 +197,8 @@ typedef enum
 
 typedef enum
 {
-	DEFAULT_LNA_CURRENT,
-	BOOST_ON_150_LNA_CURRENT,
+	DEFAULT_LNA_CURRENT = 0,
+	BOOST_ON_150_LNA_CURRENT = 11,
 } LnaBoostHf_E;
 
 typedef enum
@@ -299,10 +303,14 @@ typedef enum
 
 typedef enum
 {
-	PA_DAC_DEFAULT = 0x04,
-	PA_DAC_BOOST = 0x07,
+	PA_DAC_DEFAULT = 0x84,
+	PA_DAC_BOOST = 0x87,
 } PaDac_E;
-
+typedef enum
+{
+	RX_DONE,
+	TX_DONE,
+}DioMapping1_E;
 	
 /*  			enum end  				*/
 
@@ -616,6 +624,10 @@ uint8_t SX1276_Read(uint8_t * sx1276);
 void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length);
 void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length);
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum);
+void HW_Reset();
+uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut);
+uint8_t SX1276_RX_Entry(uint32_t timeOut);
+
 
 /*  			function end  			*/
 

@@ -3,6 +3,7 @@
 #include "sx1276.h"
 #include "main.h"
 
+extern int master;
 SX1276_T m_sx1276 = 
 {
 //	Fifo_t				  s_Fifo;
@@ -164,7 +165,7 @@ SX1276_T m_sx1276 =
 {{CRYSTAL, 					RegTcxo, 				MASK_1, MOVE_BIT_4}}, //uint8_t Tcxo[4];
 
 //	PaDac_t 			  s_PaDac;	
-{{PA_DAC_DEFAULT, 			RegPaDac ,				MASK_3, MOVE_BIT_0}},//uint8_t PaDac[4];      
+{{PA_DAC_DEFAULT, 			RegPaDac ,				MASK_7, MOVE_BIT_0}},//uint8_t PaDac[4];      
 
 //	FormerTemp_t		  s_FormerTemp;	
 {{0x00, 					RegFormerTemp, 			MASK_8, MOVE_BIT_0}}, //uint8_t FormerTemp[4];
@@ -333,7 +334,6 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 
 	//RegLna
 	SX1276_Segment_Write(m_sx1276.s_Lna.LnaGain,G1);
-	SX1276_Segment_Write(m_sx1276.s_Lna.LnaBoostLf,0x00);
 	SX1276_Segment_Write(m_sx1276.s_Lna.LnaBoostHf,BOOST_ON_150_LNA_CURRENT);
 
 	//RegModemConfig1	
@@ -343,24 +343,30 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 
 	//RegModemConfig2
 	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF);
-	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.TxContinuousMode, NORMAL_MODE);
 	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_sum);
-	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SymbTimeoutMsB,0x00);
 
 	//RegModemConfig3
-	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE);
-	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.AgcAutoOn,AGC_GAIN);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE); // 이건 시간 계산해서 넘으면 넣자
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.AgcAutoOn,AGC_GAIN); //오토? 아까는 g1왜 설정 했는데...
 
 	//RegSymbTimeoutLsb
-	SX1276_Segment_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08);
-	//RegPreambleMsb
-	SX1276_Segment_Write(m_sx1276.s_PreambleMsb.PreambleLengthMsb,0x00);
-	//RegPreambleLsb
-	SX1276_Segment_Write(m_sx1276.s_PreambleLsb.PreambleLengthLsb,0x08);
-	//RegDioMapping2
-	SX1276_Segment_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;
+	SX1276_Segment_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08); // rx 컨티어니서스 할꺼면 안쓴다 
+	SX1276_Segment_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;// 근데 이건 왜넣은거야? IO4 쓰지도 않으면서
 
-	//Reg
+	if(master)
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
+	}
+	else
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_DEFAULT);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,RX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_RXDONE_IRQ);
+	}
+
+	//RegOpMode
 	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);///
 }
 
@@ -368,85 +374,69 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 {
 	uint8_t addr = 0;
 	uint8_t temp = 0;
-	uint8_t txByte = 0;
-	//SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);//init 안하고 해보자 
 	
-	SX1276_Segment_Write(m_sx1276.s_PaConfig.PaSelect,0x01);
-	SX1276_Segment_Write(m_sx1276.s_PaConfig.MaxPower,0x00);
-	SX1276_Segment_Write(m_sx1276.s_PaConfig.OutputPower,0x07);
-	
-	SX1276_Segment_Write(m_sx1276.s_HopPeriod.FreqHoppingPeriod,0x00);
-	
-	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,0x01);
-	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio1,0x00);
-	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio2,0x00);
-	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio3,0x01);
-
-//==========================================================
-
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.RxTimeout, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.RxDone, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.PayloadCrcError, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.ValidHeader, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.TxDone, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.CadDone, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.FhssChangeChannel, 0x01, &txByte);
-	SX1276_Gather_segment(m_sx1276.s_IrqFlags.CadDetected, 0x01, &txByte);
-	SX1276_Byte_Write(RegIrqFlags, txByte);
-	txByte = 0;
-	
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.RxTimeout,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.RxDone,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.PayloadCrcError,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.ValidHeader,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.TxDone,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.CadDone,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.FhssChangeChannel,0x01);
-//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.CadDetected,0x01);
-//==========================================================
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.RxTimeoutMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.RxDoneMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.PayloadCrcErrorMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.ValidHeaderMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.TxDoneMask,0x00);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.CadDoneMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.FhssChangeChannelMask,0x01);
-	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.CadDetectedMask,0x01);
-//==========================================================	
+	SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
 
 	SX1276_Segment_Write(m_sx1276.s_PayloadLength.PayloadLength,length);
 
-	addr = SX1276_Read(m_sx1276.s_FifoTxBaseAddr.FifoTxBaseAddr);
-		
+	addr = SX1276_Read(m_sx1276.s_FifoTxBaseAddr.FifoTxBaseAddr);	
 	SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
 
 	while(1)
 	{
-		temp = SX1276_Read(m_sx1276.s_PayloadLength.PayloadLength);
+		temp = SX1276_Read(m_sx1276.s_PayloadLength.PayloadLength); //이짓을 왜하지? 당연한거 아님?
 		if(temp == length) return 1;
 
-		timeOut--;
+		timeOut--; // 이건 따로 타이머가 없기때문에 에지게 빨리 사라질것같다
 		
 		if(timeOut == 0)
 		{
-			SPI_NSS_SET;
-			RESET_SX1276;
-			HAL_Delay(1);
-			SET_SX1276;
-			HAL_Delay(100);			
-			//SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);//init 안하고 해보자
+			HW_Reset();	
+			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
+			return 0;
 		}
 	}
 
 	
 }
-void SX1276_RX_Entry(uint8_t length, uint32_t timeOut)
+uint8_t SX1276_RX_Entry(uint32_t timeOut)
 {
-	
+	uint8_t addr = 0;
+	SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
+
+	addr = SX1276_Read(m_sx1276.s_FifoRxBaseAddr.FifoRxBaseAddr);	
+	SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
+
+	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_RXCONTINUOUS); // 잘기억해 
+
+	while(1)
+	{
+		if(SX1276_Read(m_sx1276.s_ModemStat.RX_on_going) == 1)
+		{
+			return 1;
+		}
+		
+		timeOut--; // 이건 따로 타이머가 없기때문에 에지게 빨리 사라질것같다
+		
+		if(timeOut == 0)
+		{
+			HW_Reset();		
+			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			return 0;
+		}
+		HAL_Delay(1);
+	}
 }
 
 
-
+void HW_Reset()
+{
+	SPI_NSS_SET;
+	RESET_SX1276;
+	HAL_Delay(1);
+	SET_SX1276;
+	HAL_Delay(100);	
+}
 
 
 
