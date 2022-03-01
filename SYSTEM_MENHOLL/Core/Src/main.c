@@ -31,7 +31,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-//#define ORG_ROLA
+#define ORG_ROLA
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
