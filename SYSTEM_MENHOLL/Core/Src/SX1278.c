@@ -136,7 +136,7 @@ int SX1278_LoRaEntryRx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 
 	module->packetLength = length;
 
-	SX1278_config(module);		//Setting base parameter
+	//SX1278_config(module);		//Setting base parameter
 	SX1278_SPIWrite(module, REG_LR_PADAC, 0x84);	//Normal and RX
 	SX1278_SPIWrite(module, LR_RegHopPeriod, 0xFF);	//No FHSS
 	SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x01);//DIO=00,DIO1=00,DIO2=00, DIO3=01
@@ -192,7 +192,7 @@ int SX1278_LoRaEntryTx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 
 	module->packetLength = length;
 
-	SX1278_config(module); //setting base parameter
+	//SX1278_config(module); //setting base parameter
 	SX1278_SPIWrite(module, REG_LR_PADAC, 0x87);	//Tx for 20dBm
 	SX1278_SPIWrite(module, LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
 	SX1278_SPIWrite(module, REG_LR_DIOMAPPING1, 0x41); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
