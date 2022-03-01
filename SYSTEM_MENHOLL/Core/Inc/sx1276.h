@@ -95,7 +95,8 @@
 #define SPI_NSS_RESET	HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_RESET); 
 #define SPI_NSS_SET		HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_SET); 
 
-#define RESET_SX1276	HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_SET); 
+#define RESET_SX1276	HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_RESET); 
+#define SET_SX1276		HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_SET); 
 
 
 
@@ -546,7 +547,7 @@ typedef struct
 
 typedef struct
 {
-	Fifo_t				  s_Fifo;	//0x00
+	Fifo_t				  s_Fifo;//Fifo[4];;	//0x00
 	OpMode_t			  s_OpMode;	//0x01			
 	FrMsb_t 			  s_FrMsb;	//0x06		   
 	FrMid_t 			  s_FrMid;	//0x07		   
@@ -606,7 +607,11 @@ typedef struct
 /*  			function start  		*/
 uint8_t SPI_Read(uint8_t reg);
 void SPI_Write(uint8_t reg, uint8_t cmd);
-void SX1276_Write(uint8_t * sx1276, uint8_t cmd);
+void SX1276_Segment_Write(uint8_t * sx1276, uint8_t cmd);
+void SX1276_Byte_Write(uint8_t reg, uint8_t txByte);
+
+void SX1276_Gather_segment(uint8_t * sx1276, uint8_t cmd, uint8_t *txByte);
+
 uint8_t SX1276_Read(uint8_t * sx1276);
 void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length);
 void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length);

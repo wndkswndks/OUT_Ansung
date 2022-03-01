@@ -214,7 +214,7 @@ void SPI_Write(uint8_t reg, uint8_t cmd)
 }
 
 
-void SX1276_Write(uint8_t * sx1276, uint8_t cmd)
+void SX1276_Segment_Write(uint8_t * sx1276, uint8_t cmd)
 {
 	uint8_t rxByte = 0x00;
 	uint8_t txByte = 0x00;
@@ -230,6 +230,25 @@ void SX1276_Write(uint8_t * sx1276, uint8_t cmd)
 	sx1276[VALUE_E] = cmd;
 
 }
+
+void SX1276_Byte_Write(uint8_t reg, uint8_t txByte)
+{
+	SPI_Write(reg,txByte);
+}
+
+void SX1276_Gather_segment(uint8_t * sx1276, uint8_t cmd, uint8_t *txByte )
+{
+	uint8_t move = sx1276[MOVE_E];
+	uint8_t mask = sx1276[MASK_E];
+	
+	cmd &=mask;
+	*txByte |= (cmd<<move);
+	
+	sx1276[VALUE_E] = cmd;
+}
+
+
+
 
 void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length)
 {
@@ -286,12 +305,13 @@ void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
 
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum)
 {
-	RESET_SX1276;
+	SPI_NSS_SET;
+	SET_SX1276;
 
-	SX1276_Write(m_sx1276.s_OpMode.Mode,MODE_SLEEP);///
+	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_SLEEP);///
 	HAL_Delay(15);
-	SX1276_Write(m_sx1276.s_OpMode.LongRangeMode,LORA_MODE);///
-	SX1276_Write(m_sx1276.s_OpMode.LowFrequencyModeOn,LOW_FREQ_MODE);///
+	SX1276_Segment_Write(m_sx1276.s_OpMode.LongRangeMode,LORA_MODE);///
+	SX1276_Segment_Write(m_sx1276.s_OpMode.LowFrequencyModeOn,LOW_FREQ_MODE);///
 
 	uint64_t freq = ((uint64_t)frequency << 19) / 32000000;
 	uint8_t freq_reg[3];
@@ -300,46 +320,133 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	freq_reg[2] = (uint8_t) (freq >> 0);
 	SX1276_BurstWrite(m_sx1276.s_FrMsb.FrfMsb, freq_reg, 3);///
 
-	SX1276_Write(m_sx1276.s_SyncWord.SyncWord,0x34);
+	SX1276_Segment_Write(m_sx1276.s_SyncWord.SyncWord,0x34);
 
 	//RegPaConfig //17-(15-15) = 17dbm
-	SX1276_Write(m_sx1276.s_PaConfig.PaSelect,PA_BOOST);
-	SX1276_Write(m_sx1276.s_PaConfig.MaxPower,0x07);
-	SX1276_Write(m_sx1276.s_PaConfig.OutputPower,0x0f);
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.PaSelect,PA_BOOST);
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.MaxPower,0x07);
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.OutputPower,0x0f);
 
 	//RegOcp// //CCP DISABLE
-	SX1276_Write(m_sx1276.s_Ocp.OcpOn,OCP_DISABLE);
-	SX1276_Write(m_sx1276.s_Ocp.OcpTrim,0x0b);
+	SX1276_Segment_Write(m_sx1276.s_Ocp.OcpOn,OCP_DISABLE);
+	SX1276_Segment_Write(m_sx1276.s_Ocp.OcpTrim,0x0b);
 
 	//RegLna
-	SX1276_Write(m_sx1276.s_Lna.LnaGain,G1);
-	SX1276_Write(m_sx1276.s_Lna.LnaBoostLf,0x00);
-	SX1276_Write(m_sx1276.s_Lna.LnaBoostHf,BOOST_ON_150_LNA_CURRENT);
+	SX1276_Segment_Write(m_sx1276.s_Lna.LnaGain,G1);
+	SX1276_Segment_Write(m_sx1276.s_Lna.LnaBoostLf,0x00);
+	SX1276_Segment_Write(m_sx1276.s_Lna.LnaBoostHf,BOOST_ON_150_LNA_CURRENT);
 
 	//RegModemConfig1	
-	SX1276_Write(m_sx1276.s_ModemConfig1.Bw,Bw);
-	SX1276_Write(m_sx1276.s_ModemConfig1.CodingRate,CR);
-	SX1276_Write(m_sx1276.s_ModemConfig1.ImplicitHeaderModeOn, EXPLICIT_HEADER_MODE );
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig1.Bw,Bw);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig1.CodingRate,CR);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig1.ImplicitHeaderModeOn, EXPLICIT_HEADER_MODE );
 
 	//RegModemConfig2
-	SX1276_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF);
-	SX1276_Write(m_sx1276.s_ModemConfig2.TxContinuousMode, NORMAL_MODE);
-	SX1276_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_sum);
-	SX1276_Write(m_sx1276.s_ModemConfig2.SymbTimeoutMsB,0x00);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.TxContinuousMode, NORMAL_MODE);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_sum);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SymbTimeoutMsB,0x00);
 
 	//RegModemConfig3
-	SX1276_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE);
-	SX1276_Write(m_sx1276.s_ModemConfig3.AgcAutoOn,AGC_GAIN);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.AgcAutoOn,AGC_GAIN);
 
 	//RegSymbTimeoutLsb
-	SX1276_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08);
+	SX1276_Segment_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08);
 	//RegPreambleMsb
-	SX1276_Write(m_sx1276.s_PreambleMsb.PreambleLengthMsb,0x00);
+	SX1276_Segment_Write(m_sx1276.s_PreambleMsb.PreambleLengthMsb,0x00);
 	//RegPreambleLsb
-	SX1276_Write(m_sx1276.s_PreambleLsb.PreambleLengthLsb,0x08);
+	SX1276_Segment_Write(m_sx1276.s_PreambleLsb.PreambleLengthLsb,0x08);
 	//RegDioMapping2
-	SX1276_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;
+	SX1276_Segment_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;
 
 	//Reg
-	SX1276_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);///
+	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);///
 }
+
+uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
+{
+	uint8_t addr = 0;
+	uint8_t temp = 0;
+	uint8_t txByte = 0;
+	//SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);//init 안하고 해보자 
+	
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.PaSelect,0x01);
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.MaxPower,0x00);
+	SX1276_Segment_Write(m_sx1276.s_PaConfig.OutputPower,0x07);
+	
+	SX1276_Segment_Write(m_sx1276.s_HopPeriod.FreqHoppingPeriod,0x00);
+	
+	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,0x01);
+	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio1,0x00);
+	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio2,0x00);
+	SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio3,0x01);
+
+//==========================================================
+
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.RxTimeout, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.RxDone, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.PayloadCrcError, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.ValidHeader, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.TxDone, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.CadDone, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.FhssChangeChannel, 0x01, &txByte);
+	SX1276_Gather_segment(m_sx1276.s_IrqFlags.CadDetected, 0x01, &txByte);
+	SX1276_Byte_Write(RegIrqFlags, txByte);
+	txByte = 0;
+	
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.RxTimeout,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.RxDone,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.PayloadCrcError,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.ValidHeader,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.TxDone,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.CadDone,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.FhssChangeChannel,0x01);
+//	SX1276_Segment_Write(m_sx1276.s_IrqFlags.CadDetected,0x01);
+//==========================================================
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.RxTimeoutMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.RxDoneMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.PayloadCrcErrorMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.ValidHeaderMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.TxDoneMask,0x00);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.CadDoneMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.FhssChangeChannelMask,0x01);
+	SX1276_Segment_Write(m_sx1276.s_IrqFlagsMask.CadDetectedMask,0x01);
+//==========================================================	
+
+	SX1276_Segment_Write(m_sx1276.s_PayloadLength.PayloadLength,length);
+
+	addr = SX1276_Read(m_sx1276.s_FifoTxBaseAddr.FifoTxBaseAddr);
+		
+	SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
+
+	while(1)
+	{
+		temp = SX1276_Read(m_sx1276.s_PayloadLength.PayloadLength);
+		if(temp == length) return 1;
+
+		timeOut--;
+		
+		if(timeOut == 0)
+		{
+			SPI_NSS_SET;
+			RESET_SX1276;
+			HAL_Delay(1);
+			SET_SX1276;
+			HAL_Delay(100);			
+			//SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);//init 안하고 해보자
+		}
+	}
+
+	
+}
+void SX1276_RX_Entry(uint8_t length, uint32_t timeOut)
+{
+	
+}
+
+
+
+
+
+
