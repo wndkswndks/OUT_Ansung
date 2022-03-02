@@ -67,6 +67,8 @@ int message;
 int message_length;
  
 uint8_t tmp = 0;
+int8_t s_tmp = 0;
+
 
 /* USER CODE END PV */
 
@@ -228,7 +230,11 @@ int main(void)
 		HAL_Delay(800);
 		SX1276_RX_Packet(buffer);
 	}
-	
+
+	SX1276_Read(m_sx1276.s_RssiValue.Rssi);
+	SX1276_Read(m_sx1276.s_PktRssiValue.PacketRssi);
+	tmp = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
+	s_tmp = (int8_t )tmp;
     #endif
 
 

@@ -285,6 +285,8 @@ uint8_t SX1276_Read(uint8_t * sx1276)
 	
 	rxByte &= (mask<<move);
 	rxValue = rxByte >>move;
+
+	sx1276[VALUE_E] = rxValue;
 	return rxValue;
 	
 }
