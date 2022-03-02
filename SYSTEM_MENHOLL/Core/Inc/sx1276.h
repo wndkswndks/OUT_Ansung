@@ -99,8 +99,9 @@
 #define SET_SX1276		HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, GPIO_PIN_SET); 
 
 
-#define GET_IO0			HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin); 
-#define GET_DIP_IN		HAL_GPIO_ReadPin(DIP_IN_GPIO_Port, DIP_IN_Pin); 
+#define GET_IO0				HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin)
+#define GET_DEVICE_SELECT	HAL_GPIO_ReadPin(DIP_IN_GPIO_Port, DIP_IN_Pin)
+
 
 
 #define ALL_IRQ_CLEAR	0xFF
@@ -630,12 +631,15 @@ void SX1276_Byte_Write(uint8_t reg, uint8_t txByte);
 void SX1276_Gather_segment(uint8_t * sx1276, uint8_t cmd, uint8_t *txByte);
 
 uint8_t SX1276_Read(uint8_t * sx1276);
-void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length);
-void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length);
-void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum);
+void SX1276_BurstWrite(uint8_t reg, uint8_t* txBuff, uint8_t length);
+void SX1276_BurstRead(uint8_t reg, uint8_t* rxBuff, uint8_t length);
+void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_enable);
 void HW_Reset();
 uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut);
 uint8_t SX1276_RX_Entry(uint32_t timeOut);
+uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
+void SX1276_RX_Packet(uint8_t* rxBuff);
+
 
 
 /*  			function end  			*/

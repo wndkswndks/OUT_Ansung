@@ -32,7 +32,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define ORG_ROLA
+//#define ORG_ROLA
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -145,24 +145,23 @@ int main(void)
   }
 
   #else
+
   
-  SPI_NSS_SET;
-  SET_SX1276;
-  SPI_Write(0x01,0x89);
-uint8_t txByte = 0;
+  //m_sx1276.device = TX_DEVICE;
 
 
- tmp = SPI_Read(0x06);
-
- SX1276_Byte_Write(0x06, 0x44);
-
- //tmp = SX1276_Read(m_sx1276.s_ModemConfig1.Bw);
- tmp = SPI_Read(0x06);
+  SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
 
 
-
-			
-
+	if(m_sx1276.device == TX_DEVICE)
+	{
+		SX1276_TX_Entry(16, 2000);
+	}
+	else
+	{
+		SX1276_RX_Entry(2000);
+	}
+		
 
   #endif
 
@@ -212,8 +211,24 @@ uint8_t txByte = 0;
 	  }
 
     #else
-//  printf("Mode: iiiMaster\r\n");
-//  HAL_Delay(1000);
+    
+	if(m_sx1276.device == TX_DEVICE)
+	{
+		HAL_Delay(1000);
+		message_length = sprintf(buffer, "Hello %d", message);
+
+		SX1276_TX_Entry(message_length, 2000);
+		
+		SX1276_TX_Packet(buffer,message_length,2000);
+
+		message += 1;
+	}
+	else
+	{
+		HAL_Delay(800);
+		SX1276_RX_Packet(buffer);
+	}
+	
     #endif
 
 

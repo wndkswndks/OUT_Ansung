@@ -255,9 +255,9 @@ void SX1276_Gather_segment(uint8_t * sx1276, uint8_t cmd, uint8_t *txByte )
 
 
 
-void SX1276_BurstWrite(uint8_t * sx1276, uint8_t* txBuff, uint8_t length)
+void SX1276_BurstWrite(uint8_t reg, uint8_t* txBuff, uint8_t length)
 {
-	uint8_t reg = sx1276[REGISTER_E];
+	reg |=0x80;
 
 	if(length<=1)return;
 	
@@ -289,9 +289,9 @@ uint8_t SX1276_Read(uint8_t * sx1276)
 	
 }
 
-void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
+void SX1276_BurstRead(uint8_t reg, uint8_t* rxBuff, uint8_t length)
 {
-	uint8_t reg = sx1276[REGISTER_E];
+
 	uint8_t txByte = 0x00;
 	if(length<=1)return;
 	
@@ -308,9 +308,9 @@ void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
 	SPI_NSS_SET;
 }
 
-void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum)
+void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_enable)
 {
-	if(GET_DIP_IN)
+	if(!GET_DEVICE_SELECT)
 	{
 		m_sx1276.device = TX_DEVICE;
 	}
@@ -332,7 +332,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	freq_reg[0] = (uint8_t) (freq >> 16);
 	freq_reg[1] = (uint8_t) (freq >> 8);
 	freq_reg[2] = (uint8_t) (freq >> 0);
-	SX1276_BurstWrite(m_sx1276.s_FrMsb.FrfMsb, freq_reg, 3);///
+	SX1276_BurstWrite(RegFrMsb, freq_reg, 3);///
 
 	SX1276_Segment_Write(m_sx1276.s_SyncWord.SyncWord,0x34);
 
@@ -356,7 +356,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 
 	//RegModemConfig2
 	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF);
-	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_sum);
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.RxPayloadCrcOn,CRC_enable);
 
 	//RegModemConfig3
 	SX1276_Segment_Write(m_sx1276.s_ModemConfig3.LowDataRateOptimize,OPTIMIZE_DISABLE); // 이건 시간 계산해서 넘으면 넣자
@@ -398,8 +398,10 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 	while(1)
 	{
 		temp = SX1276_Read(m_sx1276.s_PayloadLength.PayloadLength); //이짓을 왜하지? 당연한거 아님?
-		if(temp == length) return 1;
-
+		if(temp == length) 
+		{
+			return 1;
+		}
 		timeOut--; // 이건 따로 타이머가 없기때문에 에지게 빨리 사라질것같다
 		
 		if(timeOut == 0)
@@ -453,6 +455,7 @@ uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut)
 		{
 			SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
 			SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);
+			return 1;
 		}
 		
 		timeOut--;
@@ -468,7 +471,7 @@ uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut)
 	
 }
 
-uint8_t SX1276_RX_Packet(uint8_t* rxBuff, uint8_t lengh)
+void SX1276_RX_Packet(uint8_t* rxBuff)
 {
 	uint8_t addr = 0;
 	uint8_t packet_size = 0;
@@ -480,9 +483,9 @@ uint8_t SX1276_RX_Packet(uint8_t* rxBuff, uint8_t lengh)
 		addr = SX1276_Read(m_sx1276.s_FifoRxCurrentaddr.FifoRxCurrentAddr);	
 		SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
 
-		packet_size = SX1276_Read(m_sx1276.s_RxNbBytes);
+		packet_size = SX1276_Read(m_sx1276.s_RxNbBytes.FifoRxBytesNb);
 
-		SX1276_BurstRead(0x00, rxBuff, packet_size);
+		if(packet_size !=0)SX1276_BurstRead(0x00, rxBuff, packet_size);
 
 		SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
 		
