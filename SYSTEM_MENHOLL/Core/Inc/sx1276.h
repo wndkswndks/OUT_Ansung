@@ -100,11 +100,14 @@
 
 
 #define GET_IO0			HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin); 
+#define GET_DIP_IN		HAL_GPIO_ReadPin(DIP_IN_GPIO_Port, DIP_IN_Pin); 
+
 
 #define ALL_IRQ_CLEAR	0xFF
 #define OPEN_TXDONE_IRQ	0xF7
 #define OPEN_RXDONE_IRQ	0x3F
 
+#define SX1276_MAX_PACKET	256
 
 
 
@@ -114,7 +117,11 @@
 
 
 /*  			enum start  			*/
-
+typedef enum
+{
+	RX_DEVICE,
+	TX_DEVICE,
+} DEVICE_E;
 typedef enum
 {
 	VALUE_E,
@@ -553,6 +560,7 @@ typedef struct
 	uint8_t AgcThresh3[4];
 } AgcThresh3_t;  
 
+
 typedef struct
 {
 	Fifo_t				  s_Fifo;//Fifo[4];;	//0x00
@@ -606,6 +614,7 @@ typedef struct
 	AgcThresh2_t		  s_AgcThresh2;		//0x63 	   
 	AgcThresh3_t		  s_AgcThresh3;  	//0x64 
 
+	DEVICE_E device;
 } SX1276_T;
 
 /*  			stuct end  				*/

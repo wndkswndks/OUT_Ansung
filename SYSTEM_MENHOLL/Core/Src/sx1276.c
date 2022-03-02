@@ -2,8 +2,9 @@
 
 #include "sx1276.h"
 #include "main.h"
+#include <string.h>
 
-extern int master;
+
 SX1276_T m_sx1276 = 
 {
 //	Fifo_t				  s_Fifo;
@@ -180,7 +181,10 @@ SX1276_T m_sx1276 =
 {{0x5b, 					RegAgcThresh2, 			MASK_8, MOVE_BIT_0}},//uint8_t AgcThresh2[4];   
 
 //	AgcThresh3_t		  s_AgcThresh3;  
-{{0xdb, 					RegAgcThresh3, 			MASK_8, MOVE_BIT_0}}//uint8_t AgcThresh3[4];    
+{{0xdb, 					RegAgcThresh3, 			MASK_8, MOVE_BIT_0}},//uint8_t AgcThresh3[4];
+
+RX_DEVICE
+
 };
 
 
@@ -306,6 +310,15 @@ void SX1276_BurstRead(uint8_t * sx1276, uint8_t* rxBuff, uint8_t length)
 
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_sum)
 {
+	if(GET_DIP_IN)
+	{
+		m_sx1276.device = TX_DEVICE;
+	}
+	else
+	{
+		m_sx1276.device = RX_DEVICE;
+	}
+	
 	SPI_NSS_SET;
 	SET_SX1276;
 
@@ -353,13 +366,13 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	SX1276_Segment_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08); // rx 컨티어니서스 할꺼면 안쓴다 
 	SX1276_Segment_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;// 근데 이건 왜넣은거야? IO4 쓰지도 않으면서
 
-	if(master)
+	if(m_sx1276.device == TX_DEVICE)
 	{
 		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
 		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
 	}
-	else
+	else if(m_sx1276.device == RX_DEVICE)
 	{
 		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_DEFAULT);
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,RX_DONE);
@@ -425,6 +438,54 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut)
 			return 0;
 		}
 		HAL_Delay(1);
+	}
+}
+
+
+uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut)
+{
+	SX1276_BurstWrite(0x00, txBuff, lengh);
+	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_TX);
+
+	while(1)
+	{
+		if(GET_IO0)
+		{
+			SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
+			SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);
+		}
+		
+		timeOut--;
+		
+		if(timeOut == 0)
+		{
+			HW_Reset();		
+			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			return 0;
+		}
+		HAL_Delay(1);
+	}
+	
+}
+
+uint8_t SX1276_RX_Packet(uint8_t* rxBuff, uint8_t lengh)
+{
+	uint8_t addr = 0;
+	uint8_t packet_size = 0;
+
+	
+	if(GET_IO0)
+	{
+		memset(rxBuff, 0x00,SX1276_MAX_PACKET);
+		addr = SX1276_Read(m_sx1276.s_FifoRxCurrentaddr.FifoRxCurrentAddr);	
+		SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
+
+		packet_size = SX1276_Read(m_sx1276.s_RxNbBytes);
+
+		SX1276_BurstRead(0x00, rxBuff, packet_size);
+
+		SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
+		
 	}
 }
 
