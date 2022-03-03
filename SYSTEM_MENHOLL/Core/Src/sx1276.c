@@ -515,7 +515,9 @@ void SX1276_Calculrate_SNR_Rssi()
 	int Rssi = 0;
 	uint8_t rssi_row = 0;
 	uint8_t rssi_pkt_tmp = 0;
-	
+
+	rssi_pkt_tmp = SX1276_Read(m_sx1276.s_PktRssiValue.PacketRssi);
+
 	snr_row = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
 	if(snr_row > 127 ) 
 	{
@@ -537,10 +539,9 @@ void SX1276_Calculrate_SNR_Rssi()
 	}
 	else
 	{
-		rssi_pkt_tmp = SX1276_Read(m_sx1276.s_PktRssiValue.PacketRssi);
 		Rssi = -RSSI_LF_CONSTANS + rssi_pkt_tmp + SNR;
 	}
-	
+
 	m_sx1276.observ.Rssi = Rssi;
 	m_sx1276.observ.SNR = SNR;
 	m_sx1276.observ.rowRssi = rssi_row;
