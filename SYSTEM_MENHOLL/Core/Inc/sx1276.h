@@ -569,6 +569,7 @@ typedef struct
 	int rowRssi;
 	int pktRssi;
 	int SNR;
+	int rowSNR;
 } OBSERV_t;
 typedef struct
 {

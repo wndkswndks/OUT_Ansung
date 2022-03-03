@@ -185,7 +185,7 @@ SX1276_T m_sx1276 =
 
 RX_DEVICE,  // txDevice or rxDevice
 
-{0,0,0,0}		// rssi, rowRssi, rssipkt, snr
+{0,0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
 
@@ -510,17 +510,18 @@ void SX1276_Calculrate_SNR_Rssi()
 {
 	int8_t SNR = 0;
 	uint8_t snr_tmp = 0;
+	uint8_t snr_row = 0;
 	int8_t twos_com = 0;
-	uint8_t Rssi = 0;
+	int Rssi = 0;
 	uint8_t rssi_row = 0;
 	uint8_t rssi_pkt_tmp = 0;
 	
-	snr_tmp = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
+	snr_row = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
 
-	snr_tmp = ~snr_tmp;
+	snr_tmp = ~snr_row;
 	twos_com = snr_tmp +0x01;
 	
-	if(snr_tmp &0x80 != 0x00 ) twos_com *=-1;
+	if(snr_row &0x80 != 0x00 ) twos_com *=-1;
 
 	SNR = twos_com/4;
 
@@ -536,9 +537,9 @@ void SX1276_Calculrate_SNR_Rssi()
 	}
 	
 	m_sx1276.observ.Rssi = Rssi;
+	m_sx1276.observ.SNR = SNR;
 	m_sx1276.observ.rowRssi = rssi_row;
 	m_sx1276.observ.pktRssi = rssi_pkt_tmp;
-	m_sx1276.observ.SNR = SNR;
-	
+	m_sx1276.observ.rowSNR = snr_row;	
 
 }
