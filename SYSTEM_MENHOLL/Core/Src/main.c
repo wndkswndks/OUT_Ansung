@@ -232,10 +232,7 @@ int main(void)
 		SX1276_RX_Packet(buffer);
 	}
 
-	SX1276_Read(m_sx1276.s_RssiValue.Rssi);
-	SX1276_Read(m_sx1276.s_PktRssiValue.PacketRssi);
-	tmp = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
-	s_tmp = (int8_t )tmp;
+	SX1276_Calculrate_SNR_Rssi();
     #endif
 
 
