@@ -151,8 +151,9 @@ int main(void)
   
   //m_sx1276.device = TX_DEVICE;
 
-
-  SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
+	HAL_Delay(1000);
+	
+    SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
 
 
 	if(m_sx1276.device == TX_DEVICE)

@@ -102,6 +102,8 @@
 #define GET_IO0				HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin)
 #define GET_DEVICE_SELECT	HAL_GPIO_ReadPin(DIP_IN_GPIO_Port, DIP_IN_Pin)
 
+#define RSSI_LF_CONSTANS	164
+#define RSSI_HF_CONSTANS	157
 
 
 #define ALL_IRQ_CLEAR	0xFF
@@ -561,7 +563,13 @@ typedef struct
 	uint8_t AgcThresh3[4];
 } AgcThresh3_t;  
 
-
+typedef struct
+{
+	int Rssi;
+	int rowRssi;
+	int pktRssi;
+	int SNR;
+} OBSERV_t;
 typedef struct
 {
 	Fifo_t				  s_Fifo;//Fifo[4];;	//0x00
@@ -616,6 +624,7 @@ typedef struct
 	AgcThresh3_t		  s_AgcThresh3;  	//0x64 
 
 	DEVICE_E device;
+	OBSERV_t observ;
 } SX1276_T;
 
 /*  			stuct end  				*/
@@ -639,7 +648,7 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut);
 uint8_t SX1276_RX_Entry(uint32_t timeOut);
 uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
 void SX1276_RX_Packet(uint8_t* rxBuff);
-
+void SX1276_Calculrate_SNR_Rssi();
 
 
 /*  			function end  			*/

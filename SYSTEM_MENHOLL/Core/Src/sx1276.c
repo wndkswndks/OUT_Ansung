@@ -183,8 +183,9 @@ SX1276_T m_sx1276 =
 //	AgcThresh3_t		  s_AgcThresh3;  
 {{0xdb, 					RegAgcThresh3, 			MASK_8, MOVE_BIT_0}},//uint8_t AgcThresh3[4];
 
-RX_DEVICE
+RX_DEVICE,  // txDevice or rxDevice
 
+{0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
 
@@ -505,4 +506,39 @@ void HW_Reset()
 }
 
 
+void SX1276_Calculrate_SNR_Rssi()
+{
+	int8_t SNR = 0;
+	uint8_t snr_tmp = 0;
+	int8_t twos_com = 0;
+	uint8_t Rssi = 0;
+	uint8_t rssi_row = 0;
+	uint8_t rssi_pkt_tmp = 0;
+	
+	snr_tmp = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
 
+	snr_tmp = ~snr_tmp;
+	twos_com = snr_tmp +0x01;
+	
+	if(snr_tmp &0x80 != 0x00 ) twos_com *=-1;
+
+	SNR = twos_com/4;
+
+	if(SNR<=0)
+	{
+		rssi_row = SX1276_Read(m_sx1276.s_RssiValue.Rssi);	
+		Rssi = -RSSI_LF_CONSTANS + rssi_row;
+	}
+	else
+	{
+		rssi_pkt_tmp = SX1276_Read(m_sx1276.s_PktRssiValue.PacketRssi);
+		Rssi = -RSSI_LF_CONSTANS + rssi_pkt_tmp + SNR;
+	}
+	
+	m_sx1276.observ.Rssi = Rssi;
+	m_sx1276.observ.rowRssi = rssi_row;
+	m_sx1276.observ.pktRssi = rssi_pkt_tmp;
+	m_sx1276.observ.SNR = SNR;
+	
+
+}
