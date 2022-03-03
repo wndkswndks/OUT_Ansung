@@ -508,24 +508,29 @@ void HW_Reset()
 
 void SX1276_Calculrate_SNR_Rssi()
 {
-	int8_t SNR = 0;
+	int SNR = 0;
 	uint8_t snr_tmp = 0;
 	uint8_t snr_row = 0;
-	int8_t twos_com = 0;
+	uint8_t twos_com = 0;
 	int Rssi = 0;
 	uint8_t rssi_row = 0;
 	uint8_t rssi_pkt_tmp = 0;
 	
 	snr_row = SX1276_Read(m_sx1276.s_PktSnrValue.PacketSnr);
+	if(snr_row > 127 ) 
+	{
+		snr_tmp = ~snr_row;
+		twos_com = snr_tmp +0x01;
+		SNR = twos_com * -1;	
+	}
+	else
+	{
+		SNR = snr_row;
+	}
 
-	snr_tmp = ~snr_row;
-	twos_com = snr_tmp +0x01;
-	
-	if(snr_row &0x80 != 0x00 ) twos_com *=-1;
+	SNR = snr_row/4;
 
-	SNR = twos_com/4;
-
-	if(SNR<=0)
+	if(SNR>0)
 	{
 		rssi_row = SX1276_Read(m_sx1276.s_RssiValue.Rssi);	
 		Rssi = -RSSI_LF_CONSTANS + rssi_row;
