@@ -60,7 +60,7 @@ SX1278_t SX1278;
 
 int master;
 int ret;
-////
+///////
 char buffer[512];
 
 int message;
