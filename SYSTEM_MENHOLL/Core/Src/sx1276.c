@@ -319,7 +319,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	}
 	else
 	{
-		m_sx1276.device = RX_DEVICE;
+		m_sx1276.device = RX_DEVICE;////
 	}
 	
 	SPI_NSS_SET;
