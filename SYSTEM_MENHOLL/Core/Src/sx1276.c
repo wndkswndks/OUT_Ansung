@@ -328,7 +328,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_SLEEP);///
 	HAL_Delay(15);
 	SX1276_Segment_Write(m_sx1276.s_OpMode.LongRangeMode,LORA_MODE);///
-	SX1276_Segment_Write(m_sx1276.s_OpMode.LowFrequencyModeOn,LOW_FREQ_MODE);///
+	SX1276_Segment_Write(m_sx1276.s_OpMode.LowFrequencyModeOn,HIGH_FREQ_MODE);///
 
 	uint64_t freq = ((uint64_t)frequency << 19) / 32000000;
 	uint8_t freq_reg[3];
