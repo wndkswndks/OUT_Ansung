@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "spi.h"
 #include "usart.h"
 #include "gpio.h"
@@ -32,7 +33,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-//#define ORG_ROLA
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -66,9 +67,6 @@ char buffer[512];
 int message;
 int message_length;
  
-uint8_t tmp = 0;
-int8_t s_tmp = 0;
-
 
 /* USER CODE END PV */
 
@@ -113,43 +111,8 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_SPI2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  #ifdef ORG_ROLA
-  master = 0;
-  if (master == 1) {
-	  printf("Mode: Master\r\n");
-  } else {
-	  printf("Mode: Slave\r\n");
-  }
-  
-  //initialize LoRa module
-  SX1278_hw.dio0.port = IO0_GPIO_Port;
-  SX1278_hw.dio0.pin = IO0_Pin;
-  SX1278_hw.nss.port = NSS_GPIO_Port;
-  SX1278_hw.nss.pin = NSS_Pin;
-  SX1278_hw.reset.port = RESET_GPIO_Port;
-  SX1278_hw.reset.pin = RESET_Pin;
-  SX1278_hw.spi = &hspi2;
-  
-  SX1278.hw = &SX1278_hw;
-  
-  printf("Configuring LoRa module\r\n");
-  SX1278_init(&SX1278, 434000000, SX1278_POWER_17DBM, SX1278_LORA_SF_7,
-  SX1278_LORA_BW_125KHZ, SX1278_LORA_CR_4_5, SX1278_LORA_CRC_EN, 10);
-  printf("Done configuring LoRaModule\r\n");
-  
-  if (master == 1) {
-	  ret = SX1278_LoRaEntryTx(&SX1278, 16, 2000);
-	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-  } else {
-	  ret = SX1278_LoRaEntryRx(&SX1278, 16, 2000);
-	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-  }
-
-  #else
-
-  
-  //m_sx1276.device = TX_DEVICE;
 
 	HAL_Delay(1000);
 	
@@ -166,10 +129,6 @@ int main(void)
 	}
 		
 
-  #endif
-
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -180,40 +139,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    #ifdef ORG_ROLA
-		  if (master == 1) {
-		  printf("Master ...\r\n");
-		  HAL_Delay(1000);
-		  printf("Sending package...\r\n");
-	  
-		  message_length = sprintf(buffer, "Hello %d", message);
-		  ret = SX1278_LoRaEntryTx(&SX1278, message_length, 2000);
-		  printf("Entry: %d\r\n", ret);
-	  
-		  printf("Sending %s\r\n", buffer);
-		  ret = SX1278_LoRaTxPacket(&SX1278, (uint8_t*) buffer,
-				  message_length, 2000);
-		  message += 1;
-	  
-		  printf("Transmission: %d\r\n", ret);
-		  printf("Package sent...\r\n");
-	  
-	  } else {
-		  printf("Slave ...\r\n");
-		  HAL_Delay(800);
-		  printf("Receiving package...\r\n");
-	  
-		  ret = SX1278_LoRaRxPacket(&SX1278);
-		  printf("Received: %d\r\n", ret);
-		  if (ret > 0) {
-			  SX1278_read(&SX1278, (uint8_t*) buffer, ret);
-			  printf("Content (%d): %s\r\n", ret, buffer);
-		  }
-		  printf("Package received ...\r\n");
-	  
-	  }
-
-    #else
     
 	if(m_sx1276.device == TX_DEVICE)
 	{
@@ -233,7 +158,7 @@ int main(void)
 	}
 
 	SX1276_Calculrate_SNR_Rssi();
-    #endif
+
 
 
   }
