@@ -3,6 +3,7 @@
 #include "sx1276.h"
 #include "main.h"
 #include <string.h>
+#include <stdio.h>
 
 
 SX1276_T m_sx1276 = 
@@ -188,7 +189,32 @@ RX_DEVICE,  // txDevice or rxDevice
 {0,0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
+char buffer[512];
 
+int message;
+int message_length;
+
+void Lora_config()
+{
+	if(m_sx1276.device == TX_DEVICE)
+	{
+		HAL_Delay(1000);
+		message_length = sprintf(buffer, "Hello %d", message);
+
+		SX1276_TX_Entry(message_length, 2000);
+		
+		SX1276_TX_Packet(buffer,message_length,2000);
+
+		message += 1;
+	}
+	else
+	{
+		HAL_Delay(800);
+		SX1276_RX_Packet(buffer);
+	}
+
+	SX1276_Calculrate_SNR_Rssi();	
+}
 uint8_t SPI_Read(uint8_t reg)
 {
 	uint8_t txByte = 0x00;

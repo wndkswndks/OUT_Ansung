@@ -72,25 +72,6 @@
 #define RegAgcThresh3                           0x64
 
 
-#define MASK_1		0X01
-#define MASK_2		0X03
-#define MASK_3		0X07
-#define MASK_4		0X0F
-#define MASK_5		0X1F
-#define MASK_6		0X3F
-#define MASK_7		0X7F
-#define MASK_8		0XFF
-
-
-#define MOVE_BIT_0	0
-#define MOVE_BIT_1	1
-#define MOVE_BIT_2	2
-#define MOVE_BIT_3	3
-#define MOVE_BIT_4	4
-#define MOVE_BIT_5	5
-#define MOVE_BIT_6	6
-#define MOVE_BIT_7	7
-
 
 #define SPI_NSS_RESET	HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_RESET); 
 #define SPI_NSS_SET		HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_SET); 
@@ -650,6 +631,7 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut);
 uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
 void SX1276_RX_Packet(uint8_t* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
+void Lora_config();
 
 
 /*  			function end  			*/

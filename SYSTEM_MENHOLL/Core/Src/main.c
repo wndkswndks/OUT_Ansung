@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include "SX1278.h"
 #include "sx1276.h"
+#include "eco_sensor.h"
 
 /* USER CODE END Includes */
 
@@ -62,10 +63,7 @@ SX1278_t SX1278;
 int master;
 int ret;
 ///////
-char buffer[512];
 
-int message;
-int message_length;
  
 
 /* USER CODE END PV */
@@ -115,7 +113,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	HAL_Delay(1000);
-	
+	ADS1115_Init();
     SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
 
 
@@ -139,25 +137,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    
-	if(m_sx1276.device == TX_DEVICE)
-	{
-		HAL_Delay(1000);
-		message_length = sprintf(buffer, "Hello %d", message);
+	Eco_Config();
 
-		SX1276_TX_Entry(message_length, 2000);
-		
-		SX1276_TX_Packet(buffer,message_length,2000);
+	Lora_config();
 
-		message += 1;
-	}
-	else
-	{
-		HAL_Delay(800);
-		SX1276_RX_Packet(buffer);
-	}
-
-	SX1276_Calculrate_SNR_Rssi();
 
 
 

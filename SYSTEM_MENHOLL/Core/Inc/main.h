@@ -85,6 +85,35 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 extern SPI_HandleTypeDef hspi2;
+extern I2C_HandleTypeDef hi2c1;
+#define MASK_1		0X01
+#define MASK_2		0X03
+#define MASK_3		0X07
+#define MASK_4		0X0F
+#define MASK_5		0X1F
+#define MASK_6		0X3F
+#define MASK_7		0X7F
+#define MASK_8		0XFF
+
+
+#define MOVE_BIT_0	 0
+#define MOVE_BIT_1	 1
+#define MOVE_BIT_2	 2
+#define MOVE_BIT_3	 3
+#define MOVE_BIT_4	 4
+#define MOVE_BIT_5	 5
+#define MOVE_BIT_6	 6
+#define MOVE_BIT_7	 7
+#define MOVE_BIT_8	 8
+#define MOVE_BIT_9	 9
+#define MOVE_BIT_10	 10
+#define MOVE_BIT_11	 11
+#define MOVE_BIT_12	 12
+#define MOVE_BIT_13	 13
+#define MOVE_BIT_14	 14
+#define MOVE_BIT_15	 15
+
+
 
 /* USER CODE END Private defines */
 
