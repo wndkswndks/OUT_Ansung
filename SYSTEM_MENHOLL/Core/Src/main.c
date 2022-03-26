@@ -113,7 +113,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	HAL_Delay(1000);
-	ADS1115_Init();
+	//ADS1115_Init();
     SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
 
 
@@ -138,7 +138,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	Eco_Config();
+	//Eco_Config();
 
 	Lora_config();
 
