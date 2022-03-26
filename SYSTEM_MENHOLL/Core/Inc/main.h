@@ -86,6 +86,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 extern SPI_HandleTypeDef hspi2;
 extern I2C_HandleTypeDef hi2c1;
+extern ADC_HandleTypeDef hadc1;
 #define MASK_1		0X01
 #define MASK_2		0X03
 #define MASK_3		0X07
