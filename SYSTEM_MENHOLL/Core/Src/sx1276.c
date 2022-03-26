@@ -211,9 +211,9 @@ void Lora_config()
 	{
 		HAL_Delay(800);
 		SX1276_RX_Packet(buffer);
+		SX1276_Calculrate_SNR_Rssi();	
 	}
 
-	SX1276_Calculrate_SNR_Rssi();	
 }
 uint8_t SPI_Read(uint8_t reg)
 {
