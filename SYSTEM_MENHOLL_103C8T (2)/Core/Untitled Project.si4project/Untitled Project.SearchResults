@@ -1,0 +1,4 @@
+---- HAL_IncTick Matches (3 in 3 files) ----
+stm32f1xx_hal.c (C:\Users\CJS\STM32CubeIDE\workspace_1.6.1\IDE_TEST\Drivers\STM32F1xx_HAL_Driver\Src) line 293 : __weak void HAL_IncTick(void)
+stm32f1xx_hal.h (C:\Users\CJS\STM32CubeIDE\workspace_1.6.1\IDE_TEST\Drivers\STM32F1xx_HAL_Driver\Inc) line 296 : void HAL_IncTick(void);
+SysTick_Handler in stm32f1xx_it.c (Src) line 188 :   HAL_IncTick();
