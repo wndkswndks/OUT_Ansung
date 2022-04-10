@@ -21,6 +21,7 @@ rule browsedata
 
 #Build steps
 build adc.pbi : index adc.xcl
+build device_staus.pbi : index device_staus.xcl
 build eco_sensor.pbi : index eco_sensor.xcl
 build gpio.pbi : index gpio.xcl
 build gps.pbi : index gps.xcl
@@ -50,12 +51,12 @@ build stm32f1xx_hal_spi.pbi : index stm32f1xx_hal_spi.xcl
 build stm32f1xx_hal_tim.pbi : index stm32f1xx_hal_tim.xcl
 build stm32f1xx_hal_tim_ex.pbi : index stm32f1xx_hal_tim_ex.xcl
 build stm32f1xx_hal_uart.pbi : index stm32f1xx_hal_uart.xcl
-build SYSTEM_MENHOLL_103C8T_part0.pbi : link adc.pbi eco_sensor.pbi gpio.pbi gps.pbi i2c.pbi
-build SYSTEM_MENHOLL_103C8T_part1.pbi : link main.pbi spi.pbi stm32f1xx_hal_msp.pbi stm32f1xx_it.pbi sx1276.pbi
-build SYSTEM_MENHOLL_103C8T_part2.pbi : link usart.pbi system_stm32f1xx.pbi stm32f1xx_hal.pbi stm32f1xx_hal_adc.pbi stm32f1xx_hal_adc_ex.pbi
-build SYSTEM_MENHOLL_103C8T_part3.pbi : link stm32f1xx_hal_cortex.pbi stm32f1xx_hal_dma.pbi stm32f1xx_hal_exti.pbi stm32f1xx_hal_flash.pbi stm32f1xx_hal_flash_ex.pbi
-build SYSTEM_MENHOLL_103C8T_part4.pbi : link stm32f1xx_hal_gpio.pbi stm32f1xx_hal_gpio_ex.pbi stm32f1xx_hal_i2c.pbi stm32f1xx_hal_pwr.pbi stm32f1xx_hal_rcc.pbi
-build SYSTEM_MENHOLL_103C8T_part5.pbi : link stm32f1xx_hal_rcc_ex.pbi stm32f1xx_hal_spi.pbi stm32f1xx_hal_tim.pbi stm32f1xx_hal_tim_ex.pbi stm32f1xx_hal_uart.pbi
+build SYSTEM_MENHOLL_103C8T_part0.pbi : link adc.pbi device_staus.pbi eco_sensor.pbi gpio.pbi gps.pbi i2c.pbi
+build SYSTEM_MENHOLL_103C8T_part1.pbi : link main.pbi spi.pbi stm32f1xx_hal_msp.pbi stm32f1xx_it.pbi sx1276.pbi usart.pbi
+build SYSTEM_MENHOLL_103C8T_part2.pbi : link system_stm32f1xx.pbi stm32f1xx_hal.pbi stm32f1xx_hal_adc.pbi stm32f1xx_hal_adc_ex.pbi stm32f1xx_hal_cortex.pbi stm32f1xx_hal_dma.pbi
+build SYSTEM_MENHOLL_103C8T_part3.pbi : link stm32f1xx_hal_exti.pbi stm32f1xx_hal_flash.pbi stm32f1xx_hal_flash_ex.pbi stm32f1xx_hal_gpio.pbi stm32f1xx_hal_gpio_ex.pbi stm32f1xx_hal_i2c.pbi
+build SYSTEM_MENHOLL_103C8T_part4.pbi : link stm32f1xx_hal_pwr.pbi stm32f1xx_hal_rcc.pbi stm32f1xx_hal_rcc_ex.pbi stm32f1xx_hal_spi.pbi stm32f1xx_hal_tim.pbi stm32f1xx_hal_tim_ex.pbi
+build SYSTEM_MENHOLL_103C8T_part5.pbi : link stm32f1xx_hal_uart.pbi
 build SYSTEM_MENHOLL_103C8T.pbd : link SYSTEM_MENHOLL_103C8T_part0.pbi SYSTEM_MENHOLL_103C8T_part1.pbi SYSTEM_MENHOLL_103C8T_part2.pbi SYSTEM_MENHOLL_103C8T_part3.pbi SYSTEM_MENHOLL_103C8T_part4.pbi SYSTEM_MENHOLL_103C8T_part5.pbi
 build SYSTEM_MENHOLL_103C8T.pbw : browsedata SYSTEM_MENHOLL_103C8T.pbd
 

@@ -1,7 +1,7 @@
 //eco_sensor.c
 
-#include <math.h>
-#include"eco_sensor.h"
+
+#include"common.h"
 
 ECO_T m_eco = 
 {
@@ -116,83 +116,7 @@ void ADC_to_Volt(uint8_t AIN_num)
 	Volt_value[AIN_num-4] = adc * ADS_FS_VALUE/ADS_MAX_ADC_VALUE;
 }
 
-void Battery_Config()
-{
-	float Volt_mcu;
-	uint16_t adc = 0;
-  	HAL_ADC_Start(&hadc1);  //ADC 시작
-  	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
-    {
-    	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	Volt_mcu = (adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(Volt_mcu<=10.8) Lora_Send_Msg("Battery Low",(uint8_t)Volt_mcu);
-    	else if(Volt_mcu>14.4) Lora_Send_Msg("Battery High",(uint8_t)Volt_mcu);
-    }
-
-  
-}
-#define IS_MENHOLL_OPEN	HAL_GPIO_ReadPin(COVER_GPIO_Port, COVER_Pin)
-void Menholl_Open_Config()
-{
-	static uint8_t open_flag = 0;
-	if(IS_MENHOLL_OPEN ==0)
-	{
-		Lora_Send_Msg("Menholl Open",open_flag);
-		open_flag++;
-		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
-	}
-
-
-}
-
-#define WATER_SENSOR_HIGH		HAL_GPIO_ReadPin(WATER_H_GPIO_Port, WATER_H_Pin)
-#define WATER_SENSOR_LOW		HAL_GPIO_ReadPin(WATER_L_GPIO_Port, WATER_L_Pin)
-
-
-
-#define OFF_OFF	0x00
-#define OFF_ON	0x01
-#define ON_OFF	0x10
-#define ON_ON	0x11
-
-void Pump_Active_Config()
-{
-	uint8_t sensor_stusus = 0;
-	uint8_t Active_flag = 0;
-	static uint8_t sensor_past = 0;
-	sensor_stusus = ((WATER_SENSOR_HIGH<<8)&0xf0) |((WATER_SENSOR_LOW)&0x0f);
-	
-
-
-	switch(sensor_stusus)
-	{
-		case OFF_OFF:
-			Active_flag = 0;
-			sensor_past = WATER_EMPTY;
-		break;
-
-		case OFF_ON:
-			if(sensor_past == WATER_FULL) Active_flag = 1;
-			else if(sensor_past == WATER_EMPTY) Active_flag = 0;
-			else Active_flag = 0;
-		break;
-
-		case ON_OFF:
-			Lora_Send_Msg("PUMP ERR",0);	
-		break;
-
-		case ON_ON:
-			Active_flag = 1;
-			sensor_past = WATER_FULL;
-		break;
-	}
-
-	if(Active_flag == 1) Lora_Send_Msg("PUMP ACTIVE",1);
-	
-
-	
-}
 uint16_t MQ_ADC_Read(uint8_t AIN_num)
 {
 	uint8_t os = 0;
@@ -344,4 +268,28 @@ float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 
 	MQ_ratio = MQ_rs / R0_MQ;
 	return MQ_ratio;
+}
+
+void All_Send()
+{
+	Lora_Send_Msg("LPG",(uint8_t)m_eco.MQ2.LPG);
+	Lora_Send_Msg("PP",(uint8_t)m_eco.MQ2.Propane);
+	Lora_Send_Msg("H2",(uint8_t)m_eco.MQ2.H2);
+	Lora_Send_Msg("CO",(uint8_t)m_eco.MQ2.CO);
+	Lora_Send_Msg("MT",(uint8_t)m_eco.MQ2.METHANE);
+	Lora_Send_Msg("CM",(uint8_t)m_eco.MQ2.CARBON_MONOXIDE);
+	Lora_Send_Msg("AC",(uint8_t)m_eco.MQ2.ALCOHOL);
+	Lora_Send_Msg("SM",(uint8_t)m_eco.MQ2.SMOKE);
+
+	Lora_Send_Msg("AC",(uint8_t)m_eco.MQ135.Alcohol);
+	Lora_Send_Msg("CO2",(uint8_t)m_eco.MQ135.Co2);
+	Lora_Send_Msg("AM",(uint8_t)m_eco.MQ135.Ammonia);
+	Lora_Send_Msg("CD",(uint8_t)m_eco.MQ135.CARBON_DIOXIDE);
+	Lora_Send_Msg("CM",(uint8_t)m_eco.MQ135.CARBON_MONOXIDE);
+	Lora_Send_Msg("TL",(uint8_t)m_eco.MQ135.TOLUENE);	
+	Lora_Send_Msg("AT",(uint8_t)m_eco.MQ135.ACETONE);
+
+	Lora_Send_Msg("Battery ",m_status.fan_Battery);
+	Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
+	Lora_Send_Msg("PUMP ACTIVE",m_status.PumpActive_flag);
 }

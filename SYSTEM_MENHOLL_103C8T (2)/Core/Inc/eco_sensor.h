@@ -3,10 +3,8 @@
 #define ECO_SENSOR_H
 
 /*  			include start  			*/
-#include "main.h"
-#include <string.h>
-#include <stdlib.h>
-#include "sx1276.h"
+#include"common.h"
+
 
 /*  			include end  			*/
 
@@ -226,11 +224,6 @@ typedef enum
 	MOVE,
 } BUFF_ADS1115_E;
 
-typedef enum
-{
-	WATER_FULL = 1,
-	WATER_EMPTY,
-} WATER_E;
 /*  			enum end  				*/
 
 
@@ -305,9 +298,7 @@ void I2c_write(uint8_t reg, uint16_t txWord);
 int compare(const void *a, const void *b); 
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ);
 float Set_MQ_PPM(float* sensor, float MQ_ratio);
-void Battery_Config();
-void Menholl_Open_Config();
-void Pump_Active_Config();
+
 
 
 

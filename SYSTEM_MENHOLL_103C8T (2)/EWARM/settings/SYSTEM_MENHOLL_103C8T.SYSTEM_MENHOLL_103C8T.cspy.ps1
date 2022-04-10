@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\source\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.general.xcl" --backend -f "C:\source\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\wndks\Documents\OUT_Ansung\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.general.xcl" --backend -f "C:\Users\wndks\Documents\OUT_Ansung\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\source\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.general.xcl" --debug_file=$debugfile --backend -f "C:\source\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\wndks\Documents\OUT_Ansung\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\wndks\Documents\OUT_Ansung\SYSTEM_MENHOLL_103C8T (2)\EWARM\settings\SYSTEM_MENHOLL_103C8T.SYSTEM_MENHOLL_103C8T.driver.xcl" 
 }

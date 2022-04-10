@@ -3,7 +3,7 @@
 #define GPS_H
 
 /*  			include start  			*/
-#include"main.h"
+#include"common.h"
 /*  			include end  			*/
 
 

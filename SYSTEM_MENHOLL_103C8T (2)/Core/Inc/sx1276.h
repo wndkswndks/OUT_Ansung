@@ -2,8 +2,7 @@
 
 #ifndef SX1276_H
 #define SX1276_H
-#include <stdint.h>
-#include"main.h"
+#include"common.h"
 
 
 /*  			include start  			*/

@@ -1201,6 +1201,9 @@
                     <name>$PROJ_DIR$\..\Core\Src\adc.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Src\device_staus.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\eco_sensor.c</name>
                 </file>
                 <file>
@@ -1226,6 +1229,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\sx1276.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Core\Src\usart.c</name>
                 </file>
             </group>
         </group>
@@ -1290,6 +1296,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim_ex.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c</name>
             </file>
         </group>
     </group>

@@ -1,6 +1,7 @@
 //gps.c
-#include"gps.h"
 
+
+#include"common.h"
 
 /*
  * gps.c
@@ -34,10 +35,6 @@
  */
 
 
-#include <stdio.h>
-#include <string.h>
-#include <usart.h>
-#include "gps.h"
 
 
 uint8_t rx_data = 0;

@@ -1,9 +1,7 @@
 //sx1276.c
 
-#include "sx1276.h"
-#include "main.h"
-#include <string.h>
-#include <stdio.h>
+#include"common.h"
+
 
 
 SX1276_T m_sx1276 = 
