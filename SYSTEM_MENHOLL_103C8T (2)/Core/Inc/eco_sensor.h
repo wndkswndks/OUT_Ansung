@@ -298,6 +298,7 @@ void I2c_write(uint8_t reg, uint16_t txWord);
 int compare(const void *a, const void *b); 
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ);
 float Set_MQ_PPM(float* sensor, float MQ_ratio);
+void All_Send();
 
 
 

@@ -4,7 +4,6 @@
 STATUS_T m_status;
 void Battery_Config()
 {
-	float Volt_mcu;
 	uint16_t adc = 0;
   	HAL_ADC_Start(&hadc1);  //ADC 시작
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
@@ -21,11 +20,10 @@ void Battery_Config()
 
 void Menholl_Open_Config()
 {
-	static uint8_t open_flag = 0;
 	if(IS_MENHOLL_OPEN ==0)
 	{
 		m_status.Menholl_open_flag = 1;
-		Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
+		//Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
 		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
 	}
 	else

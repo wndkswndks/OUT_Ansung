@@ -26,10 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include "sx1276.h"
-#include "gps.h"
-#include "eco_sensor.h"
+#include"common.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,7 +96,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   GPS_Init();
   HAL_Delay(1000);
-  ADS1115_Init();
+//  ADS1115_Init();
   SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
   
   
@@ -121,7 +119,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     //Lora_config();
-    Main_config();
+    //Main_config();
+	  Menholl_Open_Config();
 
     
   }
@@ -211,27 +210,21 @@ void Main_config()
 			if(HAL_GetTick() >standardTime + MINUTE_1)
 			{
 				Pump_Active_Config();
-				step = STEP1;
+				step = STEP5;
 				standardTime = HAL_GetTick();
 				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
 			}
 		break;
 
-//		case STEP5:
-//			if(HAL_GetTick() >standardTime + MINUTE_1)
-//			{
-//				step = STEP6;
-//				standardTime = HAL_GetTick();
-//			}
-//		break;
-//
-//		case STEP6:
-//			if(HAL_GetTick() >standardTime + MINUTE_1)
-//			{
-//				step = STEP1;
-//				standardTime = HAL_GetTick();
-//			}
-//		break;
+		case STEP5:
+			if(HAL_GetTick() >standardTime + MINUTE_1)
+			{
+				step = STEP1;
+				All_Send();
+				standardTime = HAL_GetTick();
+			}
+		break;
+
 	}
 }
 /* USER CODE END 4 */
