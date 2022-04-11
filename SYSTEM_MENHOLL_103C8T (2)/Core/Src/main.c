@@ -93,6 +93,7 @@ int main(void)
   MX_ADC1_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
   GPS_Init();
   HAL_Delay(1000);
