@@ -29,6 +29,17 @@
 #define SW3_STATUS		HAL_GPIO_ReadPin(SW3_GPIO_Port, SW3_Pin)
 #define SW4_STATUS		HAL_GPIO_ReadPin(SW4_GPIO_Port, SW4_Pin)
 
+#define LED1_ON			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET)
+#define LED1_TOGGLE		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin)
+						
+
+#define LED2_ON			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET)
+#define LED2_TOGGLE		HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin)
+
+#define LED3_ON			HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET)
+#define LED3_TOGGLE		HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin)
+
+
 
 
 /*  			define end  			*/

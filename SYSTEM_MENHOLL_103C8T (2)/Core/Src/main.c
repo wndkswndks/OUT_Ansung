@@ -65,7 +65,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)/////
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -77,7 +77,7 @@ int main(void)/////
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+int cnt = 0;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -98,10 +98,9 @@ int main(void)/////
   /* USER CODE BEGIN 2 */
   GPS_Init();
   HAL_Delay(1000);
-//  ADS1115_Init();
+  ADS1115_Init();
   SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
-  
-  
+  LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
   {
 	  SX1276_TX_Entry(16, 2000);
@@ -122,8 +121,13 @@ int main(void)/////
     /* USER CODE BEGIN 3 */
 
    // Main_config();
-	  Sw_Config();
+	//Eco_Config();
 
+
+	  Lora_Send_Msg("Menholl Open",cnt++);
+	  LED2_TOGGLE;
+	  HAL_Delay(1000);
+	  Sw_Config();
 
     
   }
@@ -185,7 +189,7 @@ void Main_config()
 		case STEP1:
 			if(HAL_GetTick() >standardTime + MINUTE_1)
 			{
-				//Eco_Config();
+				Eco_Config();
 				step = STEP2;
 				standardTime = HAL_GetTick();
 			}

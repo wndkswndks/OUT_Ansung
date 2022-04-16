@@ -39,60 +39,60 @@ float MQ135_ACETONE_gp[2]    =           {MQ135_ACETONE_A,  	 	MQ135_ACETONE_B};
 
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
-	float MQ2_ratio = 0.0;
-	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
-	
-	m_eco.MQ2.LPG       =  			Set_MQ_PPM(MQ2_LPG_gp,        MQ2_ratio);
-	if(m_eco.MQ2.LPG>20) Lora_Send_Msg("LPG",(uint8_t)m_eco.MQ2.LPG);
-	
-	m_eco.MQ2.Propane   =  			Set_MQ_PPM(MQ2_PROPANE_gp,    MQ2_ratio);
-	if(m_eco.MQ2.Propane>20) Lora_Send_Msg("Propane",(uint8_t)m_eco.MQ2.Propane);
-	
-	m_eco.MQ2.H2 =   	   			Set_MQ_PPM(MQ2_H2_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.H2>20) Lora_Send_Msg("H2",(uint8_t)m_eco.MQ2.H2);
-	
-	m_eco.MQ2.CO =   	   			Set_MQ_PPM(MQ2_CO_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.CO>20) Lora_Send_Msg("CO",(uint8_t)m_eco.MQ2.CO);
-	
-	m_eco.MQ2.METHANE =    		    Set_MQ_PPM(MQ2_METHANE_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.METHANE>20) Lora_Send_Msg("METHANE",(uint8_t)m_eco.MQ2.METHANE);
-	
-	m_eco.MQ2.CARBON_MONOXIDE =   	Set_MQ_PPM(MQ2_CARBON_MONOXIDE_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.CARBON_MONOXIDE>20) 	Lora_Send_Msg("CARBON_MONOXIDE",(uint8_t)m_eco.MQ2.CARBON_MONOXIDE);
-	
-	m_eco.MQ2.ALCOHOL =   	   		Set_MQ_PPM(MQ2_ALCOHOL_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.ALCOHOL>20) Lora_Send_Msg("ALCOHOL",(uint8_t)m_eco.MQ2.ALCOHOL);
-	
-	m_eco.MQ2.SMOKE =   	   		Set_MQ_PPM(MQ2_SMOKE_gp, 		MQ2_ratio);
-	if(m_eco.MQ2.SMOKE>20) 	Lora_Send_Msg("SMOKE",(uint8_t)m_eco.MQ2.SMOKE);
+//	float MQ2_ratio = 0.0;
+//	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
+//	
+//	m_eco.MQ2.LPG       =  			Set_MQ_PPM(MQ2_LPG_gp,        MQ2_ratio);
+//	if(m_eco.MQ2.LPG>20) Lora_Send_Msg("LPG",(uint8_t)m_eco.MQ2.LPG);
+//	
+//	m_eco.MQ2.Propane   =  			Set_MQ_PPM(MQ2_PROPANE_gp,    MQ2_ratio);
+//	if(m_eco.MQ2.Propane>20) Lora_Send_Msg("Propane",(uint8_t)m_eco.MQ2.Propane);
+//	
+//	m_eco.MQ2.H2 =   	   			Set_MQ_PPM(MQ2_H2_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.H2>20) Lora_Send_Msg("H2",(uint8_t)m_eco.MQ2.H2);
+//	
+//	m_eco.MQ2.CO =   	   			Set_MQ_PPM(MQ2_CO_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.CO>20) Lora_Send_Msg("CO",(uint8_t)m_eco.MQ2.CO);
+//	
+//	m_eco.MQ2.METHANE =    		    Set_MQ_PPM(MQ2_METHANE_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.METHANE>20) Lora_Send_Msg("METHANE",(uint8_t)m_eco.MQ2.METHANE);
+//	
+//	m_eco.MQ2.CARBON_MONOXIDE =   	Set_MQ_PPM(MQ2_CARBON_MONOXIDE_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.CARBON_MONOXIDE>20) 	Lora_Send_Msg("CARBON_MONOXIDE",(uint8_t)m_eco.MQ2.CARBON_MONOXIDE);
+//	
+//	m_eco.MQ2.ALCOHOL =   	   		Set_MQ_PPM(MQ2_ALCOHOL_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.ALCOHOL>20) Lora_Send_Msg("ALCOHOL",(uint8_t)m_eco.MQ2.ALCOHOL);
+//	
+//	m_eco.MQ2.SMOKE =   	   		Set_MQ_PPM(MQ2_SMOKE_gp, 		MQ2_ratio);
+//	if(m_eco.MQ2.SMOKE>20) 	Lora_Send_Msg("SMOKE",(uint8_t)m_eco.MQ2.SMOKE);
+//
+//	
+//
+//    float MQ135_ratio = 0.0;
+//	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
+//	m_eco.MQ135.Alcohol   = 		  Set_MQ_PPM(MQ135_ALCOHOL_gp,      MQ135_ratio);
+//	if(m_eco.MQ135.Alcohol >20) Lora_Send_Msg("Alcohol",(uint8_t)m_eco.MQ135.Alcohol);
+//	
+//	m_eco.MQ135.Co2       = 		  Set_MQ_PPM(MQ135_CO2_gp,          MQ135_ratio);
+//	if(m_eco.MQ135.Co2 >20) Lora_Send_Msg("Co2",(uint8_t)m_eco.MQ135.Co2);
+//	
+//	m_eco.MQ135.Ammonia = 			  Set_MQ_PPM(MQ135_AMMONIA_gp,        MQ135_ratio);
+//	if(m_eco.MQ135.Ammonia >20) Lora_Send_Msg("Ammonia",(uint8_t)m_eco.MQ135.Ammonia);
+//	
+//	m_eco.MQ135.CARBON_DIOXIDE =      Set_MQ_PPM(MQ135_CARBON_DIOXIDE_gp,     MQ135_ratio);
+//	if(m_eco.MQ135.CARBON_DIOXIDE >20) 	Lora_Send_Msg("CARBON_DIOXIDE",(uint8_t)m_eco.MQ135.CARBON_DIOXIDE);
+//	
+//	m_eco.MQ135.CARBON_MONOXIDE = Set_MQ_PPM(MQ135_CARBON_MONOXIDE_gp,        MQ135_ratio);
+//	if(m_eco.MQ135.CARBON_MONOXIDE >20) Lora_Send_Msg("CARBON_MONOXIDE",(uint8_t)m_eco.MQ135.CARBON_MONOXIDE);
+//	
+//	m_eco.MQ135.TOLUENE = 			  Set_MQ_PPM(MQ135_TOLUENE_gp,        MQ135_ratio);
+//	if(m_eco.MQ135.TOLUENE >20) Lora_Send_Msg("TOLUENE",(uint8_t)m_eco.MQ135.TOLUENE);
+//
+//	m_eco.MQ135.ACETONE =             Set_MQ_PPM(MQ135_ACETONE_gp,        MQ135_ratio);
+//	if(m_eco.MQ135.ACETONE >20) Lora_Send_Msg("ACETONE",(uint8_t)m_eco.MQ135.ACETONE);
 
 	
-
-    float MQ135_ratio = 0.0;
-	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
-	m_eco.MQ135.Alcohol   = 		  Set_MQ_PPM(MQ135_ALCOHOL_gp,      MQ135_ratio);
-	if(m_eco.MQ135.Alcohol >20) Lora_Send_Msg("Alcohol",(uint8_t)m_eco.MQ135.Alcohol);
-	
-	m_eco.MQ135.Co2       = 		  Set_MQ_PPM(MQ135_CO2_gp,          MQ135_ratio);
-	if(m_eco.MQ135.Co2 >20) Lora_Send_Msg("Co2",(uint8_t)m_eco.MQ135.Co2);
-	
-	m_eco.MQ135.Ammonia = 			  Set_MQ_PPM(MQ135_AMMONIA_gp,        MQ135_ratio);
-	if(m_eco.MQ135.Ammonia >20) Lora_Send_Msg("Ammonia",(uint8_t)m_eco.MQ135.Ammonia);
-	
-	m_eco.MQ135.CARBON_DIOXIDE =      Set_MQ_PPM(MQ135_CARBON_DIOXIDE_gp,     MQ135_ratio);
-	if(m_eco.MQ135.CARBON_DIOXIDE >20) 	Lora_Send_Msg("CARBON_DIOXIDE",(uint8_t)m_eco.MQ135.CARBON_DIOXIDE);
-	
-	m_eco.MQ135.CARBON_MONOXIDE = Set_MQ_PPM(MQ135_CARBON_MONOXIDE_gp,        MQ135_ratio);
-	if(m_eco.MQ135.CARBON_MONOXIDE >20) Lora_Send_Msg("CARBON_MONOXIDE",(uint8_t)m_eco.MQ135.CARBON_MONOXIDE);
-	
-	m_eco.MQ135.TOLUENE = 			  Set_MQ_PPM(MQ135_TOLUENE_gp,        MQ135_ratio);
-	if(m_eco.MQ135.TOLUENE >20) Lora_Send_Msg("TOLUENE",(uint8_t)m_eco.MQ135.TOLUENE);
-
-	m_eco.MQ135.ACETONE =             Set_MQ_PPM(MQ135_ACETONE_gp,        MQ135_ratio);
-	if(m_eco.MQ135.ACETONE >20) Lora_Send_Msg("ACETONE",(uint8_t)m_eco.MQ135.ACETONE);
-
-	
-//	ADC_to_Volt(AIN0_GND);
+	ADC_to_Volt(AIN0_GND);
 //	ADC_to_Volt(AIN1_GND);
 //	ADC_to_Volt(AIN2_GND);
 //	MCU_ADC_to_Volt();
@@ -121,11 +121,18 @@ uint16_t MQ_ADC_Read(uint8_t AIN_num)
 {
 	uint8_t os = 0;
 	uint16_t get_adc = 0;
+	uint32_t pastTime = 0;
+	
 	ADS1115_Write(m_eco.config_reg.mux, AIN_num);
-
+	pastTime = HAL_GetTick();
 	while(os==0)
 	{
 		os = ADS1115_Part_Read(m_eco.config_reg.os);
+		if(HAL_GetTick()-pastTime >2000)
+		{
+			LED1_ON;
+			os = 1;
+		}
 	}
 	
 	ADS1115_Write(m_eco.config_reg.os, BEING_SINGELE_CONV);
