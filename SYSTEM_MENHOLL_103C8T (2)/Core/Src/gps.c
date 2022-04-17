@@ -62,7 +62,7 @@ void GPS_UART_CallBack(){
 		rx_index = 0;
 		memset(rx_buffer, 0, sizeof(rx_buffer));
 	}
-	HAL_UART_Receive_IT(GPS_USART, &rx_data, 1);
+	HAL_UART_Receive(GPS_USART, &rx_data, 1,1000);
 }
 
 

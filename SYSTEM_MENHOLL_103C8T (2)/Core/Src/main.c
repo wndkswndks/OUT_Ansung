@@ -78,6 +78,8 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 int cnt = 0;
+  uint32_t pastTime = 0;
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -96,7 +98,7 @@ int cnt = 0;
   MX_ADC2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  GPS_Init();
+  //GPS_Init();
   HAL_Delay(1000);
   ADS1115_Init();
   SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
@@ -108,6 +110,12 @@ int cnt = 0;
   else
   {
 	  SX1276_RX_Entry(2000);
+  }
+
+  pastTime = HAL_GetTick();
+  while(HAL_GetTick() - pastTime <5000)
+  {
+	  GPS_UART_CallBack();
   }
 
   /* USER CODE END 2 */
