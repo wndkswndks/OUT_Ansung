@@ -78,7 +78,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 int cnt = 0;
-  uint32_t pastTime = 0;
+
 
   /* USER CODE END Init */
 
@@ -112,11 +112,7 @@ int cnt = 0;
 	  SX1276_RX_Entry(2000);
   }
 
-  pastTime = HAL_GetTick();
-  while(HAL_GetTick() - pastTime <5000)
-  {
-	  GPS_UART_CallBack();
-  }
+  GPS_config();
 
   /* USER CODE END 2 */
 
@@ -129,13 +125,16 @@ int cnt = 0;
     /* USER CODE BEGIN 3 */
 
    // Main_config();
-	//Eco_Config();
+	Eco_Config();
 
 
-	  Lora_Send_Msg("Menholl Open",cnt++);
+//	  Lora_Send_Msg("Menholl Open",cnt++);
 	  LED2_TOGGLE;
-	  HAL_Delay(1000);
-	  Sw_Config();
+//	  HAL_Delay(1000);
+//	  Sw_Config();
+//	  Error_Config();
+	  HAL_Delay(500);
+
 
     
   }

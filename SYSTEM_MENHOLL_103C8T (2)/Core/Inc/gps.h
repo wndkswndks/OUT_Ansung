@@ -64,6 +64,7 @@ typedef struct{
 
 /*  			function start  		*/
 void GPS_Init();
+void GPS_config();
 void GSP_USBPrint(char *data);
 void GPS_print_val(char *data, int value);
 void GPS_UART_CallBack();

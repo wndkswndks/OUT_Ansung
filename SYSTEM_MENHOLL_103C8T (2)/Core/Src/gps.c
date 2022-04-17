@@ -50,7 +50,15 @@ void GPS_Init()
 	HAL_UART_Receive_IT(GPS_USART, &rx_data, 1);
 }
 
-
+void GPS_config()
+{
+	uint32_t pastTime = 0;
+ 	pastTime = HAL_GetTick();
+	while(HAL_GetTick() - pastTime <5000)
+	{
+	  GPS_UART_CallBack();
+	}
+}
 void GPS_UART_CallBack(){
 	if (rx_data != '\n' && rx_index < sizeof(rx_buffer)) {
 		rx_buffer[rx_index++] = rx_data;

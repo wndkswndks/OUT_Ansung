@@ -128,7 +128,7 @@ uint16_t MQ_ADC_Read(uint8_t AIN_num)
 	while(os==0)
 	{
 		os = ADS1115_Part_Read(m_eco.config_reg.os);
-		if(HAL_GetTick()-pastTime >2000)
+		if(HAL_GetTick()-pastTime >200)
 		{
 			LED1_ON;
 			os = 1;
@@ -187,7 +187,7 @@ uint16_t I2c_read(uint8_t reg)
 {	
 	uint8_t rxBuff[2] = {0,};
 	uint16_t rxWord = 0;
-	HAL_I2C_Mem_Read(&hi2c1, ADS_ADDRESS, reg, 1, rxBuff, 2, 1000 );
+	HAL_I2C_Mem_Read(&hi2c1, ADS_ADDRESS, reg, 1, rxBuff, 2, 100 );
 	HAL_Delay(10);
 	rxWord = rxBuff[0]<<8 | rxBuff[1];
 	return rxWord;
@@ -200,7 +200,7 @@ void I2c_write(uint8_t reg, uint16_t txWord)
 	txBuff[0] = (txWord >>8)&0xff;
 	txBuff[1] = (txWord)&0xff;
 	
-	HAL_I2C_Mem_Write(&hi2c1, ADS_ADDRESS, reg, 1, txBuff, 2, 1000 );
+	HAL_I2C_Mem_Write(&hi2c1, ADS_ADDRESS, reg, 1, txBuff, 2, 100 );
 	HAL_Delay(10);
 }
 
