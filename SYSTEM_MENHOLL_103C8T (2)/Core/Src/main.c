@@ -78,7 +78,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 int cnt = 0;
-
+float float_val = 0;
 
   /* USER CODE END Init */
 
@@ -125,7 +125,7 @@ int cnt = 0;
     /* USER CODE BEGIN 3 */
 
    // Main_config();
-	Eco_Config();
+	//Eco_Config();
 
 
 //	  Lora_Send_Msg("Menholl Open",cnt++);
@@ -133,9 +133,11 @@ int cnt = 0;
 //	  HAL_Delay(1000);
 //	  Sw_Config();
 //	  Error_Config();
-	  HAL_Delay(500);
 
 
+	  HAL_Delay(1000);
+
+	
     
   }
   /* USER CODE END 3 */
@@ -240,6 +242,7 @@ void Main_config()
 		break;
 
 	}
+	Error_Config();
 }
 /* USER CODE END 4 */
 

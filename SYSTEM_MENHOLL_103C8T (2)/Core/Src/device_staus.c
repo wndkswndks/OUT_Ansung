@@ -11,8 +11,18 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
     	m_status.fan_Battery =(uint8_t)((adc * 3.3 /4095) * 12/3.3) ;
 
-    	if(m_status.fan_Battery<=10) Lora_Send_Msg("Battery Low",m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Lora_Send_Msg("Battery High",m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) Lora_Send_Msg("fan Battery Low",m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) Lora_Send_Msg("fan Battery High",m_status.fan_Battery);
+    }
+
+    HAL_ADC_Start(&hadc2);  //ADC 시작
+  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
+    {
+    	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
+    	m_status.pump_Battery =(uint8_t)((adc * 3.3 /4095) * 12/3.3) ;
+
+    	if(m_status.pump_Battery<=10) Lora_Send_Msg("pump Battery Low",m_status.pump_Battery);
+    	else if(m_status.pump_Battery>14) Lora_Send_Msg("pump Battery High",m_status.pump_Battery);
     }
 
   
@@ -23,8 +33,7 @@ void Menholl_Open_Config()
 	if(IS_MENHOLL_OPEN ==0)
 	{
 		m_status.Menholl_open_flag = 1;
-		//Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
-		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
+		Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
 	}
 	else
 	{
@@ -115,70 +124,52 @@ void Error_Config()
 	static uint8_t onFlag = 0;
 	uint8_t errStatus = 0;
 	static uint8_t cnt = 0;
-	//m_status.err_status[1] = 1;
-	//m_status.err_status[2] = 1;
-	//m_status.err_status[3] = 1;
-	//m_status.err_status[4] = 1;
-	//m_status.err_status[5] = 1;
-	//m_status.err_status[6] = 1;
-	//m_status.err_status[7] = 1;
+	uint32_t timeSave = 0;
 
-	if(onFlag==1)
+	Set_Error(ERR0R_1);
+	Set_Error(ERR0R_3);
+	Set_Error(ERR0R_5);
+
+	if(HAL_GetTick() > timeSave +1000)
 	{
-		onFlag = 0;
-
-
-		for(int i = cnt ;i < 8;i++)
+		if(onFlag==1)
 		{
-			if(m_status.err_status[i] ==1)
+			onFlag = 0;
+			for(int i = cnt ;i < 8;i++)
 			{
-				errStatus = i;
-				cnt = i+1;
-				cnt %= 8;
-				break;
+				if(m_status.err_status[i] ==1)
+				{
+					errStatus = i;
+					cnt = i+1;
+					cnt %= 8;
+					break;
+				}
+			}
+			
+			switch(errStatus)
+			{
+				case ERR0R_0:	LED1_OFF;	LED2_OFF;	LED3_OFF;	break;//000
+				case ERR0R_1:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//001					
+				case ERR0R_2:	LED1_OFF;	LED2_ON;	LED3_OFF;	break;//010
+				case ERR0R_3:	LED1_OFF;	LED2_ON;	LED3_ON;	break;//011
+				case ERR0R_4:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//100
+				case ERR0R_5:	LED1_ON;	LED2_OFF;	LED3_ON;	break;//101
+				case ERR0R_6:	LED1_ON;	LED2_ON;	LED3_OFF;	break;//110					
+				case ERR0R_7:	LED1_ON;	LED2_ON;	LED3_ON;	break;//111
 			}
 		}
-		
-		switch(errStatus)
+		else
 		{
-			case ERR0R_0://000
-				LED1_OFF;	LED2_OFF;	LED3_OFF;
-			break;
-
-			case ERR0R_1://001
-				LED1_ON;	LED2_OFF;	LED3_OFF;
-			break;
-
-			case ERR0R_2://010
-				LED1_OFF;	LED2_ON;	LED3_OFF;
-			break;
-
-			case ERR0R_3://011
-				LED1_OFF;	LED2_ON;	LED3_ON;
-			break;
-
-			case ERR0R_4://100
-				LED1_ON;	LED2_OFF;	LED3_OFF;
-			break;
-
-			case ERR0R_5://101
-				LED1_ON;	LED2_OFF;	LED3_ON;
-			break;
-
-			case ERR0R_6://110
-				LED1_ON;	LED2_ON;	LED3_OFF;
-			break;
-
-			case ERR0R_7://111
-				LED1_ON;	LED2_ON;	LED3_ON;
-			break;
+			onFlag = 1;
+			LED1_OFF;
+			LED2_OFF;
+			LED3_OFF;
 		}
+
+		timeSave = HAL_GetTick();
 	}
-	else
-	{
-		onFlag = 1;
-		LED1_OFF;
-		LED2_OFF;
-		LED3_OFF;
-	}
+}
+void Set_Error(ERROR_E error)
+{
+	m_status.err_status[error] = 1;
 }

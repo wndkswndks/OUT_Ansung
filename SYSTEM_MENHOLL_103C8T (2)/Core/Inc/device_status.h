@@ -113,6 +113,7 @@ void Menholl_Open_Config();
 void Pump_Active_Config();
 void Sw_Config();
 void Error_Config();
+void Set_Error(ERROR_E error);
 
 
 /*  			function end  			*/

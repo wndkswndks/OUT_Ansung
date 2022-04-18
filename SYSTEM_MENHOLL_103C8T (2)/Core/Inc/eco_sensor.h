@@ -239,29 +239,35 @@ typedef struct
 	
 	
 } ADS_CONFIG_REG_T;
+typedef struct
+{
+	float graph[2];
+	float value;
+	char name[15];
+} MQ_VALUE_T;
 
 typedef struct
 {
-    float H2;//H2
-	float LPG;
-    float CO;
-    float Propane;
-	float METHANE;
-	float CARBON_MONOXIDE;
-	float ALCOHOL;
-	float SMOKE;	
+    MQ_VALUE_T H2;//H2
+	MQ_VALUE_T LPG;
+    MQ_VALUE_T CO;
+    MQ_VALUE_T Propane;
+	MQ_VALUE_T METHANE;
+	MQ_VALUE_T CARBON_MONOXIDE;
+	MQ_VALUE_T ALCOHOL;
+	MQ_VALUE_T SMOKE;	
     float R0;
 } MQ2_T;
 
 typedef struct
 {
-	float Alcohol;
-	float Co2;
-	float Ammonia;
-	float CARBON_DIOXIDE;
-	float CARBON_MONOXIDE;
-	float TOLUENE;
-	float ACETONE;
+	MQ_VALUE_T Alcohol;
+	MQ_VALUE_T Co2;
+	MQ_VALUE_T Ammonia;
+	MQ_VALUE_T CARBON_DIOXIDE;
+	MQ_VALUE_T CARBON_MONOXIDE;
+	MQ_VALUE_T TOLUENE;
+	MQ_VALUE_T ACETONE;
 	float R0;
 
 } MQ135_T;
@@ -299,6 +305,9 @@ int compare(const void *a, const void *b);
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ);
 float Set_MQ_PPM(float* sensor, float MQ_ratio);
 void All_Send();
+void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char*nameStr);
+void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio );
+
 
 
 
