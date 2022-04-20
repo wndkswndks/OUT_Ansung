@@ -3,56 +3,50 @@
 
 #include"common.h"
 
-ECO_T m_eco = 
-{
-	{
-		{BEING_SINGELE_CONV,	ADS_REG_CONFIG,		MASK_1,  MOVE_BIT_15},
-		{AIN0_AIN1,				ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_12},
-		{FS_2_048V,				ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_9 },
-		{SINGLE_SHOT_MODE,		ADS_REG_CONFIG,		MASK_1,  MOVE_BIT_8 },
-		{SPS128,				ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_5 }
-	},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0}
-};
-
+ECO_T m_eco;
 
 
 
 
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
-	float MQ2_ratio = 0.0;
-	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
-		
-	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.Propane,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.CARBON_MONOXIDE,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
-		
-
-    float MQ135_ratio = 0.0;
-	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
-
-	MQ_Config(&m_eco.MQ135.Alcohol,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.Co2,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.Ammonia,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
+//	float MQ2_ratio = 0.0;
+//	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
+//		
+//	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.Propane,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.CARBON_MONOXIDE,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
+//	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
+//		
+//
+//    float MQ135_ratio = 0.0;
+//	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
+//
+//	MQ_Config(&m_eco.MQ135.Alcohol,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.Co2,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.Ammonia,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
 	
-//	ADC_to_Volt(AIN0_GND);
+	ADC_to_Volt(AIN0_GND);
 //	ADC_to_Volt(AIN1_GND);
 //	ADC_to_Volt(AIN2_GND);
 //	MCU_ADC_to_Volt();
 }
-void ADS1115_Init()
+void Eco_Init()
 {
+	ADS1115_RegInit(m_eco.config_reg.os, BEING_SINGELE_CONV,  ADS_REG_CONFIG,		MASK_1,  MOVE_BIT_15);
+	ADS1115_RegInit(m_eco.config_reg.mux,AIN0_AIN1,			ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_12);
+	ADS1115_RegInit(m_eco.config_reg.pga,FS_2_048V,			ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_9 );
+	ADS1115_RegInit(m_eco.config_reg.mode,SINGLE_SHOT_MODE,	ADS_REG_CONFIG,		MASK_1,  MOVE_BIT_8);
+	ADS1115_RegInit(m_eco.config_reg.data_rate,SPS128,		ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_5);
+	
 	MQ_Init(&m_eco.MQ2.H2, MQ2_H2_A,MQ2_H2_B, "H2");
 	MQ_Init(&m_eco.MQ2.LPG, MQ2_LPG_A,MQ2_LPG_B, "LPG");
 	MQ_Init(&m_eco.MQ2.CO, MQ2_CO_A,MQ2_CO_B, "CO");
@@ -78,6 +72,14 @@ void ADS1115_Init()
 	m_eco.MQ2.R0 = Get_MQ_Sensor(AIN1_GND, R0_MQ2);
 	m_eco.MQ135.R0 = Get_MQ_Sensor(AIN2_GND, R0_MQ135);
 
+}
+
+void ADS1115_RegInit(uint8_t *reg, uint8_t default_value, uint8_t adderess, uint8_t mask, uint8_t bit)
+{
+	reg[VALUE] = default_value;
+	reg[REG] =  adderess;
+	reg[MASK] = mask;
+	reg[MOVE] = bit;
 }
 void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char*nameStr)
 {

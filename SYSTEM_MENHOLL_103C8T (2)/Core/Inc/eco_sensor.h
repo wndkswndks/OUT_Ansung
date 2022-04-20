@@ -289,10 +289,13 @@ typedef struct
 
 void Eco_Config();
 
-void ADS1115_Init();
+void Eco_Init();
 void ADC_to_Volt(uint8_t AIN_num);
 
 uint16_t MQ_ADC_Read(uint8_t AIN_num);
+
+void ADS1115_RegInit(uint8_t *reg, uint8_t default_value, uint8_t adderess, uint8_t mask, uint8_t bit);
+
 
 
 void ADS1115_Write(uint8_t* ads1115,uint8_t cmd);
