@@ -9,10 +9,10 @@ void Battery_Config()
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	m_status.fan_Battery =(uint8_t)((adc * 3.3 /4095) * 12/3.3) ;
+    	m_status.fan_Battery =(adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) Lora_Send_Msg("fan Battery Low",m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Lora_Send_Msg("fan Battery High",m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) Lora_Send_Msg("fan Battery Low",(uint8_t)m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) Lora_Send_Msg("fan Battery High",(uint8_t)m_status.fan_Battery);
     }
 
     HAL_ADC_Start(&hadc2);  //ADC 시작

@@ -10,31 +10,31 @@ ECO_T m_eco;
 
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
-//	float MQ2_ratio = 0.0;
-//	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
-//		
-//	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.Propane,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.CARBON_MONOXIDE,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
-//	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
-//		
-//
-//    float MQ135_ratio = 0.0;
-//	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
-//
-//	MQ_Config(&m_eco.MQ135.Alcohol,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.Co2,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.Ammonia,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
-//	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
+	float MQ2_ratio = 0.0;
+	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
+		
+	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.Propane,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.CARBON_MONOXIDE,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
+	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
+		
+
+    float MQ135_ratio = 0.0;
+	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
+
+	MQ_Config(&m_eco.MQ135.Alcohol,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.Co2,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.Ammonia,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
+	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
 	
-	ADC_to_Volt(AIN0_GND);
+//	ADC_to_Volt(AIN0_GND);
 //	ADC_to_Volt(AIN1_GND);
 //	ADC_to_Volt(AIN2_GND);
 //	MCU_ADC_to_Volt();
@@ -210,7 +210,7 @@ float Set_MQ_PPM(float* sensor, float MQ_ratio)
 	
 	if(percentage<0)percentage = 0;
 
-	return PPM;
+	return percentage;
 }
 
 
@@ -284,7 +284,7 @@ void All_Send()
 	Lora_Send_Msg("TL",(uint8_t)m_eco.MQ135.TOLUENE.value);	
 	Lora_Send_Msg("AT",(uint8_t)m_eco.MQ135.ACETONE.value);
 
-	Lora_Send_Msg("Battery ",m_status.fan_Battery);
+	Lora_Send_Msg("Battery ",(uint8_t)m_status.fan_Battery);
 	Lora_Send_Msg("Battery ",m_status.pump_Battery);
 	Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
 	Lora_Send_Msg("PUMP ACTIVE",m_status.PumpActive_flag);

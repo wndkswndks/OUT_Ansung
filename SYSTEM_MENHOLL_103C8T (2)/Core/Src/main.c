@@ -22,6 +22,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "usart.h"
+#include "wwdg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -97,7 +98,11 @@ float float_val = 0;
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
+  MX_WWDG_Init();
   /* USER CODE BEGIN 2 */
+  HAL_WWDG_IRQHandler(&hwwdg);
+
+  //HAL_WWDG_Refresh(&hwwdg);
   //GPS_Init();
   HAL_Delay(1000);
   Eco_Init();
@@ -112,7 +117,7 @@ float float_val = 0;
 	  SX1276_RX_Entry(2000);
   }
 
-  GPS_config();
+  //GPS_config();
 
   /* USER CODE END 2 */
 
@@ -127,18 +132,18 @@ float float_val = 0;
    // Main_config();
 	//Eco_Config();
 
-
-//	  Lora_Send_Msg("Menholl Open",cnt++);
+	HAL_WWDG_Refresh(&hwwdg);
+	  Lora_Send_Msg("Menholl Open",cnt++);
 	  LED2_TOGGLE;
 //	  HAL_Delay(1000);
 //	  Sw_Config();
 //	  Error_Config();
 
-		Eco_Config();
+//	Eco_Config();
 //	Battery_Config();
 //	Menholl_Open_Config(); 
 //	Pump_Active_Config();
-//	  HAL_Delay(1000);
+	  HAL_Delay(500);
 
 	
     

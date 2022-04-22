@@ -94,7 +94,7 @@ typedef enum
 /*  			stuct start  			*/
 typedef struct
 {
-	uint8_t fan_Battery;
+	float fan_Battery;
 	uint8_t pump_Battery;
 	uint8_t Menholl_open_flag;
 	uint8_t PumpActive_flag;
