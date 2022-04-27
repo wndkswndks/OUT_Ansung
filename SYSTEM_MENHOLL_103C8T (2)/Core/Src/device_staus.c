@@ -11,8 +11,8 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
     	m_status.fan_Battery =(adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) Lora_Send_Msg("fan Battery Low",(uint8_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Lora_Send_Msg("fan Battery High",(uint8_t)m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) Lora_Send_Msg("<E>fan Battery Low",(uint8_t)m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) Lora_Send_Msg("<E>fan Battery High",(uint8_t)m_status.fan_Battery);
     }
 
     HAL_ADC_Start(&hadc2);  //ADC 시작
@@ -21,8 +21,8 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
     	m_status.pump_Battery =(uint8_t)((adc * 3.3 /4095) * 12/3.3) ;
 
-    	if(m_status.pump_Battery<=10) Lora_Send_Msg("pump Battery Low",m_status.pump_Battery);
-    	else if(m_status.pump_Battery>14) Lora_Send_Msg("pump Battery High",m_status.pump_Battery);
+    	if(m_status.pump_Battery<=10) Lora_Send_Msg("<E>pump Battery Low",m_status.pump_Battery);
+    	else if(m_status.pump_Battery>14) Lora_Send_Msg("<E>pump Battery High",m_status.pump_Battery);
     }
 
   
@@ -33,7 +33,7 @@ void Menholl_Open_Config()
 	if(IS_MENHOLL_OPEN ==0)
 	{
 		m_status.Menholl_open_flag = 1;
-		Lora_Send_Msg("Menholl Open",m_status.Menholl_open_flag);
+		Lora_Send_Msg("<E>Menholl Open",NONE_VALUE);
 	}
 	else
 	{
@@ -71,7 +71,7 @@ void Pump_Active_Config()
 		break;
 
 		case ON_OFF:
-			Lora_Send_Msg("PUMP ERR",0);	
+			Lora_Send_Msg("<E>PUMP ERR",NONE_VALUE);	
 		break;
 
 		case ON_ON:
@@ -83,7 +83,7 @@ void Pump_Active_Config()
 	if(Active_flag == 1) 
 	{
 		m_status.PumpActive_flag = 1;
-		Lora_Send_Msg("PUMP ACTIVE",m_status.PumpActive_flag);
+		Lora_Send_Msg("<E>PUMP ACTIVE",NONE_VALUE);
 	}
 	else
 	{
@@ -92,30 +92,23 @@ void Pump_Active_Config()
 	
 }
 
-void Sw_Config()
+void My_Device()
 {
-	SW_E sw_status = SW_MODE_0;
-	if(SW1_STATUS)m_status.sw_flag[0] =1;
-	else m_status.sw_flag[0] =0;
+	uint8_t sw_flag[4] = {0,};
+	if(SW1_STATUS)sw_flag[0] =1;
+	else sw_flag[0] =0;
 
-	if(SW2_STATUS)m_status.sw_flag[1] =1;
-	else m_status.sw_flag[1] =0;
+	if(SW2_STATUS)sw_flag[1] =1;
+	else sw_flag[1] =0;
 
-	if(SW3_STATUS)m_status.sw_flag[2] =1;
-	else m_status.sw_flag[2] =0;
+	if(SW3_STATUS)sw_flag[2] =1;
+	else sw_flag[2] =0;
 
-	if(SW4_STATUS)m_status.sw_flag[3] =1;
-	else m_status.sw_flag[3] =0;
+	if(SW4_STATUS)sw_flag[3] =1;
+	else sw_flag[3] =0;
 
-	sw_status = (m_status.sw_flag[3]<<3)|(m_status.sw_flag[2]<<2)|(m_status.sw_flag[1]<<1)|(m_status.sw_flag[0]<<0);
-	switch (sw_status)
-	{
-		case SW_MODE_0:
-		break;
+	m_status.device = (sw_flag[3]<<3)|(sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
 
-		case SW_MODE_1:
-		break;
-	}
 
 }
 
@@ -172,4 +165,10 @@ void Error_Config()
 void Set_Error(ERROR_E error)
 {
 	m_status.err_status[error] = 1;
+}
+
+void Error_Watchdog(ERROR_E error)
+{	
+	Lora_Send_Msg("<E>",error);
+	MX_IWDG_Init();
 }

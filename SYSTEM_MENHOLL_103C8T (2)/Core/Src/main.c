@@ -20,9 +20,9 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "iwdg.h"
 #include "spi.h"
 #include "usart.h"
-#include "wwdg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -98,13 +98,13 @@ float float_val = 0;
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
-  MX_WWDG_Init();
+  //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-  HAL_WWDG_IRQHandler(&hwwdg);
 
-  //HAL_WWDG_Refresh(&hwwdg);
+
   //GPS_Init();
-  HAL_Delay(1000);
+  My_Device();
+
   Eco_Init();
   SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
   LED3_ON;
@@ -117,7 +117,9 @@ float float_val = 0;
 	  SX1276_RX_Entry(2000);
   }
 
-  //GPS_config();
+  GPS_config();
+
+  Lora_Send_Msg("Device_start",NONE_VALUE);
 
   /* USER CODE END 2 */
 
@@ -132,18 +134,17 @@ float float_val = 0;
    // Main_config();
 	//Eco_Config();
 
-	HAL_WWDG_Refresh(&hwwdg);
-	  Lora_Send_Msg("Menholl Open",cnt++);
+//	  Lora_Send_Msg("Menholl Open",cnt++);
 	  LED2_TOGGLE;
 //	  HAL_Delay(1000);
-//	  Sw_Config();
-//	  Error_Config();
-
-//	Eco_Config();
-//	Battery_Config();
-//	Menholl_Open_Config(); 
-//	Pump_Active_Config();
-	  HAL_Delay(500);
+////	  Sw_Config();
+////	  Error_Config();
+//
+////	Eco_Config();
+////	Battery_Config();
+////	Menholl_Open_Config(); 
+////	Pump_Active_Config();
+	  HAL_Delay(200);
 
 	
     
@@ -164,10 +165,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
@@ -261,6 +263,7 @@ void Main_config()
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+  Error_Watchdog(ERR0R_2);
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

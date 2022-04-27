@@ -187,7 +187,7 @@ RX_DEVICE,  // txDevice or rxDevice
 {0,0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
-char buffer[512];
+uint8_t buffer[512];
 
 int message;
 int message_length;
@@ -219,19 +219,29 @@ void Lora_config()
 #define POLLING_TYPE	2
 
 
-void Lora_Send_Msg(uint8_t* msg, uint8_t data)
+void Lora_Send_Msg(char* msg, uint8_t data)
 {
 	uint8_t txBuff[30] = {0,};
 	uint8_t length = 0;
 
-	length = sprintf(txBuff, "[ Event %s : %d]", msg, data);
-
+	if(data == NONE_VALUE)
+	{
+		length = sprintf(txBuff, "[(%d) %s]",m_status.device, msg);
+	}
+	else
+	{
+		length = sprintf(txBuff, "[(%d) %s : %d]",m_status.device, msg, data);
+	}
 	SX1276_TX_Entry(length, 2000);
 			
 	SX1276_TX_Packet(txBuff,length,2000);
 	HAL_Delay(10);
 	
 }
+
+
+
+
 uint8_t SPI_Read(uint8_t reg)
 {
 	uint8_t txByte = 0x00;

@@ -93,6 +93,7 @@
 #define SX1276_MAX_PACKET	256
 
 
+#define NONE_VALUE		0XAA
 
 
 /*  			define end  			*/
@@ -631,7 +632,7 @@ uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
 void SX1276_RX_Packet(uint8_t* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
-void Lora_Send_Msg(uint8_t* msg, uint8_t data);
+void Lora_Send_Msg(char* msg, uint8_t data);
 
 
 /*  			function end  			*/

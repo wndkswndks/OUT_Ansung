@@ -58,23 +58,23 @@ typedef enum
 
 typedef enum
 {
-	SW_MODE_0,
-	SW_MODE_1,
-	SW_MODE_2,
-	SW_MODE_3,
-	SW_MODE_4,
-	SW_MODE_5,
-	SW_MODE_6,
-	SW_MODE_7,
-	SW_MODE_8,
-	SW_MODE_9,
-	SW_MODE_10,
-	SW_MODE_11,
-	SW_MODE_12,
-	SW_MODE_13,
-	SW_MODE_14,
-	SW_MODE_15,
-} SW_E;
+	DEVICE_0,
+	DEVICE_1,
+	DEVICE_2,
+	DEVICE_3,
+	DEVICE_4,
+	DEVICE_5,
+	DEVICE_6,
+	DEVICE_7,
+	DEVICE_8,
+	DEVICE_9,
+	DEVICE_10,
+	DEVICE_11,
+	DEVICE_12,
+	DEVICE_13,
+	DEVICE_14,
+	DEVICE_15,
+} DEVICE_NUM_E;
 
 typedef enum
 {
@@ -98,7 +98,7 @@ typedef struct
 	uint8_t pump_Battery;
 	uint8_t Menholl_open_flag;
 	uint8_t PumpActive_flag;
-	uint8_t sw_flag[4];
+	uint8_t device;
 	uint8_t err_status[8];
 	
 	
@@ -111,9 +111,10 @@ typedef struct
 void Battery_Config();
 void Menholl_Open_Config();
 void Pump_Active_Config();
-void Sw_Config();
+void My_Device();
 void Error_Config();
 void Set_Error(ERROR_E error);
+void Error_Watchdog(ERROR_E error);
 
 
 /*  			function end  			*/
