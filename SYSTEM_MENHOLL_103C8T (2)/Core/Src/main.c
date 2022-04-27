@@ -100,19 +100,19 @@ float float_val = 0;
   /* USER CODE BEGIN 2 */
   //GPS_Init();
   HAL_Delay(1000);
-  Eco_Init();
-  SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
-  LED3_ON;
-  if(m_sx1276.device == TX_DEVICE)
-  {
-	  SX1276_TX_Entry(16, 2000);
-  }
-  else
-  {
-	  SX1276_RX_Entry(2000);
-  }
-
-  GPS_config();
+//  Eco_Init();
+//  SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
+//  LED3_ON;
+//  if(m_sx1276.device == TX_DEVICE)
+//  {
+//	  SX1276_TX_Entry(16, 2000);
+//  }
+//  else
+//  {
+//	  SX1276_RX_Entry(2000);
+//  }
+//
+//  GPS_config();
 
   /* USER CODE END 2 */
 
@@ -134,11 +134,11 @@ float float_val = 0;
 //	  Sw_Config();
 //	  Error_Config();
 
-		Eco_Config();
+//		Eco_Config();
 //	Battery_Config();
 //	Menholl_Open_Config(); 
 //	Pump_Active_Config();
-//	  HAL_Delay(1000);
+	  HAL_Delay(500);
 
 	
     
