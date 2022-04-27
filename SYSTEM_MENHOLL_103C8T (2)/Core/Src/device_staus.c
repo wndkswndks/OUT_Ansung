@@ -170,5 +170,5 @@ void Set_Error(ERROR_E error)
 void Error_Watchdog(ERROR_E error)
 {	
 	Lora_Send_Msg("<E>",error);
-	MX_IWDG_Init();
+	//MX_IWDG_Init();
 }
