@@ -304,7 +304,7 @@ void Gateway_Receive()
 	}
 	else if(strncmp("[<N>:",buffer ,5 ))
 	{
-		node = atoi(buffer+6);
+		node = atoi(buffer+8);
 		Gateway_to_M_Send(node);
 	}
 
