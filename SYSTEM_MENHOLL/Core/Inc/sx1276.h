@@ -633,6 +633,16 @@ void SX1276_RX_Packet(uint8_t* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
 
+void SX1276_Change_rx_tx(uint8_t mode);
+
+void Master_Send();
+void Gateway_to_M_Send(uint16_t node);
+void Gateway_to_N_Send(uint16_t node);
+void Node_Send();
+void Master_Receive();
+void Gateway_Receive();
+void Node_Receive();
+
 
 /*  			function end  			*/
 

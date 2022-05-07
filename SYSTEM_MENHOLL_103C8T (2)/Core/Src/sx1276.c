@@ -300,12 +300,16 @@ void Gateway_Receive()
 	if(strncmp("[<M>:",buffer ,5 ))
 	{
 		node = atoi(buffer+6);
+		SX1276_Change_rx_tx(TX_DEVICE);
 		Gateway_to_N_Send(node);
+		SX1276_Change_rx_tx(RX_DEVICE);
 	}
 	else if(strncmp("[<N>:",buffer ,5 ))
 	{
 		node = atoi(buffer+8);
+		SX1276_Change_rx_tx(TX_DEVICE);
 		Gateway_to_M_Send(node);
+		SX1276_Change_rx_tx(RX_DEVICE);
 	}
 
 }
@@ -320,7 +324,9 @@ void Node_Receive()
 
 		if(node == m_status.device)
 		{
+			SX1276_Change_rx_tx(TX_DEVICE);
 			Node_Send();
+			SX1276_Change_rx_tx(RX_DEVICE);
 		}
 	}
 }
@@ -523,7 +529,23 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	//RegOpMode
 	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_STDBY);///
 }
-
+void SX1276_Change_rx_tx(uint8_t mode)
+{
+	if(mode == TX_DEVICE)
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
+		SX1276_TX_Entry(16, 2000);
+	}
+	else if(mode == RX_DEVICE)
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_DEFAULT);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,RX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_RXDONE_IRQ);
+		SX1276_RX_Entry(2000);
+	}	
+}
 uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 {
 	uint8_t addr = 0;

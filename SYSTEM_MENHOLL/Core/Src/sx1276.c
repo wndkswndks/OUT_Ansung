@@ -4,6 +4,7 @@
 #include "main.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 SX1276_T m_sx1276 = 
@@ -222,6 +223,116 @@ void Lora_config()
 	}
 
 }
+void SX1276_Change_rx_tx(uint8_t mode)
+{
+	if(mode == TX_DEVICE)
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
+		SX1276_TX_Entry(16, 2000);
+	}
+	else if(mode == RX_DEVICE)
+	{
+		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_DEFAULT);
+		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,RX_DONE);
+		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_RXDONE_IRQ);
+		SX1276_RX_Entry(2000);
+	}	
+}
+
+void Lora_Poling_Send_Msg(char* msg, uint16_t data)
+{
+	uint8_t txBuff[30] = {0,};
+	uint8_t length = 0;
+
+
+	length = sprintf(txBuff, "[%s:%u]",msg, data);
+
+	SX1276_TX_Entry(length, 2000);
+			
+	SX1276_TX_Packet(txBuff,length,2000);
+	HAL_Delay(20);
+	
+}
+
+
+void Master_Send()
+{
+	static uint16_t node = 0;
+	node++;
+	node %= 5; 
+	Lora_Poling_Send_Msg("<M>", node);
+}
+
+void Gateway_to_M_Send(uint16_t node)
+{
+	Lora_Poling_Send_Msg("<g>", node);
+}
+void Gateway_to_N_Send(uint16_t node)
+{
+	Lora_Poling_Send_Msg("<G>", node);
+}
+
+void Node_Send()
+{
+	uint8_t flag = 0;
+	if(flag == 0) 
+		Lora_Poling_Send_Msg("<N>OK", 1);
+	else 
+		Lora_Poling_Send_Msg("<N>NO", 1);
+}
+
+void Master_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+	if(strncmp("[<g>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+
+	}
+}
+
+void Gateway_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+
+	if(strncmp("[<M>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+		SX1276_Change_rx_tx(TX_DEVICE);
+		Gateway_to_N_Send(node);
+		SX1276_Change_rx_tx(RX_DEVICE);
+	}
+	else if(strncmp("[<N>:",buffer ,5 ))
+	{
+		node = atoi(buffer+8);
+		SX1276_Change_rx_tx(TX_DEVICE);
+		Gateway_to_M_Send(node);
+		SX1276_Change_rx_tx(RX_DEVICE);
+	}
+
+}
+
+void Node_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+	if(strncmp("[<G>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+
+		if(node == 1)
+		{
+			SX1276_Change_rx_tx(TX_DEVICE);
+			Node_Send();
+			SX1276_Change_rx_tx(RX_DEVICE);
+		}
+	}
+}
+
 uint8_t SPI_Read(uint8_t reg)
 {
 	uint8_t txByte = 0x00;
