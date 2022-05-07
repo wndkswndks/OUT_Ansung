@@ -93,7 +93,8 @@ void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 
 	strcat(str,MQ->name);
 	MQ->value =  Set_MQ_PPM(MQ->graph, MQ135_ratio);
-	if(MQ->value > MQ_OVER_PERSENT) Lora_Send_Msg(str,(uint8_t)MQ->value);
+	if(MQ->value > MQ_OVER_PERSENT) Lora_Send_Msg(str,(uint16_t)MQ->value);
+	HAL_Delay(1000);
 
 }
 
@@ -199,7 +200,7 @@ float Set_MQ_PPM(float* sensor, float MQ_ratio)
 {
 	float PPM_log,PPM,percentage = 0;
 
-	if(sensor[MQ_A]==0 && sensor[MQ_B]==0) return 0xFF;
+	if(sensor[MQ_A]==0 && sensor[MQ_B]==0) return 12345;
 
 #if MQ_SOURCE == 1
 	PPM_log = (log10(MQ_ratio) - sensor[MQ_B])/sensor[MQ_A];
@@ -209,8 +210,8 @@ float Set_MQ_PPM(float* sensor, float MQ_ratio)
 #elif MQ_SOURCE == 3
 	PPM = pow(10,((sensor[MQ_A]*(log10(MQ_ratio))) +sensor[MQ_B]));
 #endif
-	percentage = PPM/10000;
-	
+	//percentage = PPM/10000;
+	percentage = PPM;
 	if(percentage<0)percentage = 0;
 
 	return percentage;
@@ -270,37 +271,37 @@ float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 
 void All_Send()
 {
-	Lora_Send_Msg("<P>LPG",(uint8_t)m_eco.MQ2.LPG.value);
+	Lora_Send_Msg("<P>LPG",(uint16_t)m_eco.MQ2.LPG.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>PP",(uint8_t)m_eco.MQ2.Propane.value);
+	Lora_Send_Msg("<P>PP",(uint16_t)m_eco.MQ2.Propane.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>H2",(uint8_t)m_eco.MQ2.H2.value);
+	Lora_Send_Msg("<P>H2",(uint16_t)m_eco.MQ2.H2.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>CO",(uint8_t)m_eco.MQ2.CO.value);
+	Lora_Send_Msg("<P>CO",(uint16_t)m_eco.MQ2.CO.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>MT",(uint8_t)m_eco.MQ2.METHANE.value);
+	Lora_Send_Msg("<P>MT",(uint16_t)m_eco.MQ2.METHANE.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>CM",(uint8_t)m_eco.MQ2.CARBON_MONOXIDE.value);
+	Lora_Send_Msg("<P>CM",(uint16_t)m_eco.MQ2.CARBON_MONOXIDE.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>AC",(uint8_t)m_eco.MQ2.ALCOHOL.value);
+	Lora_Send_Msg("<P>AC",(uint16_t)m_eco.MQ2.ALCOHOL.value);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>SM",(uint8_t)m_eco.MQ2.SMOKE.value);
-	HAL_Delay(1000);
-
-	Lora_Send_Msg("<P>AC",(uint8_t)m_eco.MQ135.Alcohol.value);
-	HAL_Delay(1000);
-	Lora_Send_Msg("<P>AM",(uint8_t)m_eco.MQ135.Ammonia.value);
-	HAL_Delay(1000);
-	Lora_Send_Msg("<P>CD",(uint8_t)m_eco.MQ135.CARBON_DIOXIDE.value);
-	HAL_Delay(1000);
-	Lora_Send_Msg("<P>CM",(uint8_t)m_eco.MQ135.CARBON_MONOXIDE.value);
-	HAL_Delay(1000);
-	Lora_Send_Msg("<P>TL",(uint8_t)m_eco.MQ135.TOLUENE.value);	
-	HAL_Delay(1000);
-	Lora_Send_Msg("<P>AT",(uint8_t)m_eco.MQ135.ACETONE.value);
+	Lora_Send_Msg("<P>SM",(uint16_t)m_eco.MQ2.SMOKE.value);
 	HAL_Delay(1000);
 
-	Lora_Send_Msg("<P>Battery ",(uint8_t)m_status.fan_Battery);
+	Lora_Send_Msg("<P>AC",(uint16_t)m_eco.MQ135.Alcohol.value);
+	HAL_Delay(1000);
+	Lora_Send_Msg("<P>AM",(uint16_t)m_eco.MQ135.Ammonia.value);
+	HAL_Delay(1000);
+	Lora_Send_Msg("<P>CD",(uint16_t)m_eco.MQ135.CARBON_DIOXIDE.value);
+	HAL_Delay(1000);
+	Lora_Send_Msg("<P>CM",(uint16_t)m_eco.MQ135.CARBON_MONOXIDE.value);
+	HAL_Delay(1000);
+	Lora_Send_Msg("<P>TL",(uint16_t)m_eco.MQ135.TOLUENE.value);	
+	HAL_Delay(1000);
+	Lora_Send_Msg("<P>AT",(uint16_t)m_eco.MQ135.ACETONE.value);
+	HAL_Delay(1000);
+
+	Lora_Send_Msg("<P>Battery ",(uint16_t)m_status.fan_Battery);
 	HAL_Delay(1000);
 	Lora_Send_Msg("<P>Battery ",m_status.pump_Battery);
 	HAL_Delay(1000);

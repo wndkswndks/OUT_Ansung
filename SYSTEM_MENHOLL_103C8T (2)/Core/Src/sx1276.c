@@ -219,7 +219,24 @@ void Lora_config()
 #define POLLING_TYPE	2
 
 
-void Lora_Send_Msg(char* msg, uint8_t data)
+void Lora_Poling_Send_Msg(char* msg, uint16_t data)
+{
+	uint8_t txBuff[30] = {0,};
+	uint8_t length = 0;
+
+
+	length = sprintf(txBuff, "[%s:%u]",msg, data);
+
+	SX1276_TX_Entry(length, 2000);
+			
+	SX1276_TX_Packet(txBuff,length,2000);
+	HAL_Delay(20);
+	
+}
+
+
+
+void Lora_Send_Msg(char* msg, uint16_t data)
 {
 	uint8_t txBuff[30] = {0,};
 	uint8_t length = 0;
@@ -230,15 +247,83 @@ void Lora_Send_Msg(char* msg, uint8_t data)
 	}
 	else
 	{
-		length = sprintf(txBuff, "[(%d) %s : %d]",m_status.device, msg, data);
+		length = sprintf(txBuff, "[(%d) %s : %u]",m_status.device, msg, data);
 	}
 	SX1276_TX_Entry(length, 2000);
 			
 	SX1276_TX_Packet(txBuff,length,2000);
-	HAL_Delay(10);
+	HAL_Delay(20);
 	
 }
 
+void Master_Send()
+{
+	static uint16_t node = 0;
+	node++;
+	node %= m_status.nodeMaxNum; 
+	Lora_Poling_Send_Msg("<M>", node);
+}
+
+void Gateway_to_M_Send(uint16_t node)
+{
+	Lora_Poling_Send_Msg("<g>", node);
+}
+void Gateway_to_N_Send(uint16_t node)
+{
+	Lora_Poling_Send_Msg("<G>", node);
+}
+
+void Node_Send()
+{
+	if(m_status.event_flag == 0) 
+		Lora_Poling_Send_Msg("<N>OK", m_status.device);
+	else 
+		Lora_Poling_Send_Msg("<N>NO", m_status.device);
+}
+
+void Master_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+	if(strncmp("[<g>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+
+	}
+}
+
+void Gateway_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+
+	if(strncmp("[<M>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+		Gateway_to_N_Send(node);
+	}
+	else if(strncmp("[<N>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+		Gateway_to_M_Send(node);
+	}
+
+}
+
+void Node_Receive()
+{
+	uint8_t node = 0;
+	SX1276_RX_Packet(buffer);
+	if(strncmp("[<G>:",buffer ,5 ))
+	{
+		node = atoi(buffer+6);
+
+		if(node == m_status.device)
+		{
+			Node_Send();
+		}
+	}
+}
 
 
 

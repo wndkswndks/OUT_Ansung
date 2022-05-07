@@ -632,7 +632,7 @@ uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
 void SX1276_RX_Packet(uint8_t* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
-void Lora_Send_Msg(char* msg, uint8_t data);
+void Lora_Send_Msg(char* msg, uint16_t data);
 
 
 /*  			function end  			*/

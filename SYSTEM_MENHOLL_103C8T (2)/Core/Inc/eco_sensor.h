@@ -149,7 +149,7 @@
 
 #endif
 
-#define MQ_OVER_PERSENT		10
+#define MQ_OVER_PERSENT		0
 
 
 

@@ -193,6 +193,7 @@ char buffer[512];
 
 int message;
 int message_length;
+extern UART_HandleTypeDef huart2;
 
 void Lora_config()
 {
@@ -211,7 +212,13 @@ void Lora_config()
 	{
 		HAL_Delay(800);
 		SX1276_RX_Packet(buffer);
-		SX1276_Calculrate_SNR_Rssi();	
+//		if(buffer[0] !=0)
+//		{
+//			HAL_UART_Transmit(&huart2, buffer, strlen(buffer),1000);
+//			HAL_UART_Transmit(&huart2, "\r\n", 2,1000);
+//			memset(buffer,0,512);
+//		}
+		//SX1276_Calculrate_SNR_Rssi();	
 	}
 
 }

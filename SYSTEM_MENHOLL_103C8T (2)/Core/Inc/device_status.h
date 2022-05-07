@@ -100,7 +100,8 @@ typedef struct
 	uint8_t PumpActive_flag;
 	uint8_t device;
 	uint8_t err_status[8];
-	
+	uint8_t event_flag;
+	uint16_t nodeMaxNum;
 	
 } STATUS_T;
 /*  			stuct end  				*/

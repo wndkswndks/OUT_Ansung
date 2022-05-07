@@ -1,25 +1,6 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "iwdg.h"
 #include "spi.h"
 #include "usart.h"
 #include "gpio.h"
@@ -41,6 +22,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+int cnt = 0;
 
 /* USER CODE END PM */
 
@@ -52,6 +34,26 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -77,7 +79,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-int cnt = 0;
+
 float float_val = 0;
 
   /* USER CODE END Init */
@@ -97,13 +99,14 @@ float float_val = 0;
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
+//  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
 
   //GPS_Init();
   My_Device();
 
-  Eco_Init();
+  //Eco_Init();
   SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
   LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
@@ -115,7 +118,7 @@ float float_val = 0;
 	  SX1276_RX_Entry(2000);
   }
 
-  GPS_config();
+  //GPS_config();
 
   Lora_Send_Msg("Device_start",NONE_VALUE);
 
@@ -129,20 +132,20 @@ float float_val = 0;
 
     /* USER CODE BEGIN 3 */
 
-   // Main_config();
+    //Main_config();
 	//Eco_Config();
 
-//	  Lora_Send_Msg("Menholl Open",cnt++);
+	  Lora_Send_Msg("Menholl Open",cnt++);
 	  LED2_TOGGLE;
-//	  HAL_Delay(1000);
+	  HAL_Delay(100);
 ////	  Sw_Config();
 ////	  Error_Config();
 //
-////	Eco_Config();
+//	Eco_Config();
 ////	Battery_Config();
 ////	Menholl_Open_Config(); 
 ////	Pump_Active_Config();
-	  HAL_Delay(200);
+//	  HAL_Delay(1000);
 
 	
     
@@ -163,10 +166,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
@@ -200,11 +204,16 @@ void Main_config()
 {
 	static uint8_t step = STEP1;
 	static uint32_t standardTime = 0; 
+	static int cnt = 0;
 	switch(step)
 	{
 		case STEP1:
-			if(HAL_GetTick() >standardTime + MINUTE_1)
+			if(HAL_GetTick() >standardTime + SEC_30)
 			{
+				Lora_Send_Msg("Nowtime",HAL_GetTick()/1000);
+				HAL_Delay(1000);
+				Lora_Send_Msg("CNT",cnt++);
+				
 				Eco_Config();
 				step = STEP2;
 				standardTime = HAL_GetTick();
@@ -212,7 +221,7 @@ void Main_config()
 		break;
 
 		case STEP2:
-			if(HAL_GetTick() >standardTime + MINUTE_1)
+			if(HAL_GetTick() >standardTime + SEC_40)
 			{
 				Battery_Config();
 				step = STEP3;
@@ -221,7 +230,7 @@ void Main_config()
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() >standardTime + MINUTE_1)
+			if(HAL_GetTick() >standardTime + SEC_5)
 			{
 				Menholl_Open_Config(); 
 				step = STEP4;
@@ -230,17 +239,16 @@ void Main_config()
 		break;
 
 		case STEP4:
-			if(HAL_GetTick() >standardTime + MINUTE_1)
+			if(HAL_GetTick() >standardTime + SEC_5)
 			{
 				Pump_Active_Config();
 				step = STEP5;
 				standardTime = HAL_GetTick();
-				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
 			}
 		break;
 
 		case STEP5:
-			if(HAL_GetTick() >standardTime + MINUTE_1)
+			if(HAL_GetTick() >standardTime + SEC_5)
 			{
 				step = STEP1;
 				All_Send();
@@ -249,7 +257,11 @@ void Main_config()
 		break;
 
 	}
-	Error_Config();
+	LED1_TOGGLE;
+	LED2_TOGGLE;
+	LED3_TOGGLE;
+	HAL_Delay(100);
+	//Error_Config();
 }
 /* USER CODE END 4 */
 

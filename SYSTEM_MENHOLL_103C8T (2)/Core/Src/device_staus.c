@@ -9,20 +9,20 @@ void Battery_Config()
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	m_status.fan_Battery =(adc * 3.3 /4095) * 12/3.3 ;
+    	m_status.fan_Battery = (adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) Lora_Send_Msg("<E>fan Battery Low",(uint8_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Lora_Send_Msg("<E>fan Battery High",(uint8_t)m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) Lora_Send_Msg("<E>fan Battery Low",(uint16_t)m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) Lora_Send_Msg("<E>fan Battery High",(uint16_t)m_status.fan_Battery);
     }
-
+ 	HAL_Delay(1000);
     HAL_ADC_Start(&hadc2);  //ADC 시작
   	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
-    	m_status.pump_Battery =(uint8_t)((adc * 3.3 /4095) * 12/3.3) ;
+    	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.pump_Battery<=10) Lora_Send_Msg("<E>pump Battery Low",m_status.pump_Battery);
-    	else if(m_status.pump_Battery>14) Lora_Send_Msg("<E>pump Battery High",m_status.pump_Battery);
+    	if(m_status.pump_Battery<=10) Lora_Send_Msg("<E>pump Battery Low",(uint16_t)m_status.pump_Battery);
+    	else if(m_status.pump_Battery>14) Lora_Send_Msg("<E>pump Battery High",(uint16_t)m_status.pump_Battery);
     }
 
   
@@ -38,6 +38,7 @@ void Menholl_Open_Config()
 	else
 	{
 		m_status.Menholl_open_flag = 0;
+		Lora_Send_Msg("<E>Menholl Close",NONE_VALUE);
 	}
 
 
@@ -88,6 +89,7 @@ void Pump_Active_Config()
 	else
 	{
 		m_status.PumpActive_flag = 0;
+		Lora_Send_Msg("<E>PUMP DISACTIVE",NONE_VALUE);
 	}
 	
 }
@@ -170,5 +172,5 @@ void Set_Error(ERROR_E error)
 void Error_Watchdog(ERROR_E error)
 {	
 	Lora_Send_Msg("<E>",error);
-	//MX_IWDG_Init();
+	MX_IWDG_Init();
 }
