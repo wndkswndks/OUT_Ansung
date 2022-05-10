@@ -231,6 +231,7 @@ void SX1276_Change_rx_tx(uint8_t mode)
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
 		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
 		SX1276_TX_Entry(16, 2000);
+
 	}
 	else if(mode == RX_DEVICE)
 	{
@@ -256,13 +257,45 @@ void Lora_Poling_Send_Msg(char* msg, uint16_t data)
 	
 }
 
-
+uint8_t fflag = 0;
+uint16_t Gate_return = 0;
+uint16_t Master_start = 0;
 void Master_Send()
 {
 	static uint16_t node = 0;
-	node++;
-	node %= 5; 
-	Lora_Poling_Send_Msg("<M>", node);
+	static uint8_t step = 1;
+	static uint32_t timestemp = 0;
+	
+	switch(step)
+	{	
+		case 1:
+			Master_start++;
+			Master_start%=1000;
+			HAL_Delay(100);
+			SX1276_Change_rx_tx(TX_DEVICE);
+			Lora_Poling_Send_Msg("<G>", Master_start);
+			SX1276_Change_rx_tx(RX_DEVICE);
+			timestemp = HAL_GetTick();
+			
+			step = 2;
+			
+		break;
+
+		case 2:
+			
+			SX1276_RX_Packet(buffer);
+			if(strncmp("[<m>:",buffer ,5 )==0)
+			{
+				Gate_return = atoi(buffer+5);
+				memset(buffer,0,512);
+
+			}
+			if(HAL_GetTick() > timestemp + 1000)
+			{
+				step = 1;
+			}
+		break;
+	}
 }
 
 void Gateway_to_M_Send(uint16_t node)
@@ -287,49 +320,42 @@ void Master_Receive()
 {
 	uint8_t node = 0;
 	SX1276_RX_Packet(buffer);
-	if(strncmp("[<g>:",buffer ,5 ))
+	if(strncmp("[<g>:",buffer ,5 )==0)
 	{
 		node = atoi(buffer+6);
 
 	}
 }
-
+uint16_t mynode = 0;
 void Gateway_Receive()
 {
 	uint8_t node = 0;
 	SX1276_RX_Packet(buffer);
 
-	if(strncmp("[<M>:",buffer ,5 ))
+	if(strncmp("[<M>:",buffer ,5 )==0)
 	{
-		node = atoi(buffer+6);
-		SX1276_Change_rx_tx(TX_DEVICE);
-		Gateway_to_N_Send(node);
-		SX1276_Change_rx_tx(RX_DEVICE);
-	}
-	else if(strncmp("[<N>:",buffer ,5 ))
-	{
-		node = atoi(buffer+8);
+		mynode = atoi(buffer+5);
 		SX1276_Change_rx_tx(TX_DEVICE);
 		Gateway_to_M_Send(node);
 		SX1276_Change_rx_tx(RX_DEVICE);
 	}
 
-}
 
+}
+uint16_t from_Gate = 0;
 void Node_Receive()
 {
 	uint8_t node = 0;
 	SX1276_RX_Packet(buffer);
-	if(strncmp("[<G>:",buffer ,5 ))
+	if(strncmp("[<N>:",buffer ,5 )==0)
 	{
-		node = atoi(buffer+6);
-
-		if(node == 1)
-		{
-			SX1276_Change_rx_tx(TX_DEVICE);
-			Node_Send();
-			SX1276_Change_rx_tx(RX_DEVICE);
-		}
+		
+		from_Gate = atoi(buffer+5);
+		HAL_Delay(200);
+		memset(buffer, 0, 512);
+		SX1276_Change_rx_tx(TX_DEVICE);
+		Lora_Poling_Send_Msg("<g>", from_Gate);
+		SX1276_Change_rx_tx(RX_DEVICE);
 	}
 }
 
@@ -465,7 +491,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	{
 		m_sx1276.device = RX_DEVICE;////
 	}
-	
+	m_sx1276.device = TX_DEVICE;
 	SPI_NSS_SET;
 	SET_SX1276;
 
