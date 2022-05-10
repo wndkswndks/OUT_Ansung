@@ -102,7 +102,10 @@ typedef struct
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	uint16_t nodeMaxNum;
-	
+	uint8_t extensionName[4];
+	uint8_t nodeName[4];
+	uint8_t loraRute[20];
+	uint8_t polingDataStr[40];
 } STATUS_T;
 /*  			stuct end  				*/
 
@@ -116,6 +119,7 @@ void My_Device();
 void Error_Config();
 void Set_Error(ERROR_E error);
 void Error_Watchdog(ERROR_E error);
+void Poling_Str_Add(uint16_t data);
 
 
 /*  			function end  			*/

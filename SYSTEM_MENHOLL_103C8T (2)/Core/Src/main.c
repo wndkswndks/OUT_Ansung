@@ -200,69 +200,85 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+//void Main_config()
+//{
+//	static uint8_t step = STEP1;
+//	static uint32_t standardTime = 0; 
+//	static int cnt = 0;
+//	switch(step)
+//	{
+//		case STEP1:
+//			if(HAL_GetTick() >standardTime + SEC_30)
+//			{
+//				Lora_Send_Msg("Nowtime",HAL_GetTick()/1000);
+//				HAL_Delay(1000);
+//				Lora_Send_Msg("CNT",cnt++);
+//				
+//				Eco_Config();
+//				step = STEP2;
+//				standardTime = HAL_GetTick();
+//			}
+//		break;
+//
+//		case STEP2:
+//			if(HAL_GetTick() >standardTime + SEC_40)
+//			{
+//				Battery_Config();
+//				step = STEP3;
+//				standardTime = HAL_GetTick();
+//			}
+//		break;
+//
+//		case STEP3:
+//			if(HAL_GetTick() >standardTime + SEC_5)
+//			{
+//				Menholl_Open_Config(); 
+//				step = STEP4;
+//				standardTime = HAL_GetTick();
+//			}
+//		break;
+//
+//		case STEP4:
+//			if(HAL_GetTick() >standardTime + SEC_5)
+//			{
+//				Pump_Active_Config();
+//				step = STEP5;
+//				standardTime = HAL_GetTick();
+//			}
+//		break;
+//
+//		case STEP5:
+//			if(HAL_GetTick() >standardTime + SEC_5)
+//			{
+//				step = STEP1;
+//				All_Send();
+//				standardTime = HAL_GetTick();
+//			}
+//		break;
+//
+//	}
+//	LED1_TOGGLE;
+//	LED2_TOGGLE;
+//	LED3_TOGGLE;
+//	HAL_Delay(100);
+//	//Error_Config();
+//}
+
 void Main_config()
-{
-	static uint8_t step = STEP1;
-	static uint32_t standardTime = 0; 
-	static int cnt = 0;
-	switch(step)
-	{
-		case STEP1:
-			if(HAL_GetTick() >standardTime + SEC_30)
-			{
-				Lora_Send_Msg("Nowtime",HAL_GetTick()/1000);
-				HAL_Delay(1000);
-				Lora_Send_Msg("CNT",cnt++);
-				
-				Eco_Config();
-				step = STEP2;
-				standardTime = HAL_GetTick();
-			}
-		break;
+{	
+	Eco_Config();
+	Battery_Config();
+	Menholl_Open_Config(); 
+	Pump_Active_Config();
+	All_Send();
 
-		case STEP2:
-			if(HAL_GetTick() >standardTime + SEC_40)
-			{
-				Battery_Config();
-				step = STEP3;
-				standardTime = HAL_GetTick();
-			}
-		break;
-
-		case STEP3:
-			if(HAL_GetTick() >standardTime + SEC_5)
-			{
-				Menholl_Open_Config(); 
-				step = STEP4;
-				standardTime = HAL_GetTick();
-			}
-		break;
-
-		case STEP4:
-			if(HAL_GetTick() >standardTime + SEC_5)
-			{
-				Pump_Active_Config();
-				step = STEP5;
-				standardTime = HAL_GetTick();
-			}
-		break;
-
-		case STEP5:
-			if(HAL_GetTick() >standardTime + SEC_5)
-			{
-				step = STEP1;
-				All_Send();
-				standardTime = HAL_GetTick();
-			}
-		break;
-
-	}
 	LED1_TOGGLE;
 	LED2_TOGGLE;
 	LED3_TOGGLE;
 	HAL_Delay(100);
 	//Error_Config();
 }
+
 /* USER CODE END 4 */
 
 /**

@@ -219,18 +219,28 @@ void Lora_config()
 #define POLLING_TYPE	2
 
 
-void Lora_Poling_Send_Msg(char* msg, uint16_t data)
+void Lora_Event_Send_Msg(uint16_t data)
 {
 	uint8_t txBuff[30] = {0,};
+	uint8_t event_msg[10] = {0,};
 	uint8_t length = 0;
 
+	memcpy(txBuff, m_status.loraRute, strlen(m_status.loraRute));
+	strcat(txBuff,m_status.nodeName);
+	
+	sprintf(event_msg, "<E>[%u]",data);
 
-	length = sprintf(txBuff, "[%s:%u]",msg, data);
+	strcat(txBuff,event_msg);
 
+	length = strlen(txBuff);
+
+
+	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
 			
 	SX1276_TX_Packet(txBuff,length,2000);
 	HAL_Delay(20);
+	SX1276_Change_rx_tx(RX_DEVICE);
 	
 }
 
@@ -258,28 +268,10 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 
 void Master_Send()
 {
-	static uint16_t node = 0;
-	node++;
-	node %= m_status.nodeMaxNum; 
-	Lora_Poling_Send_Msg("<M>", node);
+
 }
 
-void Gateway_to_M_Send(uint16_t node)
-{
-	Lora_Poling_Send_Msg("<g>", node);
-}
-void Gateway_to_N_Send(uint16_t node)
-{
-	Lora_Poling_Send_Msg("<G>", node);
-}
 
-void Node_Send()
-{
-	if(m_status.event_flag == 0) 
-		Lora_Poling_Send_Msg("<N>OK", m_status.device);
-	else 
-		Lora_Poling_Send_Msg("<N>NO", m_status.device);
-}
 
 void Master_Receive()
 {
@@ -292,42 +284,36 @@ void Master_Receive()
 	}
 }
 
-void Gateway_Receive()
+void Gateway_Pass()
 {
-	uint8_t node = 0;
 	SX1276_RX_Packet(buffer);
 
-	if(strncmp("[<M>:",buffer ,5 ))
+	if(strncmp(m_status.extensionName,buffer ,4 ))
 	{
-		node = atoi(buffer+6);
 		SX1276_Change_rx_tx(TX_DEVICE);
-		Gateway_to_N_Send(node);
-		SX1276_Change_rx_tx(RX_DEVICE);
-	}
-	else if(strncmp("[<N>:",buffer ,5 ))
-	{
-		node = atoi(buffer+8);
-		SX1276_Change_rx_tx(TX_DEVICE);
-		Gateway_to_M_Send(node);
+		Lora_Send_Msg(buffer+4, NONE_VALUE);
 		SX1276_Change_rx_tx(RX_DEVICE);
 	}
 
 }
 
-void Node_Receive()
+void Node_Pass()
 {
-	uint8_t node = 0;
-	SX1276_RX_Packet(buffer);
-	if(strncmp("[<G>:",buffer ,5 ))
-	{
-		node = atoi(buffer+6);
+	uint8_t txBuff[20] = {0,};
 
-		if(node == m_status.device)
-		{
+	SX1276_RX_Packet(buffer);
+	if(strncmp(m_status.nodeName,buffer ,4 ))
+	{
+			memcpy(txBuff, m_status.loraRute, strlen(m_status.loraRute));
+			strcat(txBuff,m_status.nodeName);
+			strcat(txBuff,"[");
+			strcat(txBuff,m_status.polingDataStr);
+			strcat(txBuff,"]");
+
+			
 			SX1276_Change_rx_tx(TX_DEVICE);
-			Node_Send();
+			Lora_Send_Msg(txBuff, NONE_VALUE);
 			SX1276_Change_rx_tx(RX_DEVICE);
-		}
 	}
 }
 

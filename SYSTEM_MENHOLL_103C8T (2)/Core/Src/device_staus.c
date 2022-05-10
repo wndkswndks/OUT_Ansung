@@ -110,8 +110,9 @@ void My_Device()
 	else sw_flag[3] =0;
 
 	m_status.device = (sw_flag[3]<<3)|(sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
-
-
+	memcpy(m_status.extensionName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
+	memcpy(m_status.nodeName, NODE1, strlen(NODE1));
+	memcpy(m_status.loraRute, LORA_ROUTE, strlen(LORA_ROUTE));
 }
 
 void Error_Config()
@@ -174,3 +175,11 @@ void Error_Watchdog(ERROR_E error)
 	Lora_Send_Msg("<E>",error);
 	MX_IWDG_Init();
 }
+
+void Poling_Str_Add(uint16_t data)
+{
+	uint8_t buff[5] = {0,};
+	sprintf(buff, "%d,", data);
+	strcat(m_status.polingDataStr,buff);
+}
+

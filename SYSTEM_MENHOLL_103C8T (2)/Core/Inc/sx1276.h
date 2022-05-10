@@ -95,6 +95,23 @@
 
 #define NONE_VALUE		0XAA
 
+#define EXTENSION_NODE1	  "$A01"
+#define EXTENSION_NODE2	  "$A02"
+#define EXTENSION_NODE3	  "$A03"
+#define EXTENSION_NODE4	  "$A04"
+
+
+
+
+#define NODE1	  	"#001"
+#define NODE2	  	"#002"
+#define NODE3	  	"#003"
+#define NODE4	  	"#004"
+
+
+
+
+#define LORA_ROUTE	"$A03$A02$A01"
 
 /*  			define end  			*/
 
@@ -636,12 +653,10 @@ void Lora_Send_Msg(char* msg, uint16_t data);
 void SX1276_Change_rx_tx(uint8_t mode);
 
 void Master_Send();
-void Gateway_to_M_Send(uint16_t node);
-void Gateway_to_N_Send(uint16_t node);
 void Node_Send();
 void Master_Receive();
-void Gateway_Receive();
-void Node_Receive();
+void Gateway_Pass();
+void Node_Pass();
 
 
 /*  			function end  			*/
