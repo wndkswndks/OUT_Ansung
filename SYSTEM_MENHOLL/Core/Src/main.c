@@ -144,9 +144,13 @@ int main(void)
 
 	//Eco_Config();
 
-	Lora_config();
+	//Lora_config();
 
-
+	 //Master_Send();
+	  //Gateway_Receive();
+	  Lora_Poling_Send_Msg("<G>", ret++);
+	  HAL_Delay(1000);
+	//Node_Receive();
 
 
   }
