@@ -111,7 +111,9 @@
 
 
 
-#define LORA_ROUTE	"$A03$A02$A01"
+#define TO_NODE_ROUTE	      "$A01$A02"
+#define TO_MASTER_ROUTE 	"$A06$A07"
+
 
 /*  			define end  			*/
 
@@ -652,9 +654,8 @@ void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);
 void SX1276_Change_rx_tx(uint8_t mode);
 
-void Master_Send();
+void Master_Pass();
 void Node_Send();
-void Master_Receive();
 void Gateway_Pass();
 void Node_Pass();
 

@@ -100,10 +100,16 @@ float float_val = 0;
   MX_ADC2_Init();
   MX_USART1_UART_Init();
 //  MX_IWDG_Init();
+
+
+
   /* USER CODE BEGIN 2 */
 
 
   //GPS_Init();
+  Poling_Str_Add(44);
+  Poling_Str_Add(215);
+  Poling_Str_Add(66);
   My_Device();
 
   //Eco_Init();
@@ -135,9 +141,12 @@ float float_val = 0;
     //Main_config();
 	//Eco_Config();
 
-	  Lora_Send_Msg("Menholl Open",cnt++);
-	  LED2_TOGGLE;
-	  HAL_Delay(100);
+	Node_Pass();
+
+
+//	  Lora_Send_Msg("Menholl Open",cnt++);
+//	  LED2_TOGGLE;
+//	  HAL_Delay(100);
 ////	  Sw_Config();
 ////	  Error_Config();
 //

@@ -102,9 +102,10 @@ typedef struct
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	uint16_t nodeMaxNum;
-	uint8_t extensionName[4];
-	uint8_t nodeName[4];
-	uint8_t loraRute[20];
+	uint8_t extensionName[20];
+	uint8_t toNodeRute[20];
+	uint8_t toMasterRute[20];
+	uint8_t nodeName[20];
 	uint8_t polingDataStr[40];
 } STATUS_T;
 /*  			stuct end  				*/
