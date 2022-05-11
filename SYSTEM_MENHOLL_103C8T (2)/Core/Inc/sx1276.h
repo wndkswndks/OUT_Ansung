@@ -111,8 +111,8 @@
 
 
 
-#define TO_NODE_ROUTE	      "$A01$A02"
-#define TO_MASTER_ROUTE 	"$A06$A07"
+#define TO_NODE_ROUTE	      "$A01"
+#define TO_MASTER_ROUTE 	"$A01&M"
 
 
 /*  			define end  			*/

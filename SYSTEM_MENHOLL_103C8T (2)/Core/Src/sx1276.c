@@ -269,38 +269,47 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 	
 }
 
+uint8_t readMag[50] = {0,};
+
 void Master_Pass()
 {
 	static uint16_t node = 0;
-	static uint8_t step = 1;
+	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 	uint8_t txBuff[20] = {0,};
-
+	uint8_t rxBuff[50] = {0,};
 	
 	switch(step)
 	{	
-		case 1:
+		case STEP1:
 			HAL_Delay(100);
 
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			
+			strcat(txBuff,m_status.nodeName);
 			Lora_Send_Msg(txBuff, NONE_VALUE);
-			timestemp = HAL_GetTick();
-			
-			step = 2;
+			step = STEP2;
 			
 		break;
 
-		case 2:
+		case STEP2:
 			
 			SX1276_RX_Packet(buffer);
 			if(strncmp("#001",buffer ,4 )==0)
 			{
-				
+                HAL_Delay(100);
+				memcpy(readMag,buffer,50);
+                memset(buffer,0,512);
+				timestemp = HAL_GetTick();
+				step = STEP3;
 			}
+			
+		break;
+
+		case STEP3:
 			if(HAL_GetTick() > timestemp + 1000)
 			{
-				step = 1;
+
+				step = STEP1;
 			}
 		break;
 	}
@@ -311,32 +320,49 @@ void Master_Pass()
 
 void Gateway_Pass()
 {
+	uint8_t rxBuff[50] = {0,};
 	SX1276_RX_Packet(buffer);
 
-	if(strncmp(m_status.extensionName,buffer ,4 ))
+	if(strncmp(m_status.extensionName,buffer ,4 )==0)
 	{
+		memcpy(readMag,buffer,50);
+		
 		HAL_Delay(100);
 		Lora_Send_Msg(buffer+4, NONE_VALUE);
+		memset(buffer,0,512);
 	}
 
 }
 
 void Node_Pass()
 {
-	uint8_t txBuff[30] = {0,};
+	uint8_t txBuff[50] = {0,};
+	uint8_t rxBuff[50] = {0,};
+	static int cnt = 0;
+	SX1276_RX_Packet(buffer);
 
-	//SX1276_RX_Packet(buffer);
-	//if(strncmp(m_status.nodeName,buffer ,4 ))
-	//{
+
+	
+	if(strncmp(m_status.nodeName,buffer ,4 )==0)
+	{
+			memcpy(readMag,buffer,50);
+			memset(buffer,0,512);
 			HAL_Delay(100);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 			strcat(txBuff,m_status.nodeName);
 			strcat(txBuff,"[");
 			strcat(txBuff,m_status.polingDataStr);
 			strcat(txBuff,"]");
-			HAL_Delay(100);
-			//Lora_Send_Msg(txBuff, NONE_VALUE);
-	//}
+			Lora_Send_Msg(txBuff, NONE_VALUE);
+
+			memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
+
+			Poling_Str_Add(cnt);
+		  	Poling_Str_Add(cnt+100);
+		  	Poling_Str_Add(cnt+200);
+		  	cnt++;
+	}
+	memset(buffer,0,512);
 }
 
 
@@ -465,7 +491,7 @@ void SX1276_BurstRead(uint8_t reg, uint8_t* rxBuff, uint8_t length)
 
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_enable)
 {
-	if(!GET_DEVICE_SELECT)
+	if(m_status.device == 0x01)
 	{
 		m_sx1276.device = TX_DEVICE;
 	}
@@ -473,7 +499,7 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	{
 		m_sx1276.device = RX_DEVICE;////
 	}
-	
+
 	SPI_NSS_SET;
 	SET_SX1276;
 

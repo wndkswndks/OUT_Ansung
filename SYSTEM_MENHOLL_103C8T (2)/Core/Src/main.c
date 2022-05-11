@@ -126,7 +126,7 @@ float float_val = 0;
 
   //GPS_config();
 
-  Lora_Send_Msg("Device_start",NONE_VALUE);
+  //Lora_Send_Msg("Device_start",NONE_VALUE);
 
   /* USER CODE END 2 */
 
@@ -141,22 +141,15 @@ float float_val = 0;
     //Main_config();
 	//Eco_Config();
 
-	Node_Pass();
-
-
 //	  Lora_Send_Msg("Menholl Open",cnt++);
 //	  LED2_TOGGLE;
 //	  HAL_Delay(100);
-////	  Sw_Config();
-////	  Error_Config();
-//
-//	Eco_Config();
-////	Battery_Config();
-////	Menholl_Open_Config(); 
-////	Pump_Active_Config();
-//	  HAL_Delay(1000);
 
 	
+	if(m_status.device == 0x01) Master_Pass();
+	//Gateway_Pass();
+	//Node_Pass();
+
     
   }
   /* USER CODE END 3 */
