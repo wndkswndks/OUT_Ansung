@@ -112,7 +112,7 @@ void My_Device()
 	m_status.nodeMaxNum =10;
 	m_status.device = (sw_flag[3]<<3)|(sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
 	memcpy(m_status.extensionName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
-	memcpy(m_status.nodeName, NODE1, strlen(NODE1));
+	memcpy(m_status.myNodeName, NODE1, strlen(NODE1));
 
 	memcpy(m_status.toNodeRute, TO_NODE_ROUTE, strlen(TO_NODE_ROUTE));
 	memcpy(m_status.toMasterRute, TO_MASTER_ROUTE, strlen(TO_MASTER_ROUTE));

@@ -105,8 +105,9 @@ typedef struct
 	uint8_t extensionName[20];
 	uint8_t toNodeRute[20];
 	uint8_t toMasterRute[20];
-	uint8_t nodeName[20];
+	uint8_t myNodeName[20];
 	uint8_t polingDataStr[40];
+	uint8_t nodeNum[40];
 } STATUS_T;
 /*  			stuct end  				*/
 

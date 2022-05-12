@@ -226,7 +226,7 @@ void Lora_Event_Send_Msg(char* msg, uint16_t data)
 	uint8_t length = 0;
 
 	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
-	strcat(txBuff,m_status.nodeName);
+	strcat(txBuff,m_status.myNodeName);
 	
 	sprintf(event_msg, "<E>[%s:%u]",msg, data);
 
@@ -271,21 +271,42 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 
 uint8_t readMag[50] = {0,};
 int no_rx_num = 0;
+uint16_t tmp[5] = {0,};
 void Master_Pass()
 {
-	static uint16_t node = 0;
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 	uint8_t txBuff[20] = {0,};
 	uint8_t rxBuff[50] = {0,};
+	uint8_t nodeNum[10] = {0,};
+	static uint16_t nodeCnt = 1;
+	static uint16_t prenodeCnt =1;
+	static uint8_t notRxCnt,notRxflag = 0;
 	
 	switch(step)
 	{	
 		case STEP1:
 
+//			if(prenodeCnt == nodeCnt) 
+//			{
+//				notRxCnt++;
+//				if(notRxCnt > 10)
+//				{
+//					notRxCnt = 0;
+//					notRxflag = 1;
+//					PCPrintf("Not recive = %d node \r\n",nodeCnt);
+//					nodeCnt++;
+//				}
+//			}
+			
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			strcat(txBuff,m_status.nodeName);
+			strcat(txBuff,"#");
+
+			sprintf(nodeNum,"00%u",nodeCnt);
+			strcat(txBuff,nodeNum);
+			
 			Lora_Send_Msg(txBuff, NONE_VALUE);
+			prenodeCnt = nodeCnt;
 			timestemp = HAL_GetTick();
 			step = STEP2;
 			
@@ -295,7 +316,7 @@ void Master_Pass()
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() > timestemp + 1000)
+			if(HAL_GetTick() - timestemp >1000)
 			{
 				no_rx_num++;
 				step = STEP1;
@@ -304,10 +325,14 @@ void Master_Pass()
 			if(strncmp("&M",buffer ,2 )==0)
 			{
 				LED1_TOGGLE;
-                //HAL_Delay(100);
+				sscanf(buffer, "&M#001[%u,%u,%u,]", tmp, tmp+1, tmp+2);
+				PCPrintf("%s \r\n",buffer+6);
+                notRxCnt = 0;
 				memcpy(readMag,buffer,50);
+			
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
+				//nodeCnt++;
 				step = STEP3;
 			}
 			
@@ -351,14 +376,14 @@ void Node_Pass()
 
 
 	
-	if(strncmp(m_status.nodeName,buffer ,4 )==0)
+	if(strncmp(m_status.myNodeName,buffer ,4 )==0)
 	{
 			LED1_TOGGLE;
 			memcpy(readMag,buffer,50);
 			memset(buffer,0,512);
 			HAL_Delay(100);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
-			strcat(txBuff,m_status.nodeName);
+			strcat(txBuff,m_status.myNodeName);
 			strcat(txBuff,"[");
 			strcat(txBuff,m_status.polingDataStr);
 			strcat(txBuff,"]");

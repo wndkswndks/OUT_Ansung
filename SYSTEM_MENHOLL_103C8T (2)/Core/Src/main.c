@@ -1,3 +1,23 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
 #include "adc.h"
 #include "i2c.h"
 #include "iwdg.h"
@@ -23,7 +43,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 int cnt = 0;
-
+uint8_t rxBufff[1] = {0,};
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -34,26 +54,6 @@ int cnt = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -67,7 +67,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)c
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -99,13 +99,10 @@ float float_val = 0;
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
-//  MX_IWDG_Init();
-
-
-
+  //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-
+	HAL_UART_Receive_IT(&huart1, rxBufff, 1);
   //GPS_Init();
   Poling_Str_Add(44);
   Poling_Str_Add(215);
@@ -145,7 +142,7 @@ float float_val = 0;
 //	  LED2_TOGGLE;
 //	  HAL_Delay(100);
 
-	
+	//HAL_UART_Transmit_IT(&huart1, "qwerrty", 8);
 	if(m_status.device == 0x01) Master_Pass();
 	if(m_status.device == 0x02) Gateway_Pass();
 	if(m_status.device == 0x03) Node_Pass();
