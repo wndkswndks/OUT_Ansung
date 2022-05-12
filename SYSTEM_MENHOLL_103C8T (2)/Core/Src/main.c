@@ -67,7 +67,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int main(void)c
 {
   /* USER CODE BEGIN 1 */
 
@@ -147,8 +147,8 @@ float float_val = 0;
 
 	
 	if(m_status.device == 0x01) Master_Pass();
-	//Gateway_Pass();
-	//Node_Pass();
+	if(m_status.device == 0x02) Gateway_Pass();
+	if(m_status.device == 0x03) Node_Pass();
 
     
   }

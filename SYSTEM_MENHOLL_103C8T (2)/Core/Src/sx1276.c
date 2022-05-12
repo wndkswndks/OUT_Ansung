@@ -270,7 +270,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 }
 
 uint8_t readMag[50] = {0,};
-
+int no_rx_num = 0;
 void Master_Pass()
 {
 	static uint16_t node = 0;
@@ -282,11 +282,11 @@ void Master_Pass()
 	switch(step)
 	{	
 		case STEP1:
-			HAL_Delay(100);
 
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,m_status.nodeName);
 			Lora_Send_Msg(txBuff, NONE_VALUE);
+			timestemp = HAL_GetTick();
 			step = STEP2;
 			
 		break;
@@ -294,9 +294,17 @@ void Master_Pass()
 		case STEP2:
 			
 			SX1276_RX_Packet(buffer);
-			if(strncmp("#001",buffer ,4 )==0)
+
+			if(HAL_GetTick() > timestemp + 1000)
 			{
-                HAL_Delay(100);
+				no_rx_num++;
+				step = STEP1;
+				
+			}
+			if(strncmp("&M",buffer ,2 )==0)
+			{
+				LED1_TOGGLE;
+                //HAL_Delay(100);
 				memcpy(readMag,buffer,50);
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
@@ -306,7 +314,7 @@ void Master_Pass()
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() > timestemp + 1000)
+			if(HAL_GetTick() > timestemp + 300)
 			{
 
 				step = STEP1;
@@ -325,8 +333,8 @@ void Gateway_Pass()
 
 	if(strncmp(m_status.extensionName,buffer ,4 )==0)
 	{
+		LED1_TOGGLE;
 		memcpy(readMag,buffer,50);
-		
 		HAL_Delay(100);
 		Lora_Send_Msg(buffer+4, NONE_VALUE);
 		memset(buffer,0,512);
@@ -345,6 +353,7 @@ void Node_Pass()
 	
 	if(strncmp(m_status.nodeName,buffer ,4 )==0)
 	{
+			LED1_TOGGLE;
 			memcpy(readMag,buffer,50);
 			memset(buffer,0,512);
 			HAL_Delay(100);
