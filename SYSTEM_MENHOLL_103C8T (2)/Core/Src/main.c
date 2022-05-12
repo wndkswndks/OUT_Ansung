@@ -67,7 +67,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int main(void)//
 {
   /* USER CODE BEGIN 1 */
 
@@ -80,7 +80,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-float float_val = 0;
 
   /* USER CODE END Init */
 

@@ -647,8 +647,8 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 void HW_Reset();
 uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut);
 uint8_t SX1276_RX_Entry(uint32_t timeOut);
-uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut);
-void SX1276_RX_Packet(uint8_t* rxBuff);
+uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut);
+void SX1276_RX_Packet(char* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);

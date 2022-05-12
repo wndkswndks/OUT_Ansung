@@ -181,9 +181,9 @@ void Error_Watchdog(ERROR_E error)
 	MX_IWDG_Init();
 }
 
-void Poling_Str_Add(uint16_t data)
+void Poling_Str_Add(uint16_t data)//
 {
-	uint8_t buff[5] = {0,};
+	char buff[5] = {0,};
 	sprintf(buff, "%u,", data);
 	strcat(m_status.polingDataStr,buff);
 }

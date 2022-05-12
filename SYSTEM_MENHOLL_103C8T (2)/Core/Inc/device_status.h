@@ -95,19 +95,19 @@ typedef enum
 typedef struct
 {
 	float fan_Battery;
-	uint8_t pump_Battery;
+	float pump_Battery;
 	uint8_t Menholl_open_flag;
 	uint8_t PumpActive_flag;
 	uint8_t device;
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	uint16_t nodeMaxNum;
-	uint8_t extensionName[20];
-	uint8_t toNodeRute[20];
-	uint8_t toMasterRute[20];
-	uint8_t myNodeName[20];
-	uint8_t polingDataStr[40];
-	uint8_t nodeNum[40];
+	char extensionName[20];
+	char toNodeRute[20];
+	char toMasterRute[20];
+	char myNodeName[20];
+	char polingDataStr[40];
+	char nodeNum[40];
 } STATUS_T;
 /*  			stuct end  				*/
 

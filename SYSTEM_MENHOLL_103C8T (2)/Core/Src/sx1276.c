@@ -187,7 +187,7 @@ RX_DEVICE,  // txDevice or rxDevice
 {0,0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
-uint8_t buffer[512];
+char buffer[512];
 
 int message;
 int message_length;
@@ -221,8 +221,8 @@ void Lora_config()
 
 void Lora_Event_Send_Msg(char* msg, uint16_t data)
 {
-	uint8_t txBuff[30] = {0,};
-	uint8_t event_msg[15] = {0,};
+	char txBuff[30] = {0,};
+	char event_msg[15] = {0,};
 	uint8_t length = 0;
 
 	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
@@ -248,7 +248,7 @@ void Lora_Event_Send_Msg(char* msg, uint16_t data)
 
 void Lora_Send_Msg(char* msg, uint16_t data)
 {
-	uint8_t txBuff[30] = {0,};
+	char txBuff[30] = {0,};
 	uint8_t length = 0;
 
 	if(data == NONE_VALUE)
@@ -272,13 +272,12 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 uint8_t readMag[50] = {0,};
 int no_rx_num = 0;
 uint16_t tmp[5] = {0,};
-void Master_Pass()
+void Master_Pass()//
 {
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
-	uint8_t txBuff[20] = {0,};
-	uint8_t rxBuff[50] = {0,};
-	uint8_t nodeNum[10] = {0,};
+	char txBuff[20] = {0,};
+	char nodeNum[10] = {0,};
 	static uint16_t nodeCnt = 1;
 	static uint16_t prenodeCnt =1;
 	static uint8_t notRxCnt,notRxflag = 0;
@@ -339,7 +338,7 @@ void Master_Pass()
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() > timestemp + 300)
+			if(HAL_GetTick() - timestemp >300)
 			{
 
 				step = STEP1;
@@ -353,7 +352,6 @@ void Master_Pass()
 
 void Gateway_Pass()
 {
-	uint8_t rxBuff[50] = {0,};
 	SX1276_RX_Packet(buffer);
 
 	if(strncmp(m_status.extensionName,buffer ,4 )==0)
@@ -369,9 +367,8 @@ void Gateway_Pass()
 
 void Node_Pass()
 {
-	uint8_t txBuff[50] = {0,};
-	uint8_t rxBuff[50] = {0,};
-	static int cnt = 0;
+	char txBuff[50] = {0,};
+	static uint16_t cnt = 0;
 	SX1276_RX_Packet(buffer);
 
 
@@ -675,9 +672,9 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut)
 }
 
 
-uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut)
+uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut)
 {
-	SX1276_BurstWrite(0x00, txBuff, lengh);
+	SX1276_BurstWrite(0x00, (uint8_t *)txBuff, lengh);
 	SX1276_Segment_Write(m_sx1276.s_OpMode.Mode,MODE_TX);
 
 	while(1)
@@ -702,7 +699,7 @@ uint8_t SX1276_TX_Packet(uint8_t* txBuff, uint8_t lengh, uint32_t timeOut)
 	
 }
 
-void SX1276_RX_Packet(uint8_t* rxBuff)
+void SX1276_RX_Packet(char* rxBuff)
 {
 	uint8_t addr = 0;
 	uint8_t packet_size = 0;
@@ -716,7 +713,7 @@ void SX1276_RX_Packet(uint8_t* rxBuff)
 
 		packet_size = SX1276_Read(m_sx1276.s_RxNbBytes.FifoRxBytesNb);
 
-		if(packet_size !=0)SX1276_BurstRead(0x00, rxBuff, packet_size);
+		if(packet_size !=0)SX1276_BurstRead(0x00, (uint8_t *)rxBuff, packet_size);
 
 		SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
 		
