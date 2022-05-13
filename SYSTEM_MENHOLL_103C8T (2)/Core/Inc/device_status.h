@@ -102,7 +102,7 @@ typedef struct
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	uint16_t nodeMaxNum;
-	char extensionName[20];
+	char stationName[20];
 	char toNodeRute[20];
 	char toMasterRute[20];
 	char myNodeName[20];

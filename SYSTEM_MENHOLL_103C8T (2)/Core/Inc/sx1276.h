@@ -102,7 +102,7 @@
 
 
 
-
+#define NODE0	  	"#000"
 #define NODE1	  	"#001"
 #define NODE2	  	"#002"
 #define NODE3	  	"#003"
@@ -112,7 +112,11 @@
 
 
 #define TO_NODE_ROUTE	      "$A01"
+#define TO_NODE_ROUTE2	      "$A01A02A03"
+
 #define TO_MASTER_ROUTE 	"$A01&M"
+#define TO_MASTER_ROUTE2 	"$A03A02A01&M"
+
 
 
 /*  			define end  			*/

@@ -144,8 +144,10 @@ int main(void)//
 	//HAL_UART_Transmit_IT(&huart1, "qwerrty", 8);
 	if(m_status.device == 0x01) Master_Pass();
 	if(m_status.device == 0x02) Gateway_Pass();
-	if(m_status.device == 0x03) Node_Pass();
-
+	if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
+	{
+		Node_Pass();
+	}
     
   }
   /* USER CODE END 3 */
