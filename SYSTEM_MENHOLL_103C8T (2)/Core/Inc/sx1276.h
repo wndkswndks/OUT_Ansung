@@ -112,10 +112,10 @@
 
 
 #define TO_NODE_ROUTE	      "$A01"
-#define TO_NODE_ROUTE2	      "$A01A02A03"
+#define TO_NODE_ROUTE2	      "$A01$A02$A03"
 
 #define TO_MASTER_ROUTE 	"$A01&M"
-#define TO_MASTER_ROUTE2 	"$A03A02A01&M"
+#define TO_MASTER_ROUTE2 	"$A03$A02$A01&M"
 
 
 
@@ -658,7 +658,9 @@ void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);
 void SX1276_Change_rx_tx(uint8_t mode);
 
-void Master_Pass();
+void Master_Pass_Many_Node();
+void Master_Pass_Many_Station();
+
 void Node_Send();
 void Gateway_Pass();
 void Node_Pass();

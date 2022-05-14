@@ -272,7 +272,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 uint8_t readMag[50] = {0,};
 int no_rx_num[3] = {0,};
 uint16_t tmp[5] = {0,};
-void Master_Pass()//
+void Master_Pass_Many_Node()//
 {
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
@@ -351,6 +351,66 @@ void Master_Pass()//
 }
 
 
+void Master_Pass_Many_Station()//
+{
+	static uint8_t step = STEP1;
+	static uint32_t timestemp = 0;
+	char txBuff[20] = {0,};
+	char nodeNum[10] = {0,};
+	static uint16_t nodeCnt = 0;
+	static uint8_t notRxCnt,notRxflag = 0;
+	
+	switch(step)
+	{	
+		case STEP1:
+			
+			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
+			strcat(txBuff,"#");
+
+			sprintf(nodeNum,"00%u",nodeCnt);
+			strcat(txBuff,nodeNum);
+			LED2_TOGGLE;
+			Lora_Send_Msg(txBuff, NONE_VALUE);
+			timestemp = HAL_GetTick();
+			step = STEP2;
+			
+		break;
+
+		case STEP2:
+			
+			SX1276_RX_Packet(buffer);
+
+			if(HAL_GetTick() - timestemp >2000)
+			{
+				no_rx_num[nodeCnt]++;
+				step = STEP1;
+				
+			}
+			if(strncmp("&M",buffer ,2 )==0)
+			{
+				LED1_TOGGLE;
+				sscanf(buffer, "&M#001[%u,%u,%u,]", tmp, tmp+1, tmp+2);
+				PCPrintf("%s \r\n",buffer+2);
+                notRxCnt = 0;
+				memcpy(readMag,buffer,50);
+			
+                memset(buffer,0,512);
+				timestemp = HAL_GetTick();
+				step = STEP3;
+			}
+			
+		break;
+
+		case STEP3:
+			if(HAL_GetTick() - timestemp >300)
+			{
+
+				step = STEP1;
+			}
+		break;
+	}
+
+}
 
 void Gateway_Pass()
 {
