@@ -427,18 +427,18 @@ void Gateway_Pass()
 
 }
 
+//int len = 0;
 void Node_Pass()
 {
 	char txBuff[50] = {0,};
 	static uint16_t cnt = 0;
-	SX1276_RX_Packet(buffer);
-
+	//SX1276_RX_Packet(buffer);
 
 	
-	if(strncmp(m_status.myNodeName,buffer ,4 )==0)
-	{
+	//if(strncmp(m_status.myNodeName,buffer ,4 )==0)
+	//{
 			LED1_TOGGLE;
-			memcpy(readMag,buffer,50);
+			//memcpy(readMag,buffer,50);
 			memset(buffer,0,512);
 			HAL_Delay(100);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
@@ -446,6 +446,8 @@ void Node_Pass()
 			strcat(txBuff,"[");
 			strcat(txBuff,m_status.polingDataStr);
 			strcat(txBuff,"]");
+			memcpy(readMag,txBuff,50);
+			
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 
 			memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
@@ -454,7 +456,8 @@ void Node_Pass()
 		  	Poling_Str_Add(cnt+100);
 		  	Poling_Str_Add(cnt+200);
 		  	cnt++;
-	}
+	//}
+	//memset(txBuff,0,50);
 	memset(buffer,0,512);
 }
 
@@ -697,7 +700,7 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();	
-			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
 			return 0;
 		}
 	}
@@ -726,7 +729,7 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);
@@ -753,7 +756,7 @@ uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(434000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);

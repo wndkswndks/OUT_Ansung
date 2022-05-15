@@ -212,4 +212,13 @@ void Poling_Str_Add(uint16_t data)//
 	sprintf(buff, "%u,", data);
 	strcat(m_status.polingDataStr,buff);
 }
+void Led_Toggle_Config()
+{
+	static uint32_t time_stamp = 0;
 
+	if(HAL_GetTick() - time_stamp >500)
+	{
+		LED3_TOGGLE;
+		time_stamp = HAL_GetTick(); 
+	}
+}

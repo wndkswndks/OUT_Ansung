@@ -115,7 +115,7 @@
 #define TO_NODE_ROUTE2	      "$A01$A02$A03"
 
 #define TO_MASTER_ROUTE 	"$A01&M"
-#define TO_MASTER_ROUTE2 	"$A03$A02$A01&M"
+#define TO_MASTER_ROUTE2 	"$A03$A02$A01&M8"
 
 
 
