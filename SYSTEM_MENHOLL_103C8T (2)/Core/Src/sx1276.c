@@ -364,7 +364,9 @@ void Master_Pass_Many_Station()//
 	char nodeNum[10] = {0,};
 	static uint16_t nodeCnt = 0;
 	static uint8_t notRxCnt,notRxflag = 0;
-	
+	static int success_rx_num = 0;
+	static int fail_rx_num = 0;
+	static int tx_rx_num = 0;
 	switch(step)
 	{	
 		case STEP1:
@@ -378,7 +380,7 @@ void Master_Pass_Many_Station()//
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
-			
+			tx_rx_num++;
 		break;
 
 		case STEP2:
@@ -387,16 +389,17 @@ void Master_Pass_Many_Station()//
 
 			if(HAL_GetTick() - timestemp >600)
 			{
-				no_rx_num[nodeCnt]++;
+				fail_rx_num++;
 				step = STEP1;
 				
 			}
 			if(strncmp("&M",buffer ,MASTER_HEAD_LEN )==0)
 			{
 				LED1_TOGGLE;
+				success_rx_num++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%s : %d \r\n",buffer+2,no_rx_num[nodeCnt]);
+				PCPrintf("%st:%d r:%d e:%d t:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
                 notRxCnt = 0;
 				memcpy(readMag,buffer,50);
 			
@@ -669,7 +672,7 @@ void SX1276_Change_rx_tx(uint8_t mode)
 		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
 		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
-		SX1276_TX_Entry(16, 2000);
+		//SX1276_TX_Entry(16, 2000);
 	}
 	else if(mode == RX_DEVICE)
 	{
