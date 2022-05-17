@@ -160,7 +160,7 @@ int main(void)//
 	  if(m_status.device == 0x05) Node_Pass();
 	#endif
 
-    
+    Led_Toggle_Config();
   }
   /* USER CODE END 3 */
 }

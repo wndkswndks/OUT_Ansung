@@ -245,10 +245,12 @@ void Lora_Event_Send_Msg(char* msg, uint16_t data)
 }
 
 
+uint32_t preT = 0;
+uint32_t termT = 0;
 
 void Lora_Send_Msg(char* msg, uint16_t data)
 {
-	char txBuff[30] = {0,};
+	char txBuff[50] = {0,};
 	uint8_t length = 0;
 
 	if(data == NONE_VALUE)
@@ -260,11 +262,13 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 		length = sprintf(txBuff, "[(%d) %s : %u]",m_status.device, msg, data);
 	}
 
+	preT = HAL_GetTick();
 	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
 	SX1276_TX_Packet(txBuff,length,2000);
-	HAL_Delay(20);
+	//HAL_Delay(20);
 	SX1276_Change_rx_tx(RX_DEVICE);
+	termT = HAL_GetTick() - preT;
 	
 	
 }
@@ -350,6 +354,7 @@ void Master_Pass_Many_Node()//
 
 }
 
+uint32_t callbackTime= 0;
 
 void Master_Pass_Many_Station()//
 {
@@ -367,7 +372,7 @@ void Master_Pass_Many_Station()//
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,"#");
 
-			sprintf(nodeNum,"00%u",nodeCnt);
+			sprintf(nodeNum,"%u",nodeCnt);
 			strcat(txBuff,nodeNum);
 			LED2_TOGGLE;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
@@ -380,16 +385,17 @@ void Master_Pass_Many_Station()//
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() - timestemp >2000)
+			if(HAL_GetTick() - timestemp >600)
 			{
 				no_rx_num[nodeCnt]++;
 				step = STEP1;
 				
 			}
-			if(strncmp("&M",buffer ,2 )==0)
+			if(strncmp("&M",buffer ,MASTER_HEAD_LEN )==0)
 			{
 				LED1_TOGGLE;
-				sscanf(buffer, "&M#001[%u,%u,%u,]", tmp, tmp+1, tmp+2);
+				callbackTime = HAL_GetTick() - timestemp;
+				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
 				PCPrintf("%s \r\n",buffer+2);
                 notRxCnt = 0;
 				memcpy(readMag,buffer,50);
@@ -402,7 +408,7 @@ void Master_Pass_Many_Station()//
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() - timestemp >300)
+			if(HAL_GetTick() - timestemp >10)
 			{
 
 				step = STEP1;
@@ -416,31 +422,29 @@ void Gateway_Pass()
 {
 	SX1276_RX_Packet(buffer);
 
-	if(strncmp(m_status.stationName,buffer ,4 )==0)
+	if(strncmp(m_status.stationName,buffer ,STATION_HEAD_LEN )==0)
 	{
 		LED1_TOGGLE;
 		memcpy(readMag,buffer,50);
-		HAL_Delay(100);
-		Lora_Send_Msg(buffer+4, NONE_VALUE);
+		HAL_Delay(LORA_DELAY);
+		Lora_Send_Msg(buffer+STATION_HEAD_LEN, NONE_VALUE);
 		memset(buffer,0,512);
 	}
 
 }
 
-//int len = 0;
 void Node_Pass()
 {
 	char txBuff[50] = {0,};
 	static uint16_t cnt = 0;
-	//SX1276_RX_Packet(buffer);
-
+	SX1276_RX_Packet(buffer);
 	
-	//if(strncmp(m_status.myNodeName,buffer ,4 )==0)
-	//{
+	if(strncmp(m_status.myNodeName,buffer ,NODE_HEAD_LEN )==0)
+	{
 			LED1_TOGGLE;
 			//memcpy(readMag,buffer,50);
 			memset(buffer,0,512);
-			HAL_Delay(100);
+			HAL_Delay(LORA_DELAY);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 			strcat(txBuff,m_status.myNodeName);
 			strcat(txBuff,"[");
@@ -456,8 +460,7 @@ void Node_Pass()
 		  	Poling_Str_Add(cnt+100);
 		  	Poling_Str_Add(cnt+200);
 		  	cnt++;
-	//}
-	//memset(txBuff,0,50);
+	}
 	memset(buffer,0,512);
 }
 

@@ -95,6 +95,31 @@
 
 #define NONE_VALUE		0XAA
 
+#if 1
+#define EXTENSION_NODE1	  "A1"
+#define EXTENSION_NODE2	  "A2"
+#define EXTENSION_NODE3	  "A3"
+#define EXTENSION_NODE4	  "A4"
+
+
+
+#define NODE0	  	"#0"
+#define NODE1	  	"#1"
+#define NODE2	  	"#2"
+#define NODE3	  	"#3"
+#define NODE4	  	"#4"
+
+
+#define TO_NODE_ROUTE2	      "A1A2A3"
+
+#define TO_MASTER_ROUTE2 	"A3A2A1&M"
+
+#define MASTER_HEAD_LEN		2
+#define STATION_HEAD_LEN	2
+#define NODE_HEAD_LEN		2
+
+
+#else
 #define EXTENSION_NODE1	  "$A01"
 #define EXTENSION_NODE2	  "$A02"
 #define EXTENSION_NODE3	  "$A03"
@@ -115,7 +140,19 @@
 #define TO_NODE_ROUTE2	      "$A01$A02$A03"
 
 #define TO_MASTER_ROUTE 	"$A01&M"
-#define TO_MASTER_ROUTE2 	"$A03$A02$A01&M8"
+#define TO_MASTER_ROUTE2 	"$A03$A02$A01&M"
+
+#define MASTER_HEAD_LEN		2
+#define STATION_HEAD_LEN	4
+#define NODE_HEAD_LEN		4
+
+
+#endif
+
+
+
+#define LORA_DELAY		10
+
 
 
 
