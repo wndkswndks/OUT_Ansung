@@ -396,7 +396,7 @@ void Master_Pass_Many_Station()//
 				LED1_TOGGLE;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%s \r\n",buffer+2);
+				PCPrintf("%s : %d \r\n",buffer+2,no_rx_num[nodeCnt]);
                 notRxCnt = 0;
 				memcpy(readMag,buffer,50);
 			
