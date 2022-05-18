@@ -106,4 +106,5 @@ extern ADC_HandleTypeDef hadc2;
 extern UART_HandleTypeDef huart2;
 extern STATUS_T m_status;
 extern ECO_T m_eco;
+
 #endif

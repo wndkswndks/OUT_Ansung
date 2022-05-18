@@ -43,7 +43,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 int cnt = 0;
-uint8_t rxBufff[1] = {0,};
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -60,6 +59,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t rxData[1] = {0,};
+uint8_t rxMsg[30] ={0,};
 
 /* USER CODE END 0 */
 
@@ -101,7 +102,7 @@ int main(void)//
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Receive_IT(&huart1, rxBufff, 1);
+	HAL_UART_Receive_IT(&huart1, rxData, 1);
   //GPS_Init();
   Poling_Str_Add(44);
   Poling_Str_Add(215);
@@ -162,6 +163,7 @@ int main(void)//
 
 	//Lora_config();
     Led_Toggle_Config();
+    Pc_Command_Response();
   }
   /* USER CODE END 3 */
 }

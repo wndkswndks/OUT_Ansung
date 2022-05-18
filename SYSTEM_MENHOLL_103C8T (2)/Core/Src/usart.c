@@ -22,6 +22,10 @@
 
 /* USER CODE BEGIN 0 */
 #include <stdarg.h>
+#include"common.h"
+
+extern uint8_t rxData[1];
+extern uint8_t rxMsg[30];
 
 /* USER CODE END 0 */
 
@@ -199,10 +203,58 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	static uint8_t start = 0;
+	static uint8_t rxCnt = 0;
+	static uint8_t rxBuff[30] = {0,};
+	
 	if(huart == &huart2) GPS_UART_CallBack();
+	else if(huart == &huart1)
+	{
+		HAL_UART_Receive_IT(&huart1, rxData, 1);
+
+		if(rxData[0] == '[')
+		{
+			rxCnt =  0;
+			start = 1;
+		}
+		else if(rxData[0] == ']')
+		{
+			memcpy(rxMsg, rxBuff, 30);
+			memset(rxBuff, 0 , 30);
+			rxCnt = 0;
+			start = 0;
+		}
+		else if(start)
+		{
+			rxBuff[rxCnt] = rxData[0];
+			rxCnt++;
+		}
+	}
 }
 
-
+int num = 0;
+void Pc_Command_Response()
+{
+	int rxLen = 0;
+	rxLen = strlen(rxMsg);
+	if(rxLen != NULL)
+	{
+		if(strncmp("SF",rxMsg ,MASTER_HEAD_LEN )==0)
+		{
+			num = atoi(rxMsg+3);
+			memset(rxMsg, 0, 30);
+			if(num==1) 
+			{
+				SX1276_Control_SF(SF_06);
+			}
+			else if(num==2) 
+			{
+				SX1276_Control_SF(SF_12);
+			}
+		}
+		
+	}
+}
 
 void PCPrintf(char *format, ...)
 {

@@ -322,7 +322,7 @@ void Master_Pass_Many_Node()//
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() - timestemp >1000)
+			if(HAL_GetTick() - timestemp >600)
 			{
 				no_rx_num[nodeCnt]++;
 				step = STEP1;
@@ -389,7 +389,7 @@ void Master_Pass_Many_Station()//
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() - timestemp >5000)
+			if(HAL_GetTick() - timestemp >3000)
 			{
 				fail_rx_num++;
 				step = STEP1;
@@ -470,7 +470,19 @@ void Node_Pass()
 }
 
 
+void SX1276_Control_SF(SpreadingFactor_E data)
+{
+	switch(data)
+	{	
+		case SF_06:
+			SX1276_Init(922000000, SF_06, KHZ_125, RATE_4_5, CRC_ENABLE);
+		break;
 
+		case SF_12:
+			SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);
+		break;
+	}
+}
 uint8_t SPI_Read(uint8_t reg)
 {
 	uint8_t txByte = 0x00;
@@ -651,16 +663,14 @@ void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t 
 	SX1276_Segment_Write(m_sx1276.s_SymbTimeoutLsb.SymbTimeoutLsb,0x08); // rx 컨티어니서스 할꺼면 안쓴다 
 	SX1276_Segment_Write(m_sx1276.s_DioMapping2.DioMapping2,0x01); //RegDioMapping2 DIO5=00, DIO4=01 // 귀찮아서 이렇게함 ㅎㅎ;;// 근데 이건 왜넣은거야? IO4 쓰지도 않으면서
 
+	SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
 	if(m_sx1276.device == TX_DEVICE)
 	{
-		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,TX_DONE);
 		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_TXDONE_IRQ);
 	}
 	else if(m_sx1276.device == RX_DEVICE)
 	{
-		SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_BOOST);
-		//SX1276_Segment_Write(m_sx1276.s_PaDac.PaDac,PA_DAC_DEFAULT);
 		SX1276_Segment_Write(m_sx1276.s_DioMapping1.Dio0,RX_DONE);
 		SX1276_Byte_Write(RegIrqFlagsMask, OPEN_RXDONE_IRQ);
 	}
