@@ -232,9 +232,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
-int num = 0;
 void Pc_Command_Response()
 {
+	int num = 0;
 	int rxLen = 0;
 	rxLen = strlen(rxMsg);
 	if(rxLen != NULL)
@@ -245,11 +245,15 @@ void Pc_Command_Response()
 			memset(rxMsg, 0, 30);
 			if(num==1) 
 			{
-				SX1276_Control_SF(SF_06);
+				Lora_Send_Msg("SF1",NONE_VALUE);
+				//HAL_Delay(2000);
+				//SX1276_Control_SF(SF_06);
 			}
 			else if(num==2) 
 			{
-				SX1276_Control_SF(SF_12);
+				Lora_Send_Msg("SF2",NONE_VALUE);
+				//HAL_Delay(2000);
+				//SX1276_Control_SF(SF_12);
 			}
 		}
 		

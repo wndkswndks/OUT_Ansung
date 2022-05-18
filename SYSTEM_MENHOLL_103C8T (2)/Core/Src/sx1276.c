@@ -389,7 +389,7 @@ void Master_Pass_Many_Station()//
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() - timestemp >3000)
+			if(HAL_GetTick() - timestemp >2000)
 			{
 				fail_rx_num++;
 				step = STEP1;
@@ -442,6 +442,7 @@ void Node_Pass()
 {
 	char txBuff[50] = {0,};
 	static uint16_t cnt = 0;
+	int num = 0;
 	SX1276_RX_Packet(buffer);
 	
 	if(strncmp(m_status.myNodeName,buffer ,NODE_HEAD_LEN )==0)
@@ -466,6 +467,19 @@ void Node_Pass()
 		  	Poling_Str_Add(cnt+200);
 		  	cnt++;
 	}
+//	else if(strncmp(CMD_SF,buffer ,2)==0)
+//	{
+//		num = atoi(buffer+2);
+//		
+//		if(num==1) 
+//		{
+//			SX1276_Control_SF(SF_06);
+//		}
+//		else if(num==2) 
+//		{
+//			SX1276_Control_SF(SF_12);
+//		}
+//	}
 	memset(buffer,0,512);
 }
 

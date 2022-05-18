@@ -118,6 +118,8 @@
 #define STATION_HEAD_LEN	2
 #define NODE_HEAD_LEN		2
 
+#define CMD_SF		"SF"
+
 
 #else
 #define EXTENSION_NODE1	  "$A01"

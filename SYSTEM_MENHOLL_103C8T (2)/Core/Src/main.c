@@ -153,7 +153,11 @@ int main(void)//
 	  }
 
 	#else
-	  if(m_status.device == 0x01) Master_Pass_Many_Station();
+	  if(m_status.device == 0x01) 
+	  {
+		  	Master_Pass_Many_Station();
+			//Pc_Command_Response();
+	  }	
 	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
 	  {
 	  		Gateway_Pass();
@@ -163,7 +167,6 @@ int main(void)//
 
 	//Lora_config();
     Led_Toggle_Config();
-    Pc_Command_Response();
   }
   /* USER CODE END 3 */
 }
