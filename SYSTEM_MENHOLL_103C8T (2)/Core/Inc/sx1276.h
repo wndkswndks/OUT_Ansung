@@ -110,9 +110,9 @@
 #define NODE4	  	"#4"
 
 
-#define TO_NODE_ROUTE2	      "A1A2A3"
+#define TO_NODE_ROUTE2	      ""
 
-#define TO_MASTER_ROUTE2 	"A3A2A1&M"
+#define TO_MASTER_ROUTE2 	"&M"
 
 #define MASTER_HEAD_LEN		2
 #define STATION_HEAD_LEN	2
