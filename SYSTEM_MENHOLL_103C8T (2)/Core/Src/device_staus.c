@@ -135,7 +135,8 @@ void My_Device()
 		}
 	#endif
 
-
+	m_status.txWateTime = 1000;
+	m_status.txTimeOut = 2000;
 	
 	
 

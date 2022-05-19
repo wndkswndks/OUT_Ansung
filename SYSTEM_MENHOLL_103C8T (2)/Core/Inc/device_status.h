@@ -101,6 +101,7 @@ typedef struct
 	uint8_t device;
 	uint8_t err_status[8];
 	uint8_t event_flag;
+	
 	uint16_t nodeMaxNum;
 	char stationName[20];
 	char toNodeRute[20];
@@ -108,6 +109,8 @@ typedef struct
 	char myNodeName[20];
 	char polingDataStr[40];
 	char nodeNum[40];
+	uint16_t txWateTime;
+	uint16_t txTimeOut;
 } STATUS_T;
 /*  			stuct end  				*/
 

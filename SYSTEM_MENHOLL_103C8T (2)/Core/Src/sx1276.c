@@ -389,7 +389,7 @@ void Master_Pass_Many_Station()//
 			
 			SX1276_RX_Packet(buffer);
 
-			if(HAL_GetTick() - timestemp >2000)
+			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
 				fail_rx_num++;
 				step = STEP1;
@@ -413,9 +413,8 @@ void Master_Pass_Many_Station()//
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() - timestemp >2000)
+			if(HAL_GetTick() - timestemp >m_status.txWateTime)
 			{
-
 				step = STEP1;
 			}
 		break;
@@ -438,7 +437,6 @@ void Gateway_Pass()
 
 }
 
-uint8_t sf_flag = 0;
 void Node_Pass()
 {
 	char txBuff[50] = {0,};

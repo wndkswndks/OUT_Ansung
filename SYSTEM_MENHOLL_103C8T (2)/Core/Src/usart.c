@@ -26,7 +26,6 @@
 
 extern uint8_t rxData[1];
 extern uint8_t rxMsg[30];
-extern uint8_t sf_flag;
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -248,9 +247,27 @@ void Pc_Command_Response()
 			{
 				Lora_Send_Msg("SF",num);
 				HAL_Delay(100);
-				SX1276_Control_SF(num);				
+				SX1276_Control_SF((uint8_t)num);				
 			}										
 		}
+		
+		if(strncmp("WT",rxMsg ,MASTER_HEAD_LEN )==0)
+		{
+			num = atoi(rxMsg+3);
+			memset(rxMsg, 0, 30);
+
+			m_status.txWateTime = num;	
+		}	
+
+		if(strncmp("TO",rxMsg ,MASTER_HEAD_LEN )==0)
+		{
+			num = atoi(rxMsg+3);
+			memset(rxMsg, 0, 30);
+
+			m_status.txTimeOut = num;	
+		}
+
+		
 		
 	}
 }
