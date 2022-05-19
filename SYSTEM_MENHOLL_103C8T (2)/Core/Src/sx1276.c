@@ -413,7 +413,7 @@ void Master_Pass_Many_Station()//
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() - timestemp >10)
+			if(HAL_GetTick() - timestemp >100)
 			{
 
 				step = STEP1;
@@ -733,7 +733,7 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();	
-			SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
 			return 0;
 		}
 	}
@@ -762,7 +762,7 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);
@@ -789,7 +789,7 @@ uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);

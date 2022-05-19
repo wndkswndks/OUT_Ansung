@@ -305,6 +305,7 @@ typedef enum
 	SF_12,
 } SpreadingFactor_E;
 
+#define SF_VALUE	SF_12
 typedef enum
 {
 	NORMAL_MODE,

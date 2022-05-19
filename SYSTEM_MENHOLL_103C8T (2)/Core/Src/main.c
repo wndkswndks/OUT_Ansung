@@ -110,7 +110,7 @@ int main(void)//
   My_Device();
 
   //Eco_Init();
-  SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);
+  SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
   LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
   {
