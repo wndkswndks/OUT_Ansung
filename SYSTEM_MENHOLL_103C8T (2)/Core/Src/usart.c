@@ -234,7 +234,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void Pc_Command_Response()
 {
-	int num = 0;
+	uint16_t num = 0;
 	int rxLen = 0;
 	rxLen = strlen(rxMsg);
 	if(rxLen != NULL)
@@ -243,20 +243,13 @@ void Pc_Command_Response()
 		{
 			num = atoi(rxMsg+3);
 			memset(rxMsg, 0, 30);
-			if(num==1) 
+
+			if(SF_07<= num && num<= SF_12 )
 			{
-				sf_flag = 11;
-				Lora_Send_Msg("SF1",NONE_VALUE);
+				Lora_Send_Msg("SF",num);
 				HAL_Delay(100);
-				SX1276_Control_SF(SF_07);
-			}
-			else if(num==2) 
-			{
-				sf_flag = 22;
-				Lora_Send_Msg("SF2",NONE_VALUE);
-				HAL_Delay(100);
-				SX1276_Control_SF(SF_12);
-			}
+				SX1276_Control_SF(num);				
+			}										
 		}
 		
 	}

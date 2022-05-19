@@ -261,7 +261,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 	}
 	else
 	{
-		length = sprintf(txBuff, "[(%d) %s : %u]",m_status.device, msg, data);
+		length = sprintf(txBuff, "%s%u",msg, data);
 	}
 
 	preT = HAL_GetTick();
@@ -443,13 +443,12 @@ void Node_Pass()
 {
 	char txBuff[50] = {0,};
 	static uint16_t cnt = 0;
-	int num = 0;
+	uint8_t num = 0;
 	SX1276_RX_Packet(buffer);
 	
 	if(strncmp(m_status.myNodeName,buffer ,NODE_HEAD_LEN )==0)
 	{
 			LED1_TOGGLE;
-			//memcpy(readMag,buffer,50);
 			memset(buffer,0,512);
 			HAL_Delay(LORA_DELAY);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
@@ -472,37 +471,20 @@ void Node_Pass()
 	{
 		num = atoi(buffer+2);
 		
-		if(num==1) 
+		if(SF_07<= num && num<= SF_12 )
 		{
-			sf_flag = 1;
 			HAL_Delay(100);
-			SX1276_Control_SF(SF_07);
-		}
-		else if(num==2) 
-		{
-			sf_flag = 2;
-			HAL_Delay(100);
-			SX1276_Control_SF(SF_12);
-		}
+			SX1276_Control_SF(num);
+		}	
+
 	}
 	memset(buffer,0,512);
 }
 
 
-void SX1276_Control_SF(SpreadingFactor_E data)
+void SX1276_Control_SF(uint8_t     data)
 {
-	switch(data)
-	{	
-		case SF_07:
-			//SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
-			SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF_07);
-		break;
-
-		case SF_12:
-			//SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);
-			SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF_12);
-		break;
-	}
+	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,data);
 }
 uint8_t SPI_Read(uint8_t reg)
 {

@@ -697,7 +697,7 @@ void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);
 void SX1276_Change_rx_tx(uint8_t mode);
-void SX1276_Control_SF(SpreadingFactor_E data);
+void SX1276_Control_SF(uint8_t   data);
 
 void Master_Pass_Many_Node();
 void Master_Pass_Many_Station();
