@@ -413,7 +413,7 @@ void Master_Pass_Many_Station()//
 		break;
 
 		case STEP3:
-			if(HAL_GetTick() - timestemp >100)
+			if(HAL_GetTick() - timestemp >2000)
 			{
 
 				step = STEP1;
@@ -438,6 +438,7 @@ void Gateway_Pass()
 
 }
 
+uint8_t sf_flag = 0;
 void Node_Pass()
 {
 	char txBuff[50] = {0,};
@@ -467,19 +468,23 @@ void Node_Pass()
 		  	Poling_Str_Add(cnt+200);
 		  	cnt++;
 	}
-//	else if(strncmp(CMD_SF,buffer ,2)==0)
-//	{
-//		num = atoi(buffer+2);
-//		
-//		if(num==1) 
-//		{
-//			SX1276_Control_SF(SF_06);
-//		}
-//		else if(num==2) 
-//		{
-//			SX1276_Control_SF(SF_12);
-//		}
-//	}
+	else if(strncmp(CMD_SF,buffer ,2)==0)
+	{
+		num = atoi(buffer+2);
+		
+		if(num==1) 
+		{
+			sf_flag = 1;
+			HAL_Delay(100);
+			SX1276_Control_SF(SF_07);
+		}
+		else if(num==2) 
+		{
+			sf_flag = 2;
+			HAL_Delay(100);
+			SX1276_Control_SF(SF_12);
+		}
+	}
 	memset(buffer,0,512);
 }
 
@@ -488,12 +493,14 @@ void SX1276_Control_SF(SpreadingFactor_E data)
 {
 	switch(data)
 	{	
-		case SF_06:
-			SX1276_Init(922000000, SF_06, KHZ_125, RATE_4_5, CRC_ENABLE);
+		case SF_07:
+			//SX1276_Init(922000000, SF_07, KHZ_125, RATE_4_5, CRC_ENABLE);
+			SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF_07);
 		break;
 
 		case SF_12:
-			SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);
+			//SX1276_Init(922000000, SF_12, KHZ_125, RATE_4_5, CRC_ENABLE);
+			SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,SF_12);
 		break;
 	}
 }

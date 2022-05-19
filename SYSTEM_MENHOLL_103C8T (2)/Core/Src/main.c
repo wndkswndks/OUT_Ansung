@@ -156,7 +156,7 @@ int main(void)//
 	  if(m_status.device == 0x01) 
 	  {
 		  	Master_Pass_Many_Station();
-			//Pc_Command_Response();
+			Pc_Command_Response();
 	  }	
 	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
 	  {

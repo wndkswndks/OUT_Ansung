@@ -26,7 +26,7 @@
 
 extern uint8_t rxData[1];
 extern uint8_t rxMsg[30];
-
+extern uint8_t sf_flag;
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -245,15 +245,17 @@ void Pc_Command_Response()
 			memset(rxMsg, 0, 30);
 			if(num==1) 
 			{
+				sf_flag = 11;
 				Lora_Send_Msg("SF1",NONE_VALUE);
-				//HAL_Delay(2000);
-				//SX1276_Control_SF(SF_06);
+				HAL_Delay(100);
+				SX1276_Control_SF(SF_07);
 			}
 			else if(num==2) 
 			{
+				sf_flag = 22;
 				Lora_Send_Msg("SF2",NONE_VALUE);
-				//HAL_Delay(2000);
-				//SX1276_Control_SF(SF_12);
+				HAL_Delay(100);
+				SX1276_Control_SF(SF_12);
 			}
 		}
 		
