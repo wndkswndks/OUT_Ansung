@@ -231,14 +231,20 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+
+
+
 void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	int rxLen = 0;
 	rxLen = strlen(rxMsg);
+
+
+	uint8_t UU= 5;
 	if(rxLen != NULL)
 	{
-		if(strncmp("SF",rxMsg ,MASTER_HEAD_LEN )==0)
+		if(Is_Include_ThisStr( rxMsg, "SF"))
 		{
 			num = atoi(rxMsg+3);
 			memset(rxMsg, 0, 30);
@@ -247,27 +253,60 @@ void Pc_Command_Response()
 			{
 				Lora_Send_Msg("SF",num);
 				HAL_Delay(100);
-				SX1276_Control_SF((uint8_t)num);				
+				SX1276_Control_SF((uint8_t)num);	
+				PCPrintf("SF = %u \r\n",num);
 			}										
 		}
 		
-		if(strncmp("WT",rxMsg ,MASTER_HEAD_LEN )==0)
+		else if(Is_Include_ThisStr( rxMsg, "WT"))
 		{
 			num = atoi(rxMsg+3);
 			memset(rxMsg, 0, 30);
 
-			m_status.txWateTime = num;	
+			m_status.txWateTime = num;
+			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		if(strncmp("TO",rxMsg ,MASTER_HEAD_LEN )==0)
+		else if(Is_Include_ThisStr( rxMsg, "TO"))
 		{
 			num = atoi(rxMsg+3);
 			memset(rxMsg, 0, 30);
 
 			m_status.txTimeOut = num;	
+			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
 
-		
+		else if(Is_Include_ThisStr( rxMsg, "WNDKSWNDKS"))
+		{
+			num = atoi(rxMsg+11);
+			memset(rxMsg, 0, 30);
+
+	
+			PCPrintf("WNDKSWNDKS = %u \r\n",num );
+
+		}
+		else if(Is_Include_ThisStr( rxMsg, "RU"))
+		{
+			char rute1[3] = {0,};
+			char rute2[3] = {0,};
+			char rute3[3] = {0,};
+			char sumstr[9] = {0,};
+			char ruteStr[9] = "RU";
+			
+			memcpy(rute1,rxMsg+3, 2);
+			memcpy(rute2,rxMsg+6, 2);
+			memcpy(rute3,rxMsg+9, 2);
+			strcat(sumstr,rute1);
+			strcat(sumstr,rute2);
+			strcat(sumstr,rute3);
+			//memcpy(m_status.toNodeRute, sumstr, strlen(sumstr));
+
+			strcat(ruteStr,sumstr);
+
+			Lora_Send_Msg(ruteStr,NONE_VALUE);
+
+			memset(rxMsg, 0, 30);
+		}
 		
 	}
 }
@@ -286,6 +325,33 @@ void PCPrintf(char *format, ...)
 	
 	return;
 }
- 
 
+void PCPuts(char *msg)
+{
+	char str[256] = {0,};
+	memcpy(str, msg, strlen(msg));
+	
+	HAL_UART_Transmit_IT(&huart1, str, strlen(str));
+}
+
+uint32_t String_To_Hex(char* str)
+{
+	uint32_t hex = 0;
+	int len = strlen(str);
+	for(int i =0 ;i < len;i++)
+	{
+		hex |= (str[(len-1)-i]<<i*8);
+	}
+	return hex;
+}
+
+uint8_t Is_Include_ThisStr(uint8_t* buff, char* str)
+{
+	if(strncmp(str,buff ,strlen(str))==0)
+	{
+		return 1;
+	}
+
+	return 0;
+}
 /* USER CODE END 1 */

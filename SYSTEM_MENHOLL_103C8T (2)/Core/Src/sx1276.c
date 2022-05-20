@@ -356,11 +356,12 @@ void Master_Pass_Many_Node()//
 
 }
 
-uint32_t callbackTime= 0;
 
 void Master_Pass_Many_Station()//
 {
 	static uint8_t step = STEP1;
+	
+	uint32_t callbackTime= 0;
 	static uint32_t timestemp = 0;
 	char txBuff[20] = {0,};
 	char nodeNum[10] = {0,};
@@ -395,13 +396,13 @@ void Master_Pass_Many_Station()//
 				step = STEP1;
 				
 			}
-			if(strncmp("&M",buffer ,MASTER_HEAD_LEN )==0)
+			if(Is_Include_ThisStr( buffer, "&M"))
 			{
 				LED1_TOGGLE;
 				success_rx_num++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%st:%d r:%d e:%d t:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
+				PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
                 notRxCnt = 0;
 				memcpy(readMag,buffer,50);
 			
@@ -426,7 +427,7 @@ void Gateway_Pass()
 {
 	SX1276_RX_Packet(buffer);
 
-	if(strncmp(m_status.stationName,buffer ,STATION_HEAD_LEN )==0)
+	if(Is_Include_ThisStr( buffer, m_status.stationName))
 	{
 		LED1_TOGGLE;
 		memcpy(readMag,buffer,50);
@@ -443,8 +444,9 @@ void Node_Pass()
 	static uint16_t cnt = 0;
 	uint8_t num = 0;
 	SX1276_RX_Packet(buffer);
-	
-	if(strncmp(m_status.myNodeName,buffer ,NODE_HEAD_LEN )==0)
+
+
+	if(Is_Include_ThisStr( buffer, m_status.myNodeName))
 	{
 			LED1_TOGGLE;
 			memset(buffer,0,512);
@@ -465,7 +467,7 @@ void Node_Pass()
 		  	Poling_Str_Add(cnt+200);
 		  	cnt++;
 	}
-	else if(strncmp(CMD_SF,buffer ,2)==0)
+	else if(Is_Include_ThisStr( buffer, CMD_SF))
 	{
 		num = atoi(buffer+2);
 		
@@ -474,7 +476,23 @@ void Node_Pass()
 			HAL_Delay(100);
 			SX1276_Control_SF(num);
 		}	
+	}
 
+	else if(Is_Include_ThisStr( buffer, "RU"))
+	{
+		char rute1[3] = {0,};
+		char rute2[3] = {0,};
+		char rute3[3] = {0,};
+		char sumstr[9] = {0,};
+		
+		memcpy(rute1,buffer+2, 2);
+		memcpy(rute2,buffer+4, 2);
+		memcpy(rute3,buffer+6, 2);
+		strcat(sumstr,rute1);
+		strcat(sumstr,rute2);
+		strcat(sumstr,rute3);
+			//memcpy(m_status.toNodeRute, sumstr, strlen(sumstr));
+		memcpy(readMag,buffer,50);
 	}
 	memset(buffer,0,512);
 }

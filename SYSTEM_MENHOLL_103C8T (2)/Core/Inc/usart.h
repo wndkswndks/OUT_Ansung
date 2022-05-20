@@ -45,6 +45,10 @@ void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN Prototypes */
 void Pc_Command_Response();
 void PCPrintf(char *format, ...);
+void PCPuts(char *msg);
+uint32_t String_To_Hex(char* str);
+uint8_t Is_Include_ThisStr(uint8_t* buff, char* str);
+
 
 /* USER CODE END Prototypes */
 

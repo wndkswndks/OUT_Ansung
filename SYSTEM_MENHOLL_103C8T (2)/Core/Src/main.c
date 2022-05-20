@@ -61,6 +61,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 uint8_t rxData[1] = {0,};
 uint8_t rxMsg[30] ={0,};
+uint32_t hexbuff[4] = {0,};
 
 /* USER CODE END 0 */
 
@@ -121,6 +122,11 @@ int main(void)//
 	  SX1276_RX_Entry(2000);
   }
 
+
+
+
+
+
   //GPS_config();
 
   //Lora_Send_Msg("Device_start",NONE_VALUE);
@@ -166,6 +172,7 @@ int main(void)//
 	#endif
 
 	//Lora_config();
+	Pc_Command_Response();
     Led_Toggle_Config();
   }
   /* USER CODE END 3 */
