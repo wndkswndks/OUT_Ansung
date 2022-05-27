@@ -24,8 +24,12 @@
 #include <stdarg.h>
 #include"common.h"
 
-extern uint8_t rxData[1];
-extern uint8_t rxMsg[30];
+extern uint8_t rxData1[1];
+extern uint8_t rxData2[1];
+
+extern uint8_t rxMsg1[30];
+extern uint8_t rxMsg2[30];
+
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -149,6 +153,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* USART2 interrupt Init */
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
 
   /* USER CODE END USART2_MspInit 1 */
@@ -192,6 +199,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
 
+    /* USART2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspDeInit 1 */
 
   /* USER CODE END USART2_MspDeInit 1 */
@@ -202,31 +211,59 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	static uint8_t start = 0;
-	static uint8_t rxCnt = 0;
-	static uint8_t rxBuff[30] = {0,};
+	static uint8_t start1 = 0;
+	static uint8_t rxCnt1 = 0;
+	static uint8_t rxBuff1[30] = {0,};
+
+	static uint8_t start2 = 0;
+	static uint8_t rxCnt2 = 0;
+	static uint8_t rxBuff2[30] = {0,};
 	
-	if(huart == &huart2) GPS_UART_CallBack();
+	if(huart == &huart2) //GPS_UART_CallBack();
+	{
+		HAL_UART_Receive_IT(&huart2, rxData2, 1);
+
+		if(rxData2[0] == '[')
+		{
+			rxCnt2 =  0;
+			start2 = 1;
+		}
+		else if(rxData2[0] == ']')
+		{
+			memcpy(rxMsg2, rxBuff2, 30);
+			memset(rxBuff2, 0 , 30);
+			rxCnt2 = 0;
+			start2 = 0;
+		}
+		else if(start2)
+		{
+			rxBuff2[rxCnt2] = rxData2[0];
+			rxCnt2++;
+		}
+			
+	}
+
+	
 	else if(huart == &huart1)
 	{
-		HAL_UART_Receive_IT(&huart1, rxData, 1);
+		HAL_UART_Receive_IT(&huart1, rxData1, 1);
 
-		if(rxData[0] == '[')
+		if(rxData1[0] == '[')
 		{
-			rxCnt =  0;
-			start = 1;
+			rxCnt1 =  0;
+			start1 = 1;
 		}
-		else if(rxData[0] == ']')
+		else if(rxData1[0] == ']')
 		{
-			memcpy(rxMsg, rxBuff, 30);
-			memset(rxBuff, 0 , 30);
-			rxCnt = 0;
-			start = 0;
+			memcpy(rxMsg1, rxBuff1, 30);
+			memset(rxBuff1, 0 , 30);
+			rxCnt1 = 0;
+			start1 = 0;
 		}
-		else if(start)
+		else if(start1)
 		{
-			rxBuff[rxCnt] = rxData[0];
-			rxCnt++;
+			rxBuff1[rxCnt1] = rxData1[0];
+			rxCnt1++;
 		}
 	}
 }
@@ -238,20 +275,18 @@ void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	int rxLen = 0;
-	rxLen = strlen(rxMsg);
+	rxLen = strlen(rxMsg1);
 
-
-	uint8_t UU= 5;
 	if(rxLen != NULL)
 	{
-		if(rxMsg[DIVISION_POS] !='_') return;
+		if(rxMsg1[DIVISION_POS] !='_') return;
 		
-		if(atoi(rxMsg+VALUE_POS) != 0)
+		if(atoi(rxMsg1+VALUE_POS) != 0)
 		{
-			num = atoi(rxMsg+VALUE_POS);
+			num = atoi(rxMsg1+VALUE_POS);
 		}
 		
-		if(Is_Include_ThisStr( rxMsg, "SF"))
+		if(Is_Include_ThisStr( rxMsg1, "SF"))
 		{
 			if(SF_07<= num && num<= SF_12 )
 			{
@@ -262,27 +297,27 @@ void Pc_Command_Response()
 			}										
 		}
 		
-		else if(Is_Include_ThisStr( rxMsg, "WT"))
+		else if(Is_Include_ThisStr( rxMsg1, "WT"))
 		{
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		else if(Is_Include_ThisStr( rxMsg, "TO"))
+		else if(Is_Include_ThisStr( rxMsg1, "TO"))
 		{
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
 
-		else if(Is_Include_ThisStr( rxMsg, "RU"))
+		else if(Is_Include_ThisStr( rxMsg1, "RU"))
 		{				
-			Lora_Send_Msg(rxMsg,NONE_VALUE);
+			Lora_Send_Msg(rxMsg1,NONE_VALUE);
 			HAL_Delay(100);
-			if(rxMsg[DIVISION_POS] =='_')
-				memcpy(m_status.toNodeRute, rxMsg+VALUE_POS, strlen(rxMsg)-CMD_LEN);
+			if(rxMsg1[DIVISION_POS] =='_')
+				memcpy(m_status.toNodeRute, rxMsg1+VALUE_POS, strlen(rxMsg1)-CMD_LEN);
 
 		}
-		memset(rxMsg, 0, 30);
+		memset(rxMsg1, 0, 30);
 	}
 }
 
@@ -328,5 +363,16 @@ uint8_t Is_Include_ThisStr(uint8_t* buff, char* str)
 	}
 
 	return 0;
+}
+
+
+uint8_t E22HeadMsg[6] = {0x11, 0x01, 0x03,0xAA,0xBB,0xCC};
+uint8_t E22ReadStatus[3] = {0xC1, 0x00, 0x09}; 
+uint8_t dddata[] = "[AABBCC]";
+int wwee = 0;
+void E22_Send()
+{
+	//HAL_UART_Transmit_IT(&huart2, E22ReadStatus, 3);
+	HAL_UART_Transmit_IT(&huart2, dddata, strlen(dddata));
 }
 /* USER CODE END 1 */

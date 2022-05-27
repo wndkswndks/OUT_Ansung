@@ -59,8 +59,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t rxData[1] = {0,};
-uint8_t rxMsg[30] ={0,};
+uint8_t rxData1[1] = {0,};
+uint8_t rxData2[1] = {0,};
+
+uint8_t rxMsg1[30] ={0,};
+uint8_t rxMsg2[30] ={0,};
+
 uint32_t hexbuff[4] = {0,};
 
 /* USER CODE END 0 */
@@ -69,7 +73,7 @@ uint32_t hexbuff[4] = {0,};
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)//
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -103,7 +107,8 @@ int main(void)//
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Receive_IT(&huart1, rxData, 1);
+	HAL_UART_Receive_IT(&huart1, rxData1, 1);
+	HAL_UART_Receive_IT(&huart2, rxData2, 1);
   //GPS_Init();
   Poling_Str_Add(44);
   Poling_Str_Add(215);
@@ -148,32 +153,32 @@ int main(void)//
 //	  LED2_TOGGLE;
 //	  HAL_Delay(100);
 
-	//HAL_UART_Transmit_IT(&huart1, "qwerrty", 8);
 
-	#if 0
-	  if(m_status.device == 0x01) Master_Pass_Many_Node();
-	  if(m_status.device == 0x02) Gateway_Pass();
-	  if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
-	  {
-		  Node_Pass();
-	  }
+//	#if 0
+//	  if(m_status.device == 0x01) Master_Pass_Many_Node();
+//	  if(m_status.device == 0x02) Gateway_Pass();
+//	  if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
+//	  {
+//		  Node_Pass();
+//	  }
+//
+//	#else
+//	  if(m_status.device == 0x01) 
+//	  {
+//		  	Master_Pass_Many_Station();
+//			Pc_Command_Response();
+//	  }	
+//	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
+//	  {
+//	  		Gateway_Pass();
+//	  }
+//	  if(m_status.device == 0x05) Node_Pass();
+//	#endif
 
-	#else
-	  if(m_status.device == 0x01) 
-	  {
-		  	Master_Pass_Many_Station();
-			Pc_Command_Response();
-	  }	
-	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
-	  {
-	  		Gateway_Pass();
-	  }
-	  if(m_status.device == 0x05) Node_Pass();
-	#endif
-
-	//Lora_config();
-	Pc_Command_Response();
-    Led_Toggle_Config();
+	//E22_Send();
+	//HAL_Delay(3000);
+	//Pc_Command_Response();
+    //Led_Toggle_Config();
   }
   /* USER CODE END 3 */
 }
