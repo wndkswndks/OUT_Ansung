@@ -244,11 +244,15 @@ void Pc_Command_Response()
 	uint8_t UU= 5;
 	if(rxLen != NULL)
 	{
+		if(rxMsg[DIVISION_POS] !='_') return;
+		
+		if(atoi(rxMsg+VALUE_POS) != 0)
+		{
+			num = atoi(rxMsg+VALUE_POS);
+		}
+		
 		if(Is_Include_ThisStr( rxMsg, "SF"))
 		{
-			num = atoi(rxMsg+3);
-			memset(rxMsg, 0, 30);
-
 			if(SF_07<= num && num<= SF_12 )
 			{
 				Lora_Send_Msg("SF",num);
@@ -260,54 +264,25 @@ void Pc_Command_Response()
 		
 		else if(Is_Include_ThisStr( rxMsg, "WT"))
 		{
-			num = atoi(rxMsg+3);
-			memset(rxMsg, 0, 30);
-
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
 		else if(Is_Include_ThisStr( rxMsg, "TO"))
 		{
-			num = atoi(rxMsg+3);
-			memset(rxMsg, 0, 30);
-
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
 
-		else if(Is_Include_ThisStr( rxMsg, "WNDKSWNDKS"))
-		{
-			num = atoi(rxMsg+11);
-			memset(rxMsg, 0, 30);
-
-	
-			PCPrintf("WNDKSWNDKS = %u \r\n",num );
-
-		}
 		else if(Is_Include_ThisStr( rxMsg, "RU"))
-		{
-			char rute1[3] = {0,};
-			char rute2[3] = {0,};
-			char rute3[3] = {0,};
-			char sumstr[9] = {0,};
-			char ruteStr[9] = "RU";
-			
-			memcpy(rute1,rxMsg+3, 2);
-			memcpy(rute2,rxMsg+6, 2);
-			memcpy(rute3,rxMsg+9, 2);
-			strcat(sumstr,rute1);
-			strcat(sumstr,rute2);
-			strcat(sumstr,rute3);
-			//memcpy(m_status.toNodeRute, sumstr, strlen(sumstr));
+		{				
+			Lora_Send_Msg(rxMsg,NONE_VALUE);
+			HAL_Delay(100);
+			if(rxMsg[DIVISION_POS] =='_')
+				memcpy(m_status.toNodeRute, rxMsg+VALUE_POS, strlen(rxMsg)-CMD_LEN);
 
-			strcat(ruteStr,sumstr);
-
-			Lora_Send_Msg(ruteStr,NONE_VALUE);
-
-			memset(rxMsg, 0, 30);
 		}
-		
+		memset(rxMsg, 0, 30);
 	}
 }
 

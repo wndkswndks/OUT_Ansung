@@ -39,6 +39,11 @@ extern UART_HandleTypeDef huart2;
 
 /* USER CODE END Private defines */
 
+
+#define DIVISION_POS	2
+#define VALUE_POS		3
+#define CMD_LEN			3
+
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 
@@ -48,6 +53,8 @@ void PCPrintf(char *format, ...);
 void PCPuts(char *msg);
 uint32_t String_To_Hex(char* str);
 uint8_t Is_Include_ThisStr(uint8_t* buff, char* str);
+
+
 
 
 /* USER CODE END Prototypes */

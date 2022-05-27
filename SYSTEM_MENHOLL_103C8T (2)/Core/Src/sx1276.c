@@ -328,7 +328,7 @@ void Master_Pass_Many_Node()//
 				step = STEP1;
 				
 			}
-			if(strncmp("&M",buffer ,2 )==0)
+			if(strncmp(MASTER,buffer ,2 )==0)
 			{
 				LED1_TOGGLE;
 				sscanf(buffer, "&M#001[%u,%u,%u,]", tmp, tmp+1, tmp+2);
@@ -452,6 +452,7 @@ void Node_Pass()
 			memset(buffer,0,512);
 			HAL_Delay(LORA_DELAY);
 			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
+			strcat(txBuff,MASTER);
 			strcat(txBuff,m_status.myNodeName);
 			strcat(txBuff,"[");
 			strcat(txBuff,m_status.polingDataStr);
@@ -484,15 +485,27 @@ void Node_Pass()
 		char rute2[3] = {0,};
 		char rute3[3] = {0,};
 		char sumstr[9] = {0,};
+		uint8_t cnt = 0;
+		if(buffer[2] != '_') return;
+
+		for(int i =0 ;i < strlen(buffer);i++)
+		{
+			if(buffer[i]=='$') cnt++;
+		}
+		memcpy(rute1,buffer+3, 2);
+		memcpy(rute2,buffer+5, 2);
+		memcpy(rute3,buffer+7, 2);
+		memset(m_status.toMasterRute,0,strlen(m_status.toMasterRute));
+		strcat(m_status.toMasterRute,rute3);
+		strcat(m_status.toMasterRute,rute2);
+		strcat(m_status.toMasterRute,rute1);
+
 		
-		memcpy(rute1,buffer+2, 2);
-		memcpy(rute2,buffer+4, 2);
-		memcpy(rute3,buffer+6, 2);
-		strcat(sumstr,rute1);
-		strcat(sumstr,rute2);
-		strcat(sumstr,rute3);
-			//memcpy(m_status.toNodeRute, sumstr, strlen(sumstr));
-		memcpy(readMag,buffer,50);
+		memcpy(readMag,m_status.toMasterRute,20);
+
+		memset(m_status.toMasterRute,0,strlen(m_status.toMasterRute));
+
+		
 	}
 	memset(buffer,0,512);
 }

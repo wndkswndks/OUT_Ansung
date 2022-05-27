@@ -96,10 +96,10 @@
 #define NONE_VALUE		0XAA
 
 #if 1
-#define EXTENSION_NODE1	  "A1"
-#define EXTENSION_NODE2	  "A2"
-#define EXTENSION_NODE3	  "A3"
-#define EXTENSION_NODE4	  "A4"
+#define EXTENSION_NODE1	  "$1"
+#define EXTENSION_NODE2	  "$2"
+#define EXTENSION_NODE3	  "$3"
+#define EXTENSION_NODE4	  "$4"
 
 
 
@@ -109,10 +109,10 @@
 #define NODE3	  	"#3"
 #define NODE4	  	"#4"
 
-
+#define MASTER		"&M"
 #define TO_NODE_ROUTE2	      ""
 
-#define TO_MASTER_ROUTE2 	"&M"
+#define TO_MASTER_ROUTE2 	""
 
 #define MASTER_HEAD_LEN		2
 #define STATION_HEAD_LEN	2
