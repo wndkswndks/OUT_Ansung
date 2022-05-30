@@ -375,10 +375,9 @@ void Master_Pass_Many_Station()//
 		case STEP1:
 			
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			strcat(txBuff,"#");
+			strcat(txBuff,"N0");
 
-			sprintf(nodeNum,"%u",nodeCnt);
-			strcat(txBuff,nodeNum);
+			strcat(txBuff,"NO");
 			LED2_TOGGLE;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
@@ -440,33 +439,15 @@ void Gateway_Pass()
 
 void Node_Pass()
 {
-	char txBuff[50] = {0,};
-	static uint16_t cnt = 0;
 	uint8_t num = 0;
 	SX1276_RX_Packet(buffer);
 
 
 	if(Is_Include_ThisStr( buffer, m_status.myNodeName))
 	{
-			LED1_TOGGLE;
-			memset(buffer,0,512);
-			HAL_Delay(LORA_DELAY);
-			memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
-			strcat(txBuff,MASTER);
-			strcat(txBuff,m_status.myNodeName);
-			strcat(txBuff,"[");
-			strcat(txBuff,m_status.polingDataStr);
-			strcat(txBuff,"]");
-			memcpy(readMag,txBuff,50);
-			
-			Lora_Send_Msg(txBuff, NONE_VALUE);
-
-			memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
-
-			Poling_Str_Add(cnt);
-		  	Poling_Str_Add(cnt+100);
-		  	Poling_Str_Add(cnt+200);
-		  	cnt++;
+		if(Is_Include_ThisStr( buffer+2, "NO")) Node_Nomal_Response();
+		if(Is_Include_ThisStr( buffer+2, "RU")) Node_Rute_Response();
+		
 	}
 	else if(Is_Include_ThisStr( buffer, CMD_SF))
 	{
@@ -479,38 +460,55 @@ void Node_Pass()
 		}	
 	}
 
-	else if(Is_Include_ThisStr( buffer, "RU"))
-	{
-		char rute1[3] = {0,};
-		char rute2[3] = {0,};
-		char rute3[3] = {0,};
-		char sumstr[9] = {0,};
-		uint8_t cnt = 0;
-		if(buffer[2] != '_') return;
-
-		for(int i =0 ;i < strlen(buffer);i++)
-		{
-			if(buffer[i]=='$') cnt++;
-		}
-		memcpy(rute1,buffer+3, 2);
-		memcpy(rute2,buffer+5, 2);
-		memcpy(rute3,buffer+7, 2);
-		memset(m_status.toMasterRute,0,strlen(m_status.toMasterRute));
-		strcat(m_status.toMasterRute,rute3);
-		strcat(m_status.toMasterRute,rute2);
-		strcat(m_status.toMasterRute,rute1);
-
-		
-		memcpy(readMag,m_status.toMasterRute,20);
-
-		memset(m_status.toMasterRute,0,strlen(m_status.toMasterRute));
-
-		
-	}
 	memset(buffer,0,512);
 }
 
 
+void Node_SF_Response()
+{
+	uint8_t num = 0;
+	
+	num = atoi(buffer+2);
+	
+	if(SF_07<= num && num<= SF_12 )
+	{
+		HAL_Delay(100);
+		SX1276_Control_SF(num);
+	}	
+
+	
+}
+
+void Node_Rute_Response()
+{
+	memset(m_status.toMasterRute, 0, strlen(m_status.toMasterRute));
+	memcpy(m_status.toMasterRute, buffer+5, strlen(buffer) - 5);	
+
+}
+void Node_Nomal_Response()
+{
+	char txBuff[50] = {0,};
+	static uint16_t cnt = 0;
+
+	LED1_TOGGLE;
+	HAL_Delay(LORA_DELAY);
+	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
+	strcat(txBuff,MASTER);
+	strcat(txBuff,m_status.myNodeName);
+	strcat(txBuff,"[");
+	strcat(txBuff,m_status.polingDataStr);
+	strcat(txBuff,"]");
+	memcpy(readMag,txBuff,50);
+	
+	Lora_Send_Msg(txBuff, NONE_VALUE);
+
+	memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
+
+	Poling_Str_Add(cnt);
+  	Poling_Str_Add(cnt+100);
+  	Poling_Str_Add(cnt+200);
+  	cnt++;
+}
 void SX1276_Control_SF(uint8_t     data)
 {
 	SX1276_Segment_Write(m_sx1276.s_ModemConfig2.SpreadingFactor,data);

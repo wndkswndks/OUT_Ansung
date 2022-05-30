@@ -96,23 +96,23 @@
 #define NONE_VALUE		0XAA
 
 #if 1
-#define EXTENSION_NODE1	  "$1"
-#define EXTENSION_NODE2	  "$2"
-#define EXTENSION_NODE3	  "$3"
-#define EXTENSION_NODE4	  "$4"
+#define EXTENSION_NODE1	  "A1"
+#define EXTENSION_NODE2	  "A2"
+#define EXTENSION_NODE3	  "A3"
+#define EXTENSION_NODE4	  "A4"
 
 
 
-#define NODE0	  	"#0"
-#define NODE1	  	"#1"
-#define NODE2	  	"#2"
-#define NODE3	  	"#3"
-#define NODE4	  	"#4"
+#define NODE0	  	"N0"
+#define NODE1	  	"N1"
+#define NODE2	  	"N2"
+#define NODE3	  	"N3"
+#define NODE4	  	"N4"
 
 #define MASTER		"&M"
-#define TO_NODE_ROUTE2	      ""
+#define TO_NODE_ROUTE2	      "A1A2A3"
 
-#define TO_MASTER_ROUTE2 	""
+#define TO_MASTER_ROUTE2 	"A3A2A1"
 
 #define MASTER_HEAD_LEN		2
 #define STATION_HEAD_LEN	2
@@ -706,6 +706,8 @@ void Node_Send();
 void Gateway_Pass();
 void Node_Pass();
 
+void Node_Nomal_Response();
+void Node_Rute_Response();
 
 /*  			function end  			*/
 

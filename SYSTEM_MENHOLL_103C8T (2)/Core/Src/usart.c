@@ -271,6 +271,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 
+
 void Pc_Command_Response()
 {
 	uint16_t num = 0;
@@ -294,6 +295,16 @@ void Pc_Command_Response()
 				HAL_Delay(100);
 				SX1276_Control_SF((uint8_t)num);	
 				PCPrintf("SF = %u \r\n",num);
+
+				switch(num)
+				{
+					case SF_07 :	m_status.txTimeOut = 63 + 10;	break;
+					case SF_08 :	m_status.txTimeOut = 104 + 10;	break;
+					case SF_09 :	m_status.txTimeOut = 181 + 10;	break;
+					case SF_10 :	m_status.txTimeOut = 352 +10;	break;
+					case SF_11 :	m_status.txTimeOut = 694 + 10;	break;
+					case SF_12 :	m_status.txTimeOut = 1221 +10;	break;										
+				}
 			}										
 		}
 		
@@ -311,16 +322,46 @@ void Pc_Command_Response()
 
 		else if(Is_Include_ThisStr( rxMsg1, "RU"))
 		{				
-			Lora_Send_Msg(rxMsg1,NONE_VALUE);
-			HAL_Delay(100);
-			if(rxMsg1[DIVISION_POS] =='_')
-				memcpy(m_status.toNodeRute, rxMsg1+VALUE_POS, strlen(rxMsg1)-CMD_LEN);
-
+			Rute_Cmd(rxMsg1);
 		}
 		memset(rxMsg1, 0, 30);
 	}
 }
+void Rute_Cmd(uint8_t* msg)
+{
+	char rute[10][10] = {0,};
+	char node[5] = {0,};
+	char str[40] = {0,};
+	char *ptr = strtok(msg+VALUE_POS, "_");      // " " 공백 문자를 기준으로 문자열을 자름, 포인터 반환
+	uint8_t cnt = 0;
+	
+	memcpy(node, ptr, strlen(ptr));
+	
+    while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
+    {
+        ptr = strtok(NULL, "_");      // 다음 문자열을 잘라서 포인터를 반환
+        memcpy(rute[cnt++], ptr, strlen(ptr));
+    }
+	cnt--;
 
+    strcat(str, m_status.toNodeRute);
+    strcat(str, node);
+    strcat(str, "RU_");
+    
+	for(int i =cnt-1 ; i >= 0; i--)
+	{
+		strcat(str, rute[i]);
+	}
+    
+	Lora_Send_Msg(str,NONE_VALUE);
+	HAL_Delay(100);
+	memset(m_status.toNodeRute, 0 , 20);
+	
+	for(int i =0 ; i < cnt; i++)
+	{
+		strcat(m_status.toNodeRute, rute[i]);
+	}
+}
 void PCPrintf(char *format, ...)
 {
 	va_list	ap;

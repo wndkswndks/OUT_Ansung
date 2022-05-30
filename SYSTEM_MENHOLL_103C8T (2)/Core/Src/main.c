@@ -154,31 +154,31 @@ int main(void)
 //	  HAL_Delay(100);
 
 
-//	#if 0
-//	  if(m_status.device == 0x01) Master_Pass_Many_Node();
-//	  if(m_status.device == 0x02) Gateway_Pass();
-//	  if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
-//	  {
-//		  Node_Pass();
-//	  }
-//
-//	#else
-//	  if(m_status.device == 0x01) 
-//	  {
-//		  	Master_Pass_Many_Station();
-//			Pc_Command_Response();
-//	  }	
-//	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
-//	  {
-//	  		Gateway_Pass();
-//	  }
-//	  if(m_status.device == 0x05) Node_Pass();
-//	#endif
+	#if 0
+	  if(m_status.device == 0x01) Master_Pass_Many_Node();
+	  if(m_status.device == 0x02) Gateway_Pass();
+	  if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
+	  {
+		  Node_Pass();
+	  }
+
+	#else
+	  if(m_status.device == 0x01) 
+	  {
+		  	Master_Pass_Many_Station();
+			Pc_Command_Response();
+	  }	
+	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
+	  {
+	  		Gateway_Pass();
+	  }
+	  if(m_status.device == 0x05) Node_Pass();
+	#endif
 
 	//E22_Send();
 	//HAL_Delay(3000);
 	//Pc_Command_Response();
-    //Led_Toggle_Config();
+    Led_Toggle_Config();
   }
   /* USER CODE END 3 */
 }
