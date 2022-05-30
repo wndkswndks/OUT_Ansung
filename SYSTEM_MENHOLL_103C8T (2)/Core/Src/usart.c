@@ -411,9 +411,13 @@ uint8_t E22HeadMsg[6] = {0x11, 0x01, 0x03,0xAA,0xBB,0xCC};
 uint8_t E22ReadStatus[3] = {0xC1, 0x00, 0x09}; 
 uint8_t dddata[] = "[AABBCC]";
 int wwee = 0;
-void E22_Send()
+void E22_Send(uint8_t* buff)
 {
-	//HAL_UART_Transmit_IT(&huart2, E22ReadStatus, 3);
-	HAL_UART_Transmit_IT(&huart2, dddata, strlen(dddata));
+	char str[40] = "[";
+
+	strcat(str, buff);
+	strcat(str, "]");
+
+	HAL_UART_Transmit_IT(&huart2, str, strlen(str));
 }
 /* USER CODE END 1 */

@@ -364,22 +364,19 @@ void Master_Pass_Many_Station()//
 	uint32_t callbackTime= 0;
 	static uint32_t timestemp = 0;
 	char txBuff[20] = {0,};
-	char nodeNum[10] = {0,};
-	static uint16_t nodeCnt = 0;
-	static uint8_t notRxCnt,notRxflag = 0;
 	static int success_rx_num = 0;
 	static int fail_rx_num = 0;
 	static int tx_rx_num = 0;
 	switch(step)
 	{	
 		case STEP1:
-			
+			LED2_TOGGLE;
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,"N0");
-
-			strcat(txBuff,"NO");
-			LED2_TOGGLE;
+			strcat(txBuff,"NO");	
 			Lora_Send_Msg(txBuff, NONE_VALUE);
+			//E22_Send(buffer+STATION_HEAD_LEN);
+			
 			timestemp = HAL_GetTick();
 			step = STEP2;
 			tx_rx_num++;
@@ -402,7 +399,6 @@ void Master_Pass_Many_Station()//
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
 				PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
-                notRxCnt = 0;
 				memcpy(readMag,buffer,50);
 			
                 memset(buffer,0,512);
@@ -431,7 +427,11 @@ void Gateway_Pass()
 		LED1_TOGGLE;
 		memcpy(readMag,buffer,50);
 		HAL_Delay(LORA_DELAY);
+		
 		Lora_Send_Msg(buffer+STATION_HEAD_LEN, NONE_VALUE);
+		
+		//E22_Send(buffer+STATION_HEAD_LEN);
+		
 		memset(buffer,0,512);
 	}
 

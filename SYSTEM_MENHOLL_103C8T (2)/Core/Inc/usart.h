@@ -52,7 +52,7 @@ void PCPuts(char *msg);
 uint32_t String_To_Hex(char* str);
 uint8_t Is_Include_ThisStr(uint8_t* buff, char* str);
 
-void E22_Send();
+void E22_Send(uint8_t* buff);
 void Rute_Cmd(uint8_t* msg);
 
 
