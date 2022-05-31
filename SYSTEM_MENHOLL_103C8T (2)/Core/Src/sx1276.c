@@ -187,6 +187,19 @@ RX_DEVICE,  // txDevice or rxDevice
 {0,0,0,0,0}		// rssi, rowRssi, rssipkt, snr
 };
 
+void SX1276_Init_Reg()
+{
+
+	
+}
+
+void SX1276_Setting_Reg(uint8_t value, uint8_t reg, uint8_t mask, uint8_t move, uint8_t  * buff)
+{
+	buff[VALUE_E] = value;
+	buff[REGISTER_E] = reg;
+	buff[MASK_E] = mask;
+	buff[MOVE_E] = move;
+}
 char buffer[512];
 
 int message;
@@ -392,7 +405,7 @@ void Master_Pass_Many_Station()//
 				step = STEP1;
 				
 			}
-			if(Is_Include_ThisStr( buffer, "&M"))
+			if(Is_Include_ThisStr( buffer, 0, "&M"))
 			{
 				LED1_TOGGLE;
 				success_rx_num++;
@@ -422,7 +435,7 @@ void Gateway_Pass()
 {
 	SX1276_RX_Packet(buffer);
 
-	if(Is_Include_ThisStr( buffer, m_status.stationName))
+	if(Is_Include_ThisStr( buffer, 0, m_status.stationName))
 	{
 		LED1_TOGGLE;
 		memcpy(readMag,buffer,50);
@@ -443,13 +456,13 @@ void Node_Pass()
 	SX1276_RX_Packet(buffer);
 
 
-	if(Is_Include_ThisStr( buffer, m_status.myNodeName))
+	if(Is_Include_ThisStr( buffer, 0, m_status.myNodeName))
 	{
-		if(Is_Include_ThisStr( buffer+2, "NO")) Node_Nomal_Response();
-		if(Is_Include_ThisStr( buffer+2, "RU")) Node_Rute_Response();
+		if(Is_Include_ThisStr( buffer, 2, "NO")) Node_Nomal_Response();
+		if(Is_Include_ThisStr( buffer, 2, "RU")) Node_Rute_Response();
 		
 	}
-	else if(Is_Include_ThisStr( buffer, CMD_SF))
+	else if(Is_Include_ThisStr( buffer, 0, CMD_SF))
 	{
 		num = atoi(buffer+2);
 		

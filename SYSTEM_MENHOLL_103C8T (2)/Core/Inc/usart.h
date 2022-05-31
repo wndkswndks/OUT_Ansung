@@ -40,6 +40,16 @@ extern UART_HandleTypeDef huart2;
 #define VALUE_POS 		3
 
 #define CMD_LEN		3
+typedef struct
+{
+	char msgBuff[30];
+	uint8_t rxByte[1];
+	uint8_t rxBuff[30];
+	uint8_t rxCnt;
+	uint8_t rxStart;
+} UART_T;
+
+
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
@@ -50,7 +60,7 @@ void Pc_Command_Response();
 void PCPrintf(char *format, ...);
 void PCPuts(char *msg);
 uint32_t String_To_Hex(char* str);
-uint8_t Is_Include_ThisStr(uint8_t* buff, char* str);
+uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str);
 
 void E22_Send(uint8_t* buff);
 void Rute_Cmd(uint8_t* msg);

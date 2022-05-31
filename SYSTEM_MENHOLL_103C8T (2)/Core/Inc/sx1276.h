@@ -110,9 +110,9 @@
 #define NODE4	  	"N4"
 
 #define MASTER		"&M"
-#define TO_NODE_ROUTE2	      "A1A2A3"
+#define TO_NODE_ROUTE2	      ""
 
-#define TO_MASTER_ROUTE2 	"A3A2A1"
+#define TO_MASTER_ROUTE2 	""
 
 #define MASTER_HEAD_LEN		2
 #define STATION_HEAD_LEN	2
@@ -688,6 +688,9 @@ uint8_t SX1276_Read(uint8_t * sx1276);
 void SX1276_BurstWrite(uint8_t reg, uint8_t* txBuff, uint8_t length);
 void SX1276_BurstRead(uint8_t reg, uint8_t* rxBuff, uint8_t length);
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_enable);
+void SX1276_Init_Reg();
+void SX1276_Setting_Reg(uint8_t value, uint8_t reg, uint8_t mask, uint8_t move, uint8_t  * buff );
+
 void HW_Reset();
 uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut);
 uint8_t SX1276_RX_Entry(uint32_t timeOut);

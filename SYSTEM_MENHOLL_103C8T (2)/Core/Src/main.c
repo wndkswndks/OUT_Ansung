@@ -62,7 +62,7 @@ void SystemClock_Config(void);
 uint8_t rxData1[1] = {0,};
 uint8_t rxData2[1] = {0,};
 
-uint8_t rxMsg1[30] ={0,};
+char rxMsg1[30] ={0,};
 uint8_t rxMsg2[30] ={0,};
 
 uint32_t hexbuff[4] = {0,};

@@ -209,6 +209,12 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 /* USER CODE BEGIN 1 */
 
+
+UART_T m_uart1;
+UART_T m_uart2;
+
+
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	static uint8_t start1 = 0;
@@ -268,14 +274,35 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
+{
+	HAL_UART_Receive_IT(huart, uart->rxByte, 1);
 
+		if(uart->rxByte[0] == '[')
+		{
+			uart->rxCnt = 0;
+			uart->rxStart = 1;
+		}
+		else if(uart->rxByte[0] == ']')
+		{
+			memcpy(uart->msgBuff, uart->rxBuff, 30);
+			memset(uart->rxBuff, 0 , 30);
+			uart->rxCnt = 0;
+			uart->rxStart = 0;
+		}
+		else if(uart->rxStart)
+		{
+			uart->rxBuff[uart->rxCnt] = uart->rxByte[0];
+			uart->rxCnt++;
+		}
+}
 
 
 
 void Pc_Command_Response()
 {
 	uint16_t num = 0;
-	int rxLen = 0;
+	char rxLen = 0;
 	rxLen = strlen(rxMsg1);
 
 	if(rxLen != NULL)
@@ -287,7 +314,7 @@ void Pc_Command_Response()
 			num = atoi(rxMsg1+VALUE_POS);
 		}
 		
-		if(Is_Include_ThisStr( rxMsg1, "SF"))
+		if(Is_Include_ThisStr( rxMsg1, 0, "SF"))
 		{
 			if(SF_07<= num && num<= SF_12 )
 			{
@@ -308,19 +335,19 @@ void Pc_Command_Response()
 			}										
 		}
 		
-		else if(Is_Include_ThisStr( rxMsg1, "WT"))
+		else if(Is_Include_ThisStr( rxMsg1, 0, "WT"))
 		{
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		else if(Is_Include_ThisStr( rxMsg1, "TO"))
+		else if(Is_Include_ThisStr( rxMsg1, 0, "TO"))
 		{
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
 
-		else if(Is_Include_ThisStr( rxMsg1, "RU"))
+		else if(Is_Include_ThisStr( rxMsg1, 0, "RU"))
 		{				
 			Rute_Cmd(rxMsg1);
 		}
@@ -396,14 +423,16 @@ uint32_t String_To_Hex(char* str)
 	return hex;
 }
 
-uint8_t Is_Include_ThisStr(uint8_t* buff, char* str)
+uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str)
 {
-	if(strncmp(str,buff ,strlen(str))==0)
+	if(strncmp(str, buff + order ,strlen(str))==0)
 	{
 		return 1;
 	}
-
-	return 0;
+	else
+	{
+		return 0;
+	}
 }
 
 
@@ -413,7 +442,7 @@ uint8_t dddata[] = "[AABBCC]";
 int wwee = 0;
 void E22_Send(uint8_t* buff)
 {
-	char str[40] = "[";
+	uint8_t str[40] = "[";
 
 	strcat(str, buff);
 	strcat(str, "]");
