@@ -107,7 +107,8 @@ int main(void)
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Receive_IT(&huart1, rxData1, 1);
+	//HAL_UART_Receive_IT(&huart1, rxData1, 1);
+	HAL_UART_Receive_IT(&huart1, m_uart1.rxByte, 1);
 	HAL_UART_Receive_IT(&huart2, rxData2, 1);
   //GPS_Init();
   Poling_Str_Add(44);

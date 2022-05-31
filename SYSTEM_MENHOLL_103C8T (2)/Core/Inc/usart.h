@@ -64,6 +64,7 @@ uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str);
 
 void E22_Send(uint8_t* buff);
 void Rute_Cmd(uint8_t* msg);
+void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart);
 
 
 

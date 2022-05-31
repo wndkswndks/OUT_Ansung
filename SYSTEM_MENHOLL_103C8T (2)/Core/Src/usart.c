@@ -252,25 +252,27 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 	else if(huart == &huart1)
 	{
-		HAL_UART_Receive_IT(&huart1, rxData1, 1);
+//		HAL_UART_Receive_IT(&huart1, rxData1, 1);
+//
+//		if(rxData1[0] == '[')
+//		{
+//			rxCnt1 =  0;
+//			start1 = 1;
+//		}
+//		else if(rxData1[0] == ']')
+//		{
+//			memcpy(rxMsg1, rxBuff1, 30);
+//			memset(rxBuff1, 0 , 30);
+//			rxCnt1 = 0;
+//			start1 = 0;
+//		}
+//		else if(start1)
+//		{
+//			rxBuff1[rxCnt1] = rxData1[0];
+//			rxCnt1++;
+//		}
 
-		if(rxData1[0] == '[')
-		{
-			rxCnt1 =  0;
-			start1 = 1;
-		}
-		else if(rxData1[0] == ']')
-		{
-			memcpy(rxMsg1, rxBuff1, 30);
-			memset(rxBuff1, 0 , 30);
-			rxCnt1 = 0;
-			start1 = 0;
-		}
-		else if(start1)
-		{
-			rxBuff1[rxCnt1] = rxData1[0];
-			rxCnt1++;
-		}
+		Uart_Rx_Parssing(&huart1, &m_uart1);
 	}
 }
 
@@ -303,18 +305,18 @@ void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	char rxLen = 0;
-	rxLen = strlen(rxMsg1);
+	rxLen = strlen(m_uart1.msgBuff);
 
 	if(rxLen != NULL)
 	{
-		if(rxMsg1[DIVISION_POS] !='_') return;
+		if(m_uart1.msgBuff[DIVISION_POS] !='_') return;
 		
-		if(atoi(rxMsg1+VALUE_POS) != 0)
+		if(atoi(m_uart1.msgBuff+VALUE_POS) != 0)
 		{
-			num = atoi(rxMsg1+VALUE_POS);
+			num = atoi(m_uart1.msgBuff+VALUE_POS);
 		}
 		
-		if(Is_Include_ThisStr( rxMsg1, 0, "SF"))
+		if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "SF"))
 		{
 			if(SF_07<= num && num<= SF_12 )
 			{
@@ -335,23 +337,23 @@ void Pc_Command_Response()
 			}										
 		}
 		
-		else if(Is_Include_ThisStr( rxMsg1, 0, "WT"))
+		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "WT"))
 		{
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		else if(Is_Include_ThisStr( rxMsg1, 0, "TO"))
+		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "TO"))
 		{
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
 
-		else if(Is_Include_ThisStr( rxMsg1, 0, "RU"))
+		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "RU"))
 		{				
-			Rute_Cmd(rxMsg1);
+			Rute_Cmd(m_uart1.msgBuff);
 		}
-		memset(rxMsg1, 0, 30);
+		memset(m_uart1.msgBuff, 0, 30);
 	}
 }
 void Rute_Cmd(uint8_t* msg)

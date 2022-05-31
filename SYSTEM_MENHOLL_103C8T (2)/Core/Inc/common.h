@@ -13,7 +13,7 @@
 #include"eco_sensor.h"
 #include "sx1276.h"
 #include"gps.h"
-
+#include "usart.h"
 /*  			include end  			*/
 
 
@@ -106,5 +106,6 @@ extern ADC_HandleTypeDef hadc2;
 extern UART_HandleTypeDef huart2;
 extern STATUS_T m_status;
 extern ECO_T m_eco;
-
+extern UART_T m_uart1;
+extern UART_T m_uart2;
 #endif
