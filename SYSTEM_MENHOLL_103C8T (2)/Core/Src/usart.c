@@ -227,26 +227,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 	if(huart == &huart2) //GPS_UART_CallBack();
 	{
-		HAL_UART_Receive_IT(&huart2, rxData2, 1);
-
-		if(rxData2[0] == '[')
-		{
-			rxCnt2 =  0;
-			start2 = 1;
-		}
-		else if(rxData2[0] == ']')
-		{
-			memcpy(rxMsg2, rxBuff2, 30);
-			memset(rxBuff2, 0 , 30);
-			rxCnt2 = 0;
-			start2 = 0;
-		}
-		else if(start2)
-		{
-			rxBuff2[rxCnt2] = rxData2[0];
-			rxCnt2++;
-		}
-			
+//		HAL_UART_Receive_IT(&huart2, rxData2, 1);
+//
+//		if(rxData2[0] == '[')
+//		{
+//			rxCnt2 =  0;
+//			start2 = 1;
+//		}
+//		else if(rxData2[0] == ']')
+//		{
+//			memcpy(rxMsg2, rxBuff2, 30);
+//			memset(rxBuff2, 0 , 30);
+//			rxCnt2 = 0;
+//			start2 = 0;
+//		}
+//		else if(start2)
+//		{
+//			rxBuff2[rxCnt2] = rxData2[0];
+//			rxCnt2++;
+//		}
+		Uart_Rx_Parssing(&huart2, &m_uart2);
 	}
 
 	
@@ -325,15 +325,15 @@ void Pc_Command_Response()
 				SX1276_Control_SF((uint8_t)num);	
 				PCPrintf("SF = %u \r\n",num);
 
-				switch(num)
-				{
-					case SF_07 :	m_status.txTimeOut = 63 + 10;	break;
-					case SF_08 :	m_status.txTimeOut = 104 + 10;	break;
-					case SF_09 :	m_status.txTimeOut = 181 + 10;	break;
-					case SF_10 :	m_status.txTimeOut = 352 +10;	break;
-					case SF_11 :	m_status.txTimeOut = 694 + 10;	break;
-					case SF_12 :	m_status.txTimeOut = 1221 +10;	break;										
-				}
+//				switch(num)
+//				{
+//					case SF_07 :	m_status.txTimeOut = 63 + 10;	break;
+//					case SF_08 :	m_status.txTimeOut = 104 + 10;	break;
+//					case SF_09 :	m_status.txTimeOut = 181 + 10;	break;
+//					case SF_10 :	m_status.txTimeOut = 352 +10;	break;
+//					case SF_11 :	m_status.txTimeOut = 694 + 10;	break;
+//					case SF_12 :	m_status.txTimeOut = 1221 +10;	break;										
+//				}
 			}										
 		}
 		
@@ -440,15 +440,19 @@ uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str)
 
 uint8_t E22HeadMsg[6] = {0x11, 0x01, 0x03,0xAA,0xBB,0xCC};
 uint8_t E22ReadStatus[3] = {0xC1, 0x00, 0x09}; 
+uint8_t E22_buff[40] = {0,};
 uint8_t dddata[] = "[AABBCC]";
 int wwee = 0;
 void E22_Send(uint8_t* buff)
 {
-	uint8_t str[40] = "[";
+	uint8_t str_e22[40] = "[";
 
-	strcat(str, buff);
-	strcat(str, "]");
+	strcat(str_e22, buff);
+	strcat(str_e22, "]");
 
-	HAL_UART_Transmit_IT(&huart2, str, strlen(str));
+	//memcpy(E22_buff,str_e22,strlen(str_e22) );
+	
+	HAL_UART_Transmit(&huart2, str_e22, strlen(str_e22),1000);
+	//HAL_UART_Transmit_IT(&huart2, dddata, 9);
 }
 /* USER CODE END 1 */
