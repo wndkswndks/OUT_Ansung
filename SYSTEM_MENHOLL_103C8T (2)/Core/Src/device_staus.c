@@ -112,36 +112,19 @@ void My_Device()
 	m_status.nodeMaxNum =10;
 	m_status.device = (sw_flag[3]<<3)|(sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
 	
-	
 
-	#if 0
-		if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE, strlen(TO_NODE_ROUTE));
-		if(m_status.device==2) memcpy(m_status.stationName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
-		if(m_status.device==3) memcpy(m_status.myNodeName, NODE0, strlen(NODE0));
-		if(m_status.device==4) memcpy(m_status.myNodeName, NODE1, strlen(NODE1));
-		if(m_status.device==5) memcpy(m_status.myNodeName, NODE2, strlen(NODE2));
-		
-		if(m_status.device==3 ||m_status.device==4||m_status.device==5)
-			memcpy(m_status.toMasterRute, TO_MASTER_ROUTE, strlen(TO_MASTER_ROUTE));
-	#else
-		if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
-		if(m_status.device==2) memcpy(m_status.stationName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
-		if(m_status.device==3) memcpy(m_status.stationName, EXTENSION_NODE2, strlen(EXTENSION_NODE2));
-		if(m_status.device==4) memcpy(m_status.stationName, EXTENSION_NODE3, strlen(EXTENSION_NODE3));
-		if(m_status.device==5) 
-		{
-			memcpy(m_status.myNodeName, NODE0, strlen(NODE0));
-			memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
-		}
-	#endif
+	if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
+	if(m_status.device==2) memcpy(m_status.stationName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
+	if(m_status.device==3) memcpy(m_status.stationName, EXTENSION_NODE2, strlen(EXTENSION_NODE2));
+	if(m_status.device==4) memcpy(m_status.stationName, EXTENSION_NODE3, strlen(EXTENSION_NODE3));
+	if(m_status.device==5) 
+	{
+		memcpy(m_status.myNodeName, NODE0, strlen(NODE0));
+		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+	}
 
 	m_status.txWateTime = 100;
 	m_status.txTimeOut = 700;
-	
-	
-
-	
-	
 
 
 }

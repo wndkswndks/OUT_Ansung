@@ -117,7 +117,7 @@ int main(void)
   My_Device();
 
   //Eco_Init();
-  SX1276_Init(922125000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
+  SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
   LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
   {
@@ -155,15 +155,6 @@ int main(void)
 //	  HAL_Delay(100);
 
 
-	#if 0
-	  if(m_status.device == 0x01) Master_Pass_Many_Node();
-	  if(m_status.device == 0x02) Gateway_Pass();
-	  if(m_status.device == 0x03 ||m_status.device == 0x04||m_status.device == 0x05) 
-	  {
-		  Node_Pass();
-	  }
-
-	#else
 	  if(m_status.device == 0x01) 
 	  {
 		  	Master_Pass_Many_Station();
@@ -174,11 +165,7 @@ int main(void)
 	  		Gateway_Pass();
 	  }
 	  if(m_status.device == 0x05) Node_Pass();
-	#endif
 
-	//E22_Send();
-	//HAL_Delay(3000);
-	//Pc_Command_Response();
     Led_Toggle_Config();
   }
   /* USER CODE END 3 */

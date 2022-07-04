@@ -217,61 +217,15 @@ UART_T m_uart2;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	static uint8_t start1 = 0;
-	static uint8_t rxCnt1 = 0;
-	static uint8_t rxBuff1[30] = {0,};
-
-	static uint8_t start2 = 0;
-	static uint8_t rxCnt2 = 0;
-	static uint8_t rxBuff2[30] = {0,};
 	
 	if(huart == &huart2) //GPS_UART_CallBack();
 	{
-//		HAL_UART_Receive_IT(&huart2, rxData2, 1);
-//
-//		if(rxData2[0] == '[')
-//		{
-//			rxCnt2 =  0;
-//			start2 = 1;
-//		}
-//		else if(rxData2[0] == ']')
-//		{
-//			memcpy(rxMsg2, rxBuff2, 30);
-//			memset(rxBuff2, 0 , 30);
-//			rxCnt2 = 0;
-//			start2 = 0;
-//		}
-//		else if(start2)
-//		{
-//			rxBuff2[rxCnt2] = rxData2[0];
-//			rxCnt2++;
-//		}
 		Uart_Rx_Parssing(&huart2, &m_uart2);
 	}
 
 	
 	else if(huart == &huart1)
 	{
-//		HAL_UART_Receive_IT(&huart1, rxData1, 1);
-//
-//		if(rxData1[0] == '[')
-//		{
-//			rxCnt1 =  0;
-//			start1 = 1;
-//		}
-//		else if(rxData1[0] == ']')
-//		{
-//			memcpy(rxMsg1, rxBuff1, 30);
-//			memset(rxBuff1, 0 , 30);
-//			rxCnt1 = 0;
-//			start1 = 0;
-//		}
-//		else if(start1)
-//		{
-//			rxBuff1[rxCnt1] = rxData1[0];
-//			rxCnt1++;
-//		}
-
 		Uart_Rx_Parssing(&huart1, &m_uart1);
 	}
 }

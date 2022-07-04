@@ -369,7 +369,6 @@ void Master_Pass_Many_Node()//
 
 }
 
-#define SX1276_USE
 
 void Master_Pass_Many_Station()//
 {
@@ -389,25 +388,15 @@ void Master_Pass_Many_Station()//
 			strcat(txBuff,"N0");
 			strcat(txBuff,"NO");	
 
-			#ifdef SX1276_USE
-				Lora_Send_Msg(txBuff, NONE_VALUE);
-			#else
-				E22_Send(txBuff);
-			#endif
-			
+			Lora_Send_Msg(txBuff, NONE_VALUE);
+
 			timestemp = HAL_GetTick();
 			step = STEP2;
 			tx_rx_num++;
 		break;
 
 		case STEP2:
-			#ifdef SX1276_USE
-				SX1276_RX_Packet(buffer);
-			#else
-				memcpy(buffer,m_uart2.msgBuff, strlen(m_uart2.msgBuff));
-			#endif
-			
-			
+			SX1276_RX_Packet(buffer);
 
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
@@ -444,11 +433,7 @@ void Master_Pass_Many_Station()//
 
 void Gateway_Pass()
 {
-	#ifdef SX1276_USE
-		SX1276_RX_Packet(buffer);
-	#else
-		memcpy(buffer,m_uart2.msgBuff, strlen(m_uart2.msgBuff));
-	#endif
+	SX1276_RX_Packet(buffer);
 
 	if(Is_Include_ThisStr( buffer, 0, m_status.stationName))
 	{
@@ -456,11 +441,7 @@ void Gateway_Pass()
 		memcpy(readMag,buffer,50);
 		HAL_Delay(LORA_DELAY);
 		
-		#ifdef SX1276_USE
-			Lora_Send_Msg(buffer+STATION_HEAD_LEN, NONE_VALUE);
-		#else
-			E22_Send(buffer+STATION_HEAD_LEN);
-		#endif
+		Lora_Send_Msg(buffer+STATION_HEAD_LEN, NONE_VALUE);
 
 		memset(m_uart2.msgBuff,0,30);
 		memset(buffer,0,512);
@@ -472,13 +453,7 @@ void Node_Pass()
 {
 	uint8_t num = 0;
 	
-	#ifdef SX1276_USE
-		SX1276_RX_Packet(buffer);
-	#else
-		memcpy(buffer,m_uart2.msgBuff, strlen(m_uart2.msgBuff));
-	#endif
-
-
+	SX1276_RX_Packet(buffer);
 
 	if(Is_Include_ThisStr( buffer, 0, m_status.myNodeName))
 	{
@@ -538,13 +513,7 @@ void Node_Nomal_Response()
 	strcat(txBuff,")");
 	memcpy(readMag,txBuff,50);
 	
-	#ifdef SX1276_USE
-		Lora_Send_Msg(txBuff, NONE_VALUE);
-	#else
-		E22_Send(txBuff);
-	#endif
-
-
+	Lora_Send_Msg(txBuff, NONE_VALUE);
 
 	memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
 
@@ -793,7 +762,7 @@ uint8_t SX1276_TX_Entry(uint8_t length, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();	
-			SX1276_Init(922125000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE); // 아니다 이건 해야할듯
 			return 0;
 		}
 	}
@@ -822,7 +791,7 @@ uint8_t SX1276_RX_Entry(uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(922125000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);
@@ -849,7 +818,7 @@ uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut)
 		if(timeOut == 0)
 		{
 			HW_Reset();		
-			SX1276_Init(922125000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
+			SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);// 아니다 이건 해야할듯
 			return 0;
 		}
 		HAL_Delay(1);
