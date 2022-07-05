@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdarg.h> 
 
 #include"main.h"
 #include"device_status.h"
@@ -14,6 +15,7 @@
 #include "sx1276.h"
 #include"gps.h"
 #include "usart.h"
+#include "lte_module.h"
 /*  			include end  			*/
 
 
@@ -108,4 +110,7 @@ extern STATUS_T m_status;
 extern ECO_T m_eco;
 extern UART_T m_uart1;
 extern UART_T m_uart2;
+extern uint8_t rxBuff1[1300];
+extern int rxCnt1;
+
 #endif

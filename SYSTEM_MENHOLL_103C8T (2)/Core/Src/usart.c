@@ -226,7 +226,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 	else if(huart == &huart1)
 	{
-		Uart_Rx_Parssing(&huart1, &m_uart1);
+		//Uart_Rx_Parssing(&huart1, &m_uart1);
+
+		HAL_UART_Receive_IT(&huart1, rxData1, 1);				
+
+		rxBuff1[rxCnt1] = rxData1[0];
+		rxCnt1++;
 	}
 }
 
@@ -315,14 +320,14 @@ void Rute_Cmd(uint8_t* msg)
 	char rute[10][10] = {0,};
 	char node[5] = {0,};
 	char str[40] = {0,};
-	char *ptr = strtok(msg+VALUE_POS, "_");      // " " ê³µë°± ë¬¸ìë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë¬¸ìì—´ì„ ìë¦„, í¬ì¸í„° ë°˜í™˜
+	char *ptr = strtok(msg+VALUE_POS, "_");      // " " ê³µë°± ë¬¸ìë¥? ê¸°ì??œ¼ë¡? ë¬¸ì?—´?„ ?ë¦?, ?¬?¸?„° ë°˜í™˜
 	uint8_t cnt = 0;
 	
 	memcpy(node, ptr, strlen(ptr));
 	
-    while (ptr != NULL)               // ìë¥¸ ë¬¸ìì—´ì´ ë‚˜ì˜¤ì§€ ì•Šì„ ë•Œê¹Œì§€ ë°˜ë³µ
+    while (ptr != NULL)               // ?ë¥? ë¬¸ì?—´?´ ?‚˜?˜¤ì§? ?•Š?„ ?•Œê¹Œì? ë°˜ë³µ
     {
-        ptr = strtok(NULL, "_");      // ë‹¤ìŒ ë¬¸ìì—´ì„ ì˜ë¼ì„œ í¬ì¸í„°ë¥¼ ë°˜í™˜
+        ptr = strtok(NULL, "_");      // ?‹¤?Œ ë¬¸ì?—´?„ ?˜?¼?„œ ?¬?¸?„°ë¥? ë°˜í™˜
         memcpy(rute[cnt++], ptr, strlen(ptr));
     }
 	cnt--;
