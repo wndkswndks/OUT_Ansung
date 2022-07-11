@@ -453,12 +453,16 @@ void Node_Pass()
 {
 	uint8_t num = 0;
 	
-	SX1276_RX_Packet(buffer);
+	//SX1276_RX_Packet(buffer);
 
 	if(Is_Include_ThisStr( buffer, 0, m_status.myNodeName))
 	{
+		
 		if(Is_Include_ThisStr( buffer, 2, "NO")) Node_Nomal_Response();
 		if(Is_Include_ThisStr( buffer, 2, "RU")) Node_Rute_Response();
+
+			memset(m_uart2.msgBuff,0,30);
+			memset(buffer,0,512);
 		
 	}
 	else if(Is_Include_ThisStr( buffer, 0, CMD_SF))
@@ -472,8 +476,7 @@ void Node_Pass()
 		}	
 	}
 
-	memset(m_uart2.msgBuff,0,30);
-	memset(buffer,0,512);
+
 }
 
 
@@ -513,8 +516,10 @@ void Node_Nomal_Response()
 	strcat(txBuff,")");
 	memcpy(readMag,txBuff,50);
 	
+	loraSand = 1;
 	Lora_Send_Msg(txBuff, NONE_VALUE);
-
+	loraSand = 0;
+	
 	memset(m_status.polingDataStr, 0, strlen(m_status.polingDataStr));
 
 	Poling_Str_Add(cnt);
