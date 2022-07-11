@@ -104,31 +104,33 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
- // MX_IWDG_Init();
+  //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
 	//HAL_UART_Receive_IT(&huart1, rxData1, 1);
 	HAL_UART_Receive_IT(&huart1, m_uart1.rxByte, 1);
 	HAL_UART_Receive_IT(&huart2, rxData2, 1);
   //GPS_Init();
-  Poling_Str_Add(44);
-  Poling_Str_Add(215);
-  Poling_Str_Add(66);
-  My_Device();
+//  Poling_Str_Add(44);
+//  Poling_Str_Add(215);
+//  Poling_Str_Add(66);
+//  My_Device();
+//
+//  //Eco_Init();
+//  SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
+//  LED3_ON;
+//  if(m_sx1276.device == TX_DEVICE)
+//  {
+//	  SX1276_TX_Entry(16, 2000);
+//  }
+//  else
+//  {
+//	  SX1276_RX_Entry(2000);
+//  }
 
-  //Eco_Init();
-  SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
-  LED3_ON;
-  if(m_sx1276.device == TX_DEVICE)
-  {
-	  SX1276_TX_Entry(16, 2000);
-  }
-  else
-  {
-	  SX1276_RX_Entry(2000);
-  }
+  LTE_Init();
 
-
+  HTTP_Config();
 
 
 
@@ -155,16 +157,16 @@ int main(void)
 //	  HAL_Delay(100);
 
 
-	  if(m_status.device == 0x01) 
-	  {
-		  	Master_Pass_Many_Station();
-			Pc_Command_Response();
-	  }	
-	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
-	  {
-	  		Gateway_Pass();
-	  }
-	  if(m_status.device == 0x05) Node_Pass();
+//	  if(m_status.device == 0x01) 
+//	  {
+//		  	Master_Pass_Many_Station();
+//			Pc_Command_Response();
+//	  }	
+//	  if(m_status.device == 0x02 ||m_status.device == 0x03||m_status.device == 0x04) 
+//	  {
+//	  		Gateway_Pass();
+//	  }
+//	  if(m_status.device == 0x05) Node_Pass();
 
     Led_Toggle_Config();
   }

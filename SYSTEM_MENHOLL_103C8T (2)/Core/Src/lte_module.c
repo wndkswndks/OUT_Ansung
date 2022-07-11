@@ -485,13 +485,12 @@ void HTTP_Config()
 	//char* WApiKey  = "PVAEO8IIU8VVDXJZ"; //test4
 	
 	char sendMsg[200] = "GET /update";
-	int testData[10]={111,222,333,444,555,666};
-
+	int testData[10]={11,22,33,44,55,66};
 
 	strcat(sendMsg,"?api_key=");
 	strcat(sendMsg,WApiKey);
 
-	for(int i =0 ;i < 6;i++)
+	for(int i =1 ;i < 6;i++)
 	{
 		Passing_field(i,testData[i],sendMsg);
 	}
