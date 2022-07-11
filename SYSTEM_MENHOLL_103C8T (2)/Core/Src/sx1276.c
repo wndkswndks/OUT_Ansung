@@ -825,15 +825,19 @@ uint8_t SX1276_TX_Packet(char* txBuff, uint8_t lengh, uint32_t timeOut)
 	}
 	
 }
+uint8_t Get_ioFlag = 33;
+uint32_t Get_ttime = 0;
+uint32_t Gap_ttime = 0;
 
 void SX1276_RX_Packet(char* rxBuff)
 {
 	uint8_t addr = 0;
 	uint8_t packet_size = 0;
 
-	
-	if(GET_IO0)
+	//Get_ioFlag = GET_IO0;
+	if(Get_ioFlag = GET_IO0)
 	{
+		Get_ttime = HAL_GetTick();
 		memset(rxBuff, 0x00,SX1276_MAX_PACKET);
 		addr = SX1276_Read(m_sx1276.s_FifoRxCurrentaddr.FifoRxCurrentAddr);	
 		SX1276_Segment_Write(m_sx1276.s_FifoAddrPtr.FifoAddrPtr,addr);
@@ -843,7 +847,7 @@ void SX1276_RX_Packet(char* rxBuff)
 		if(packet_size !=0)SX1276_BurstRead(0x00, (uint8_t *)rxBuff, packet_size);
 
 		SX1276_Byte_Write(RegIrqFlags, ALL_IRQ_CLEAR);
-		
+		Gap_ttime = HAL_GetTick() - Get_ttime;
 	}
 }
 
