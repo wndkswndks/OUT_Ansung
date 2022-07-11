@@ -79,6 +79,7 @@ void Error_Handler(void);
 #define RESET_GPIO_Port GPIOA
 #define IO0_Pin GPIO_PIN_9
 #define IO0_GPIO_Port GPIOA
+#define IO0_EXTI_IRQn EXTI9_5_IRQn
 #define LTE_WAKE_Pin GPIO_PIN_10
 #define LTE_WAKE_GPIO_Port GPIOA
 #define LTE_RESET_Pin GPIO_PIN_11

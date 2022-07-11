@@ -368,7 +368,7 @@ void Master_Pass_Many_Node()//
 	}
 
 }
-
+uint8_t loraSand = 0;
 
 void Master_Pass_Many_Station()//
 {
@@ -387,16 +387,16 @@ void Master_Pass_Many_Station()//
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,"N0");
 			strcat(txBuff,"NO");	
-
+			loraSand = 1;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
-
+			loraSand = 0;
 			timestemp = HAL_GetTick();
 			step = STEP2;
 			tx_rx_num++;
 		break;
 
 		case STEP2:
-			SX1276_RX_Packet(buffer);
+			//SX1276_RX_Packet(buffer);
 
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
