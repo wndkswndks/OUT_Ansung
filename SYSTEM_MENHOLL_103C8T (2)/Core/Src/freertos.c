@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include"common.h"
 
 /* USER CODE END Includes */
 
@@ -32,11 +33,14 @@
 /* USER CODE BEGIN PTD */
 void vTask1(void* pvPrameters);
 void vTask2(void* pvPrameters);
+void vTask3(void* pvPrameters);
+
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+extern char buffer[512];
 
 /* USER CODE END PD */
 
@@ -111,6 +115,7 @@ void MX_FREERTOS_Init(void) {
   /* add threads, ... */
   xTaskCreate(vTask1, "Task 1", 128, NULL, 4, NULL);
   xTaskCreate(vTask2, "Task 2", 128, NULL, 4, NULL);
+  //xTaskCreate(vTask3, "Task 3", 128, NULL, 4, NULL);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -139,8 +144,15 @@ void vTask1(void* pvPrameters)
 {
 	while(1)
 	{
-		Master_Pass_Many_Station();
-		Pc_Command_Response();
+		if(m_status.device == 0x01)
+		{
+			Master_Pass_Many_Station();
+			//Pc_Command_Response();
+		}
+		if(m_status.device == 0x05)
+		{
+			Node_Pass();
+		}
 
 	}
 }
@@ -149,8 +161,17 @@ void vTask2(void* pvPrameters)
 {
 	while(1)
 	{
-		LED3_TOGGLE;
-		HAL_Delay(100);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
+		//HAL_Delay(1000);
+		osDelay(100);
+	}
+}
+
+void vTask3(void* pvPrameters)
+{
+	while(1)
+	{
+		SX1276_RX_Packet(buffer);
 	}
 }
 

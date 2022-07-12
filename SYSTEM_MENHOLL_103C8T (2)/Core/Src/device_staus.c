@@ -97,20 +97,18 @@ void Pump_Active_Config()
 void My_Device()
 {
 	uint8_t sw_flag[4] = {0,};
-	if(SW1_STATUS)sw_flag[0] =1;
+	if(!SW1_STATUS)sw_flag[0] =1;
 	else sw_flag[0] =0;
 
-	if(SW2_STATUS)sw_flag[1] =1;
+	if(!SW2_STATUS)sw_flag[1] =1;
 	else sw_flag[1] =0;
 
-	if(SW3_STATUS)sw_flag[2] =1;
+	if(!SW3_STATUS)sw_flag[2] =1;
 	else sw_flag[2] =0;
 
-	if(SW4_STATUS)sw_flag[3] =1;
-	else sw_flag[3] =0;
 
 	m_status.nodeMaxNum =10;
-	m_status.device = (sw_flag[3]<<3)|(sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
+	m_status.device = (sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
 	
 
 	if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
