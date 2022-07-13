@@ -416,18 +416,18 @@ void Master_Pass_Many_Station()//
 				memset(m_uart2.msgBuff,0,30);
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
-				step = STEP1;
-				osDelay(m_status.txWateTime);
+				step = STEP3;
+				//osDelay(m_status.txWateTime);
 			}
 			
 		break;
 
-//		case STEP3:
-//			if(HAL_GetTick() - timestemp >m_status.txWateTime)
-//			{
-//				step = STEP1;
-//			}
-//		break;
+		case STEP3:
+			if(HAL_GetTick() - timestemp >m_status.txWateTime)
+			{
+				step = STEP1;
+			}
+		break;
 	}
 
 }
