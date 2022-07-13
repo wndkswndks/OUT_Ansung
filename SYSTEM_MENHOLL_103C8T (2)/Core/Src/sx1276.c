@@ -417,6 +417,7 @@ void Master_Pass_Many_Station()//
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
 				step = STEP3;
+				//osDelay(m_status.txWateTime);
 			}
 			
 		break;
@@ -474,6 +475,9 @@ void Node_Pass()
 			HAL_Delay(100);
 			SX1276_Control_SF(num);
 		}	
+
+			memset(m_uart2.msgBuff,0,30);
+			memset(buffer,0,512);
 	}
 
 
