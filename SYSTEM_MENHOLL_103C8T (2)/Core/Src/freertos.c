@@ -118,7 +118,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 
-  xTaskCreate(vTask1, "Task 1", 128, NULL, 4, &xTask1Handle);
+  xTaskCreate(vTask1, "Task 1", 256, NULL, 4, &xTask1Handle);
   xTaskCreate(vTask2, "Task 2", 128, NULL, 4, &xTask2Handle);
 //  if(m_status.device == 0x01)
 //  		xTaskCreate(vTask3, "Task 3", 128, NULL, 3, &xTask3Handle);
