@@ -370,6 +370,8 @@ void Master_Pass_Many_Node()//
 }
 uint8_t loraSand = 0;
 
+int rx_cnt = 0;
+
 void Master_Pass_Many_Station()//
 {
 	static uint8_t step = STEP1;
@@ -410,7 +412,13 @@ void Master_Pass_Many_Station()//
 				success_rx_num++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
+				//PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
+				rx_cnt++;
+				if(rx_cnt %10==0)
+				{
+
+					HTTP_Config();
+				}
 				memcpy(readMag,buffer,50);
 
 				memset(m_uart2.msgBuff,0,30);
