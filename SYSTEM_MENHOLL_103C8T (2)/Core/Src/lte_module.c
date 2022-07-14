@@ -485,7 +485,7 @@ void HTTP_Config()
 	//char* WApiKey  = "PVAEO8IIU8VVDXJZ"; //test4
 	
 	char sendMsg[200] = "GET /update";
-	int testData[10]={11,22,33,44,55,66};
+	int testData[10]={110,220,330,440,550,660};
 
 	strcat(sendMsg,"?api_key=");
 	strcat(sendMsg,WApiKey);

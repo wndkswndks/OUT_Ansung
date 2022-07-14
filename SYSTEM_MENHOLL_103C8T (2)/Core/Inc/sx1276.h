@@ -704,12 +704,16 @@ void SX1276_Control_SF(uint8_t   data);
 
 void Master_Pass_Many_Node();
 void Master_Pass_Many_Station();
+void Master_Pass_Many_Station2();
+
 
 void Node_Send();
 void Gateway_Pass();
 void Node_Pass();
 
 void Node_Nomal_Response();
+void Node_Nomal_Response2();
+
 void Node_Rute_Response();
 
 /*  			function end  			*/

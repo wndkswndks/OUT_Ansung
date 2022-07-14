@@ -35,12 +35,16 @@ void vTask1(void* pvPrameters);
 void vTask2(void* pvPrameters);
 void vTask3(void* pvPrameters);
 
-
+void PriorChange();
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 extern char buffer[512];
+xTaskHandle xTask1Handle = NULL;
+xTaskHandle xTask2Handle = NULL;
+xTaskHandle xTask3Handle = NULL;
+
 
 /* USER CODE END PD */
 
@@ -113,9 +117,13 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  xTaskCreate(vTask1, "Task 1", 128, NULL, 4, NULL);
-  xTaskCreate(vTask2, "Task 2", 128, NULL, 4, NULL);
-  //xTaskCreate(vTask3, "Task 3", 128, NULL, 4, NULL);
+
+  xTaskCreate(vTask1, "Task 1", 128, NULL, 4, &xTask1Handle);
+  xTaskCreate(vTask2, "Task 2", 128, NULL, 4, &xTask2Handle);
+//  if(m_status.device == 0x01)
+//  		xTaskCreate(vTask3, "Task 3", 128, NULL, 3, &xTask3Handle);
+  		
+  		//uxTaskPriorityGet(xTask2Handle);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -146,7 +154,7 @@ void vTask1(void* pvPrameters)
 	{
 		if(m_status.device == 0x01)
 		{
-			Master_Pass_Many_Station();
+			Master_Pass_Many_Station2();
 			//Pc_Command_Response();
 		}
 		if(m_status.device == 0x05)
@@ -171,8 +179,23 @@ void vTask3(void* pvPrameters)
 {
 	while(1)
 	{
-		SX1276_RX_Packet(buffer);
+		HTTP_Config();
+		//osDelay(10000);
+		HAL_Delay(10000);
+		vTaskPrioritySet(NULL,3);
 	}
+}
+
+long bigboss[6] = {0,};
+void PriorChange()
+{
+//	bigboss[0] = uxTaskPriorityGet(xTask1Handle);
+//	bigboss[1] = uxTaskPriorityGet(xTask2Handle);
+//	bigboss[2] = uxTaskPriorityGet(xTask3Handle);
+	vTaskPrioritySet(xTask3Handle,5);
+//	bigboss[3] = uxTaskPriorityGet(xTask1Handle);
+//	bigboss[4] = uxTaskPriorityGet(xTask2Handle);
+//	bigboss[5] = uxTaskPriorityGet(xTask3Handle);
 }
 
 /* USER CODE END Application */

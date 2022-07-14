@@ -130,9 +130,8 @@ int main(void)
 	  SX1276_RX_Entry(2000);
   }
 
-//  LTE_Init();
-//
-//  HTTP_Config();
+  LTE_Init();
+
 
 
 
