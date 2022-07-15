@@ -41,7 +41,7 @@ void AT_CMD_College(uint8_t * buff, ...);
 
 void Basic_Config();
 void TCP_Config();
-void HTTP_Config();
+void HTTP_Config(char* txBuff);
 void MQTT_Config();
 
 void CMD_Init();

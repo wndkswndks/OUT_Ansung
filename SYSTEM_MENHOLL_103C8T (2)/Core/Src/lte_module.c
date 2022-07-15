@@ -449,7 +449,7 @@ void CMD_Set_MQTT_Disconnect()
 
 
 
-void HTTP_Config()
+void HTTP_Config(char* txBuff)
 {
 	Terminal_Send("START\r\n");
 	CMD_Reset();
@@ -485,14 +485,14 @@ void HTTP_Config()
 	//char* WApiKey  = "PVAEO8IIU8VVDXJZ"; //test4
 	
 	char sendMsg[200] = "GET /update";
-	int testData[10]={110,220,330,440,550,660};
+	//int testData[10]={110,220,330,440,550,660};
 
 	strcat(sendMsg,"?api_key=");
 	strcat(sendMsg,WApiKey);
 
-	for(int i =1 ;i < 6;i++)
+	for(int i =0 ; i < 8; i++)
 	{
-		Passing_field(i,testData[i],sendMsg);
+		Passing_field(i+1,txBuff[i],sendMsg);
 	}
 
 	strcat(sendMsg," HTTP/1.1\r\n");

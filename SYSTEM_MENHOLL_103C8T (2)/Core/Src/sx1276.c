@@ -291,146 +291,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 uint8_t readMag[50] = {0,};
 int no_rx_num[3] = {0,};
 int tmpBuff[5] = {0,};
-void Master_Pass_Many_Node()//
-{
-	static uint8_t step = STEP1;
-	static uint32_t timestemp = 0;
-	char txBuff[20] = {0,};
-	char nodeNum[10] = {0,};
-	static uint16_t nodeCnt = 0;
-	static uint16_t prenodeCnt =1;
-	static uint8_t notRxCnt,notRxflag = 0;
-	
-	switch(step)
-	{	
-		case STEP1:
-
-			if(prenodeCnt == nodeCnt) 
-			{
-				notRxCnt++;
-				if(notRxCnt > 10)
-				{
-					notRxCnt = 0;
-					notRxflag = 1;
-					PCPrintf("Not recive = %d node \r\n",nodeCnt);
-					nodeCnt++;
-					nodeCnt %=3;
-				}
-			}
-			
-			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			strcat(txBuff,"#");
-
-			sprintf(nodeNum,"00%u",nodeCnt);
-			strcat(txBuff,nodeNum);
-			
-			Lora_Send_Msg(txBuff, NONE_VALUE);
-			prenodeCnt = nodeCnt;
-			timestemp = HAL_GetTick();
-			step = STEP2;
-			
-		break;
-
-		case STEP2:
-			
-			SX1276_RX_Packet(buffer);
-
-			if(HAL_GetTick() - timestemp >600)
-			{
-				no_rx_num[nodeCnt]++;
-				step = STEP1;
-				
-			}
-			if(strncmp(MASTER,buffer ,2 )==0)
-			{
-				LED1_TOGGLE;
-				//sscanf(buffer, "&M#001[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%s \r\n",buffer+2);
-                notRxCnt = 0;
-				memcpy(readMag,buffer,50);
-			
-                memset(buffer,0,512);
-				timestemp = HAL_GetTick();
-				nodeCnt++;
-				nodeCnt %=3;
-				step = STEP3;
-			}
-			
-		break;
-
-		case STEP3:
-			if(HAL_GetTick() - timestemp >300)
-			{
-
-				step = STEP1;
-			}
-		break;
-	}
-
-}
 uint8_t loraSand = 0;
-
-void Master_Pass_Many_Station()//
-{
-	static uint8_t step = STEP1;
-	
-	uint32_t callbackTime= 0;
-	static uint32_t timestemp = 0;
-	char txBuff[20] = {0,};
-	static int success_rx_num = 0;
-	static int fail_rx_num = 0;
-	static int tx_rx_num = 0;
-	switch(step)
-	{	
-		case STEP1:
-			LED2_TOGGLE;
-			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			strcat(txBuff,"N0");
-			strcat(txBuff,"NO");	
-			loraSand = 1;
-			Lora_Send_Msg(txBuff, NONE_VALUE);
-			loraSand = 0;
-			timestemp = HAL_GetTick();
-			step = STEP2;
-			tx_rx_num++;
-		break;
-
-		case STEP2:
-			//SX1276_RX_Packet(buffer);
-
-			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
-			{
-				fail_rx_num++;
-				step = STEP1;
-				
-			}
-			if(Is_Include_ThisStr( buffer, 0, "&M"))
-			{
-				LED1_TOGGLE;
-				success_rx_num++;
-				callbackTime = HAL_GetTick() - timestemp;
-				//sscanf(buffer, "&M#000[%u,%u,%u,]", tmp, tmp+1, tmp+2);
-				PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
-				memcpy(readMag,buffer,50);
-
-				memset(m_uart2.msgBuff,0,30);
-                memset(buffer,0,512);
-				timestemp = HAL_GetTick();
-				step = STEP3;
-				//osDelay(m_status.txWateTime);
-			}
-			
-		break;
-
-		case STEP3:
-			if(HAL_GetTick() - timestemp >m_status.txWateTime)
-			{
-				step = STEP1;
-			}
-		break;
-	}
-
-}
 
 void Master_Pass_Many_Station2()//
 {
@@ -442,13 +303,17 @@ void Master_Pass_Many_Station2()//
 	static int success_rx_num = 0;
 	static int fail_rx_num = 0;
 	static int tx_rx_num = 0;
-	static int tx_cnt = 0;
+	static int nodeNum = 0;
+	char nodeNumStr[4] = {0,};
+	char txLteMsg[8] = {0,};
 	switch(step)
 	{	
 		case STEP1:
 			LED2_TOGGLE;
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
-			strcat(txBuff,"N0");
+			strcat(txBuff,"N");
+			sprintf(nodeNumStr,"%d",nodeNum);
+			strcat(txBuff,nodeNumStr);
 			strcat(txBuff,"NO");	
 			loraSand = 1;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
@@ -465,22 +330,28 @@ void Master_Pass_Many_Station2()//
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
 				fail_rx_num++;
+
+				if(fail_rx_num>20)
+				{
+					txLteMsg[0] = nodeNum;
+					txLteMsg[1] = 99;
+					HTTP_Config(txLteMsg);
+					LTE_Init();			
+					fail_rx_num = 0;
+					nodeNum++;
+					
+				}
 				step = STEP1;
 				
 			}
 			if(Is_Include_ThisStr( buffer, 0, "&M"))
 			{
 				LED1_TOGGLE;
+				nodeNum++;
+				fail_rx_num = 0;
 				success_rx_num++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&MN0(%d,%d,%d,)", tmpBuff, tmpBuff+1, tmpBuff+2);
-				tx_cnt++;
-				if(tx_cnt%10 == 0)
-				{
-					HTTP_Config();
-					LTE_Init();
-					// PriorChange();
-				}
 
 				//PCPrintf("%s tx:%d rx:%d err:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, fail_rx_num,callbackTime);
 				memcpy(readMag,buffer,50);

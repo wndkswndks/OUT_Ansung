@@ -179,7 +179,7 @@ void vTask3(void* pvPrameters)
 {
 	while(1)
 	{
-		HTTP_Config();
+		//HTTP_Config();
 		//osDelay(10000);
 		HAL_Delay(10000);
 		vTaskPrioritySet(NULL,3);
