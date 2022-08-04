@@ -22,6 +22,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include"common.h"
 
 /* USER CODE END Includes */
 
@@ -45,6 +46,9 @@
 extern uint8_t loraSand;
 extern char buffer[512];
 int loraRxCnt = 0;
+extern char bufferCheck[30][20];
+extern char bCnt;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -174,6 +178,12 @@ void EXTI9_5_IRQHandler(void)
 	{
 		loraRxCnt++;
 		SX1276_RX_Packet(buffer);
+		if(buffer[0] !=0)
+		{
+			memcpy(bufferCheck[bCnt++],buffer,strlen(buffer));
+			bCnt%=30;
+		}
+		
 	}
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(IO0_Pin);

@@ -135,6 +135,8 @@ int main(void)
 
 
 
+  MQTT_Config();
+  //HTTP_Config();
 
   //GPS_config();
 
@@ -143,9 +145,9 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
+  //MX_FREERTOS_Init();
   /* Start scheduler */
-  osKernelStart();
+  //osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
@@ -284,19 +286,25 @@ void SystemClock_Config(void)
 //	HAL_Delay(100);
 //	//Error_Config();
 //}
-
+extern uint8_t eventFlag;
+extern char buffer[512];
 void Main_config()
 {	
-	Eco_Config();
-	Battery_Config();
-	Menholl_Open_Config(); 
-	Pump_Active_Config();
-	All_Send();
+	static uint32_t startTime = 0;
+	uint8_t timeFlag = 0;
+	//Eco_Config();
+	//Battery_Config();
+	//Menholl_Open_Config(); 
+	//Pump_Active_Config();
 
-	LED1_TOGGLE;
-	LED2_TOGGLE;
-	LED3_TOGGLE;
-	HAL_Delay(100);
+
+	
+	if(HAL_GetTick()-startTime>60000)
+	{
+		startTime = HAL_GetTick();
+			Node_event(18,33);
+
+	}
 	//Error_Config();
 }
 

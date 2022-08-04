@@ -18,7 +18,6 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.Propane,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
-	MQ_Config(&m_eco.MQ2.CARBON_MONOXIDE,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
 		
@@ -47,22 +46,21 @@ void Eco_Init()
 	ADS1115_RegInit(m_eco.config_reg.mode,SINGLE_SHOT_MODE,	ADS_REG_CONFIG,		MASK_1,  MOVE_BIT_8);
 	ADS1115_RegInit(m_eco.config_reg.data_rate,SPS128,		ADS_REG_CONFIG,		MASK_3,  MOVE_BIT_5);
 	
-	MQ_Init(&m_eco.MQ2.H2, MQ2_H2_A,MQ2_H2_B, "H2");
-	MQ_Init(&m_eco.MQ2.LPG, MQ2_LPG_A,MQ2_LPG_B, "LPG");
-	MQ_Init(&m_eco.MQ2.CO, MQ2_CO_A,MQ2_CO_B, "CO");
-	MQ_Init(&m_eco.MQ2.Propane, MQ2_PROPANE_A,MQ2_PROPANE_B, "Propane");
-	MQ_Init(&m_eco.MQ2.METHANE, MQ2_METHANE_A,MQ2_METHANE_B, "METHANE");
-	MQ_Init(&m_eco.MQ2.CARBON_MONOXIDE, MQ2_CARBON_MONOXIDE_A,MQ2_CARBON_MONOXIDE_B, "CARBON_MONOXIDE");
-	MQ_Init(&m_eco.MQ2.ALCOHOL, MQ2_ALCOHOL_A,MQ2_ALCOHOL_B, "ALCOHOL");
-	MQ_Init(&m_eco.MQ2.SMOKE, MQ2_SMOKE_A,MQ2_SMOKE_B, "SMOKE");
+	MQ_Init(&m_eco.MQ2.H2, MQ2_H2_A,MQ2_H2_B, 0);
+	MQ_Init(&m_eco.MQ2.LPG, MQ2_LPG_A,MQ2_LPG_B, 1);
+	MQ_Init(&m_eco.MQ2.CO, MQ2_CO_A,MQ2_CO_B, 2);
+	MQ_Init(&m_eco.MQ2.Propane, MQ2_PROPANE_A,MQ2_PROPANE_B, 3);
+	MQ_Init(&m_eco.MQ2.METHANE, MQ2_METHANE_A,MQ2_METHANE_B, 4);
+	MQ_Init(&m_eco.MQ2.ALCOHOL, MQ2_ALCOHOL_A,MQ2_ALCOHOL_B, 5);
+	MQ_Init(&m_eco.MQ2.SMOKE, MQ2_SMOKE_A,MQ2_SMOKE_B, 6);
 
-	MQ_Init(&m_eco.MQ135.Alcohol, MQ135_ALCOHOL_A,MQ135_ALCOHOL_B, "ALCOHOL");
-	MQ_Init(&m_eco.MQ135.Co2, MQ135_CO2_A,MQ135_CO2_B, "CO2");
-	MQ_Init(&m_eco.MQ135.Ammonia, MQ135_AMMONIA_A,MQ135_AMMONIA_B, "AMMONIA");
-	MQ_Init(&m_eco.MQ135.CARBON_DIOXIDE, MQ135_CARBON_DIOXIDE_A,MQ135_CARBON_DIOXIDE_B, "CARBON_DIOXIDE");
-	MQ_Init(&m_eco.MQ135.CARBON_MONOXIDE, MQ135_CARBON_MONOXIDE_A,MQ135_CARBON_MONOXIDE_B, "CARBON_MONOXIDE");
-	MQ_Init(&m_eco.MQ135.TOLUENE, MQ135_TOLUENE_A,MQ135_TOLUENE_B, "TOLUENE");
-	MQ_Init(&m_eco.MQ135.ACETONE, MQ135_ACETONE_A,MQ135_ACETONE_B, "ACETONE");
+	MQ_Init(&m_eco.MQ135.Alcohol, MQ135_ALCOHOL_A,MQ135_ALCOHOL_B, 8);
+	MQ_Init(&m_eco.MQ135.Co2, MQ135_CO2_A,MQ135_CO2_B, 9);
+	MQ_Init(&m_eco.MQ135.Ammonia, MQ135_AMMONIA_A,MQ135_AMMONIA_B, 10);
+	MQ_Init(&m_eco.MQ135.CARBON_DIOXIDE, MQ135_CARBON_DIOXIDE_A,MQ135_CARBON_DIOXIDE_B, 11);
+	MQ_Init(&m_eco.MQ135.CARBON_MONOXIDE, MQ135_CARBON_MONOXIDE_A,MQ135_CARBON_MONOXIDE_B, 12);
+	MQ_Init(&m_eco.MQ135.TOLUENE, MQ135_TOLUENE_A,MQ135_TOLUENE_B, 13);
+	MQ_Init(&m_eco.MQ135.ACETONE, MQ135_ACETONE_A,MQ135_ACETONE_B, 14);
 
 
 	
@@ -81,19 +79,16 @@ void ADS1115_RegInit(uint8_t *reg, uint8_t default_value, uint8_t adderess, uint
 	reg[MASK] = mask;
 	reg[MOVE] = bit;
 }
-void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char*nameStr)
+void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum)
 {
 	MQ->graph[0]= a;
 	MQ->graph[1]= b;
-	memcpy(MQ->name, nameStr, strlen(nameStr));
+	MQ->eventNum = eventNum;
 }
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 {
-	char str[20] = "<E>";
-
-	strcat(str,MQ->name);
 	MQ->value =  Set_MQ_PPM(MQ->graph, MQ135_ratio);
-	if(MQ->value > MQ_OVER_PERSENT) Lora_Send_Msg(str,(uint16_t)MQ->value);
+	if(MQ->value > MQ_OVER_PERSENT) Lora_Event_Send_Msg(MQ->eventNum,(uint16_t)MQ->value);
 	HAL_Delay(1000);
 
 }

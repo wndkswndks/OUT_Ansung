@@ -197,7 +197,7 @@ void CMD_GetTxPower()
 	AT_CMD("AT%MEAS=\"4\"");	
 }
 
-#define CMD_DELAY	2000
+#define CMD_DELAY	500
 
 void Basic_Config()
 {
@@ -385,63 +385,69 @@ void TCP_Config()
 
 //==============================
 //mqtt
-void CMD_Set_MQTT_EV()
+void CMD_Set_MQTT_EV(int value)
 {
-	int value = 0;
-	AT_CMD_College("AT%%MQTTEV=\"ALL\",%d", value);
-	Rx_Buff1Clear();
+	AT_CMD_College("AT%MQTTEV=\"ALL\",%d\r\n", value);
+	OK_Check();
 }
 
 void CMD_Set_MQTT_NODES()
 {
-	char clientID[128] = {0,};
-	char mqttADDR[256] = {0,};
+	char clientID[128] =  "Cellular_node";
+	char mqttADDR[256] = "broker.hivemq.com";
 
-	AT_CMD_College("AT%%MQTTCFG=\"NODES\",1,\"%s\",\"%s\"", clientID, mqttADDR);
-	Rx_Buff1Clear();
+	AT_CMD_College("AT%MQTTCFG=\"NODES\",1,\"%s\",\"%s\"\r\n", clientID, mqttADDR);
+	HAL_Delay(2000);
+	OK_Check();
 }
 
 void CMD_Set_MQTT_TIMEOUT()
 {
-	uint32_t value = 0;
-	AT_CMD_College("AT%%MQTTCFG=\"PROTOCOL\",1,0,%u,1", value);
-	Rx_Buff1Clear();
+	uint32_t value = 1200;
+	AT_CMD_College("AT%MQTTCFG=\"PROTOCOL\",1,0,%u,1\r\n", value);
+	OK_Check();
 	
 }
 void CMD_Set_MQTT_Connect()
 {
-	AT_CMD("AT%%MQTTCMD=\"CONNECT\",1");
+	AT_CMD("AT%MQTTCMD=\"CONNECT\",1");
+	HAL_Delay(2000);
+	OK_Check();
 }
 
 void CMD_MQTT_SUBSCRIBE()
 {
 	int qos = 0;
-	char clientTopic[128];
+	char clientTopic[128] = "type1sc/0/test";
 	
-	AT_CMD_College("AT%%MQTTCMD=\"SUBSCRIBE\",1,%d,\"%s\"", qos, clientTopic);
-	Rx_Buff1Clear();
+	AT_CMD_College("AT%MQTTCMD=\"SUBSCRIBE\",1,%d,\"%s\"\r\n", qos, clientTopic);
+	HAL_Delay(2000);
+	OK_Check();
 }
 
 void CMD_MQTT_Publish()
 {
 	int qos = 0;
-	char clientTopic[128];
-	int szData = 0;
+	char clientTopic[128] = "type1sc/0/test";
+	int szData = 25;
+	char buff[50]="Temperature/50, Humidity/60";
 	
-	AT_CMD_College("AT%%MQTTCMD=\"PUBLISH\",1,%d,0,\"%s\",%d", qos, clientTopic,(szData + 1));
-	Rx_Buff1Clear();
+	AT_CMD_College("AT%MQTTCMD=\"PUBLISH\",1,%d,0,\"%s\",%d\r\nFAN/OFF, PUMP/ON, CAP/OFF\r\n", qos, clientTopic,(szData + 1));
+
+	OK_Check();
 }
 
 void MQTT_UnSUBSCRIBE()
 {
-	char clientTopic[128];
-	AT_CMD_College("AT%%MQTTCMD=\"UNSUBSCRIBE\",1,\"%s\"", clientTopic);
-	Rx_Buff1Clear();
+	char clientTopic[128] = "type1sc/0/test";
+	AT_CMD_College("AT%MQTTCMD=\"UNSUBSCRIBE\",1,\"%s\"\r\n", clientTopic);
+	OK_Check();
 }
 
 void CMD_Set_MQTT_Disconnect()
 {
-	AT_CMD("AT%%MQTTCMD=\"DISCONNECT\",1");
+	AT_CMD("AT%MQTTCMD=\"DISCONNECT\",1");
+	OK_Check();
 }
 
 //==============================
@@ -449,7 +455,7 @@ void CMD_Set_MQTT_Disconnect()
 
 
 
-void HTTP_Config(char* txBuff)
+void HTTP_Config(uint8_t channel, int* txBuff)
 {
 	Terminal_Send("START\r\n");
 	CMD_Reset();
@@ -481,8 +487,21 @@ void HTTP_Config(char* txBuff)
 	HAL_Delay(CMD_DELAY);
 	Terminal_Send("<7>\r\n");
 	
+	//char WApiKey[18] = {0,};
 	char* WApiKey  = "R23GE8B1UPOM1RR4";//test1
-	//char* WApiKey  = "PVAEO8IIU8VVDXJZ"; //test4
+	char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
+	char* WApiKey2  = "YHS7XLM9Y6NJWNOF";//test2
+	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
+	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
+
+	
+//	switch(channel)
+//	{
+//		case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
+//		case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
+//		case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
+//		case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
+//	}
 	
 	char sendMsg[200] = "GET /update";
 	//int testData[10]={110,220,330,440,550,660};
@@ -593,7 +612,7 @@ void OK_Check()
 			if(rxBuff1[i]==NULL)i++;
 			else break;
 		}
-		char* ptr = strstr(rxBuff1+i,"OK");
+		char* ptr = strstr(rxBuff1+i,"OK\r\n");
 		
 		if(ptr !=NULL)
 		{
@@ -629,7 +648,66 @@ void Passing_field(uint8_t num, int data, char* str)
 }
 void MQTT_Config()
 {
-	
+	CMD_Reset();
+	HAL_Delay(CMD_DELAY);
+	HAL_Delay(CMD_DELAY);
+	Terminal_Send("<1>\r\n");
+
+	CMD_Init();
+	HAL_Delay(CMD_DELAY);
+	Terminal_Send("<2>\r\n");
+
+	CMD_CanConnect();
+	HAL_Delay(CMD_DELAY);
+	Terminal_Send("<3>\r\n");
+
+
+  char _Topic[] = "type1sc/0/test";
+  char _message[64];
+  float t = 0.0;
+  float h = 0.0;
+  char temp[8]; // Stores temperature value
+  char humi[8]; // Stores humidity value	
+
+  CMD_Set_MQTT_EV(1);
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<4>\r\n");
+  
+  CMD_Set_MQTT_NODES();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<5>\r\n");
+
+  CMD_Set_MQTT_TIMEOUT();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<6>\r\n");
+
+  CMD_Set_MQTT_Connect();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<7>\r\n");
+  
+
+  CMD_MQTT_SUBSCRIBE();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<8>\r\n");
+
+  CMD_MQTT_Publish();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<9>\r\n");
+
+ // return;
+
+  MQTT_UnSUBSCRIBE();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<10>\r\n");
+
+  CMD_Set_MQTT_Disconnect();
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<11>\r\n");
+
+  CMD_Set_MQTT_EV(0);
+  HAL_Delay(CMD_DELAY);
+  Terminal_Send("<12>\r\n");
+  
 }
 
 

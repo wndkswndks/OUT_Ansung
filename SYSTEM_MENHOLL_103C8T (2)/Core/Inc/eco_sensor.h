@@ -244,7 +244,7 @@ typedef struct
 {
 	float graph[2];
 	float value;
-	char name[15];
+	char eventNum;
 } MQ_VALUE_T;
 
 typedef struct
@@ -309,7 +309,7 @@ int compare(const void *a, const void *b);
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ);
 float Set_MQ_PPM(float* sensor, float MQ_ratio);
 void All_Send();
-void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char*nameStr);
+void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum);
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio );
 
 

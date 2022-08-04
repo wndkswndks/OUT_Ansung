@@ -120,8 +120,8 @@ void MX_FREERTOS_Init(void) {
 
   xTaskCreate(vTask1, "Task 1", 256, NULL, 4, &xTask1Handle);
   xTaskCreate(vTask2, "Task 2", 128, NULL, 4, &xTask2Handle);
-//  if(m_status.device == 0x01)
-//  		xTaskCreate(vTask3, "Task 3", 128, NULL, 3, &xTask3Handle);
+  if(m_status.device != 0x01)
+  		xTaskCreate(vTask3, "Task 3", 128, NULL, 4, &xTask3Handle);
   		
   		//uxTaskPriorityGet(xTask2Handle);
   /* USER CODE END RTOS_THREADS */
@@ -154,10 +154,10 @@ void vTask1(void* pvPrameters)
 	{
 		if(m_status.device == 0x01)
 		{
-			Master_Pass_Many_Station2();
+			Master_Pass();
 			//Pc_Command_Response();
 		}
-		if(m_status.device == 0x05)
+		if(m_status.device != 0x01)
 		{
 			Node_Pass();
 		}
@@ -179,14 +179,13 @@ void vTask3(void* pvPrameters)
 {
 	while(1)
 	{
-		//HTTP_Config();
-		//osDelay(10000);
-		HAL_Delay(10000);
-		vTaskPrioritySet(NULL,3);
+		//LED2_TOGGLE;
+		//osDelay(500);
+		Main_config();	
+                //osDelay(100);
 	}
 }
 
-long bigboss[6] = {0,};
 void PriorChange()
 {
 //	bigboss[0] = uxTaskPriorityGet(xTask1Handle);

@@ -11,8 +11,8 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
     	m_status.fan_Battery = (adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) Lora_Send_Msg("<E>fan Battery Low",(uint16_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Lora_Send_Msg("<E>fan Battery High",(uint16_t)m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) Lora_Event_Send_Msg(16,(uint16_t)m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) Lora_Event_Send_Msg(16,(uint16_t)m_status.fan_Battery);
     }
  	HAL_Delay(1000);
     HAL_ADC_Start(&hadc2);  //ADC 시작
@@ -21,8 +21,8 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
     	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.pump_Battery<=10) Lora_Send_Msg("<E>pump Battery Low",(uint16_t)m_status.pump_Battery);
-    	else if(m_status.pump_Battery>14) Lora_Send_Msg("<E>pump Battery High",(uint16_t)m_status.pump_Battery);
+    	if(m_status.pump_Battery<=10) Lora_Event_Send_Msg(17,(uint16_t)m_status.pump_Battery);
+    	else if(m_status.pump_Battery>14) Lora_Event_Send_Msg(17,(uint16_t)m_status.pump_Battery);
     }
 
   
@@ -33,14 +33,8 @@ void Menholl_Open_Config()
 	if(IS_MENHOLL_OPEN ==0)
 	{
 		m_status.Menholl_open_flag = 1;
-		Lora_Send_Msg("<E>Menholl Open",NONE_VALUE);
+		Lora_Event_Send_Msg(18,1);
 	}
-	else
-	{
-		m_status.Menholl_open_flag = 0;
-		Lora_Send_Msg("<E>Menholl Close",NONE_VALUE);
-	}
-
 
 }
 
@@ -72,7 +66,7 @@ void Pump_Active_Config()
 		break;
 
 		case ON_OFF:
-			Lora_Send_Msg("<E>PUMP ERR",NONE_VALUE);	
+			Lora_Event_Send_Msg(19,1);	
 		break;
 
 		case ON_ON:
@@ -84,12 +78,12 @@ void Pump_Active_Config()
 	if(Active_flag == 1) 
 	{
 		m_status.PumpActive_flag = 1;
-		Lora_Send_Msg("<E>PUMP ACTIVE",NONE_VALUE);
+		Lora_Event_Send_Msg(19,2);
 	}
 	else
 	{
 		m_status.PumpActive_flag = 0;
-		Lora_Send_Msg("<E>PUMP DISACTIVE",NONE_VALUE);
+		Lora_Event_Send_Msg(19,3);
 	}
 	
 }
@@ -122,7 +116,7 @@ void My_Device()
 	}
 
 	m_status.txWateTime = 100;
-	m_status.txTimeOut = 700;
+	m_status.txTimeOut = 2000;
 
 
 }

@@ -358,7 +358,7 @@ void PCPrintf(char *format, ...)
 	va_start(ap, format);
 	vsprintf(str, format, ap);
 	
-	HAL_UART_Transmit_IT(&huart1, str, strlen(str));
+	HAL_UART_Transmit_IT(&huart2, str, strlen(str));
 
 	va_end(ap);
 	

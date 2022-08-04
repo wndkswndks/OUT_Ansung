@@ -109,7 +109,12 @@
 #define NODE3	  	"N3"
 #define NODE4	  	"N4"
 
-#define MASTER		"&M"
+#define MASTER				"&M"
+#define NODE_LORA_OK		"&L"
+#define NODE_EVENT			"&E"
+
+
+
 #define TO_NODE_ROUTE2	      ""
 
 #define TO_MASTER_ROUTE2 	""
@@ -699,15 +704,18 @@ void SX1276_RX_Packet(char* rxBuff);
 void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);
+void Lora_Event_Send_Msg(char num, uint16_t data);
+
 void SX1276_Change_rx_tx(uint8_t mode);
 void SX1276_Control_SF(uint8_t   data);
 
-void Master_Pass_Many_Station2();
+void Master_Pass();
+void Master_Event();
 
-
-void Node_Send();
 void Gateway_Pass();
 void Node_Pass();
+uint8_t Node_event(char   num, uint16_t data);
+
 
 void Node_Nomal_Response();
 void Node_Nomal_Response2();
