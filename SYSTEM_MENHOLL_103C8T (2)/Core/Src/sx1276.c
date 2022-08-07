@@ -319,7 +319,7 @@ void Master_poling()
 	uint32_t callbackTime= 0;
 	static uint32_t timestemp = 0;
 	char txBuff[20] = {0,};
-	static int success_rx_num = 0;
+	static int successRxNum = 0;
 	static int failRxNum = 0;
 	static int txRxNum = 0;
 	static int nodeNum = 0;
@@ -358,7 +358,8 @@ void Master_poling()
 					HTTP_Config(1, txLteMsg);
 					LTE_Init();			
 					failRxNum = 0;
-					//nodeNum++;
+					nodeNum++;
+					nodeNum %=3;
 					
 				}
 				step = STEP1;
@@ -367,12 +368,14 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
-				//nodeNum++;
+				nodeNum++;
+				nodeNum %=2;
+				
 				failRxNum = 0;
-				success_rx_num++;
+				successRxNum++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&MN0(%d,%d,%d,)", tmpBuff, tmpBuff+1, tmpBuff+2);
-				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+4, txRxNum, success_rx_num, callbackTime);
+				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxNum, successRxNum, callbackTime);
 				memcpy(readMag,buffer,50);
 
 				memset(m_uart2.msgBuff,0,30);

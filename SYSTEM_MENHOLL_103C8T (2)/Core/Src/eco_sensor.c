@@ -300,8 +300,8 @@ void All_Send()
 	HAL_Delay(1000);
 	Lora_Send_Msg("<P>Battery ",(uint16_t)m_status.pump_Battery);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>Menholl Open",m_status.Menholl_open_flag);
+	Lora_Send_Msg("<P>Menholl Open",m_status.MenhollOpenFlag);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>PUMP ACTIVE",m_status.PumpActive_flag);
+	Lora_Send_Msg("<P>PUMP ACTIVE",m_status.PumpActiveFlag);
 	HAL_Delay(1000);
 }

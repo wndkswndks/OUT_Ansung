@@ -34,7 +34,7 @@ void Menholl_Open_Config()
 {
 	if(IS_MENHOLL_OPEN ==0)
 	{
-		m_status.Menholl_open_flag = 1;
+		m_status.MenhollOpenFlag = 1;
 		Lora_Event_Send_Msg(18,1);
 	}
 
@@ -79,12 +79,12 @@ void Pump_Active_Config()
 
 	if(Active_flag == 1) 
 	{
-		m_status.PumpActive_flag = 1;
+		m_status.PumpActiveFlag = 1;
 		Lora_Event_Send_Msg(19,2);
 	}
 	else
 	{
-		m_status.PumpActive_flag = 0;
+		m_status.PumpActiveFlag = 0;
 		Lora_Event_Send_Msg(19,3);
 	}
 	
@@ -108,12 +108,24 @@ void My_Device()
 	
 
 	if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
-	if(m_status.device==2) memcpy(m_status.stationName, EXTENSION_NODE1, strlen(EXTENSION_NODE1));
-	if(m_status.device==3) memcpy(m_status.stationName, EXTENSION_NODE2, strlen(EXTENSION_NODE2));
-	if(m_status.device==4) memcpy(m_status.stationName, EXTENSION_NODE3, strlen(EXTENSION_NODE3));
-	if(m_status.device==5) 
+	if(m_status.device==2) 
 	{
 		memcpy(m_status.myNodeName, NODE0, strlen(NODE0));
+		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+	}
+	if(m_status.device==3) 
+	{
+		memcpy(m_status.myNodeName, NODE1, strlen(NODE0));
+		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+	}
+	if(m_status.device==4) 
+	{
+		memcpy(m_status.myNodeName, NODE2, strlen(NODE0));
+		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+	}
+	if(m_status.device==5) 
+	{
+		memcpy(m_status.myNodeName, NODE3, strlen(NODE0));
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 

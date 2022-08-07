@@ -96,8 +96,8 @@ typedef struct
 {
 	float fan_Battery;
 	float pump_Battery;
-	uint8_t Menholl_open_flag;
-	uint8_t PumpActive_flag;
+	uint8_t MenhollOpenFlag;
+	uint8_t PumpActiveFlag;
 	uint8_t device;
 	uint8_t err_status[8];
 	uint8_t event_flag;

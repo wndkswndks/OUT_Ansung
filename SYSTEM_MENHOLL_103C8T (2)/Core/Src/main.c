@@ -135,7 +135,7 @@ int main(void)
 
 
   //MQTT_Config();
-  HTTP_Config(1,httpTemp );
+  //HTTP_Config(1,httpTemp );
 
   //GPS_config();
 
@@ -144,9 +144,9 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
-  //MX_FREERTOS_Init();
+  MX_FREERTOS_Init();
   /* Start scheduler */
-  //osKernelStart();
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
@@ -290,19 +290,27 @@ extern char buffer[512];
 void Main_config()
 {	
 	static uint32_t startTime = 0;
+	uint8_t eventFlag = 0;
 	//Eco_Config();
 	//Battery_Config();
 	//Menholl_Open_Config(); 
 	//Pump_Active_Config();
 
-
-	
-	if(HAL_GetTick()-startTime>60000)
+	if(WATER_SENSOR_HIGH == 0)
 	{
-		startTime = HAL_GetTick();
-			Node_event(18,33);
-
+		eventFlag = 1;
 	}
+	if(eventFlag)
+	{
+		Node_event(18,33);
+		eventFlag = 0;
+	}
+//	if(HAL_GetTick()-startTime>60000)
+//	{
+//		startTime = HAL_GetTick();
+//			Node_event(18,33);
+//
+//	}
 	//Error_Config();
 }
 
