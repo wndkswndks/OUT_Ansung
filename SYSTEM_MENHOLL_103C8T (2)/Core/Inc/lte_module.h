@@ -32,10 +32,10 @@
 
 /*  			function start  		*/
 void LTE_Init();
-void Terminal_Send(uint8_t* buff);
+void Terminal_Send(char * buff);
 
-void AT_CMD(uint8_t * buff);
-void AT_CMD_College(uint8_t * buff, ...);
+void AT_CMD(char * buff);
+void AT_CMD_College(char * buff, ...);
 
 
 

@@ -710,6 +710,8 @@ void SX1276_Change_rx_tx(uint8_t mode);
 void SX1276_Control_SF(uint8_t   data);
 
 void Master_Pass();
+void Master_poling();
+
 void Master_Event();
 
 void Gateway_Pass();

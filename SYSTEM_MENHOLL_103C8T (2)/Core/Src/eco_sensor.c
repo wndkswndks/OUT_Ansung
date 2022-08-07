@@ -7,7 +7,7 @@ ECO_T m_eco;
 
 
 
-//
+
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
 	float MQ2_ratio = 0.0;
@@ -190,7 +190,7 @@ void I2c_write(uint8_t reg, uint16_t txWord)
 	HAL_I2C_Mem_Write(&hi2c1, ADS_ADDRESS, reg, 1, txBuff, 2, 100 );
 	HAL_Delay(10);
 }
-
+//
 float Set_MQ_PPM(float* sensor, float MQ_ratio)
 {
 	float PPM_log,PPM,percentage = 0;
@@ -298,7 +298,7 @@ void All_Send()
 
 	Lora_Send_Msg("<P>Battery ",(uint16_t)m_status.fan_Battery);
 	HAL_Delay(1000);
-	Lora_Send_Msg("<P>Battery ",m_status.pump_Battery);
+	Lora_Send_Msg("<P>Battery ",(uint16_t)m_status.pump_Battery);
 	HAL_Delay(1000);
 	Lora_Send_Msg("<P>Menholl Open",m_status.Menholl_open_flag);
 	HAL_Delay(1000);

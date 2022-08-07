@@ -230,8 +230,7 @@ void Lora_config()
 
 }
 
-#define EVENT_TYPE		1
-#define POLLING_TYPE	2
+
 
 uint8_t loraSand = 0;
 
@@ -304,24 +303,29 @@ char bCnt = 0;
 uint8_t eventFlag = 0;
 void Master_Pass()//
 {
-	static uint8_t step = STEP1;
-	
-	uint32_t callbackTime= 0;
-	static uint32_t timestemp = 0;
-	char txBuff[20] = {0,};
-	static int success_rx_num = 0;
-	static int fail_rx_num = 0;
-	static int tx_rx_num = 0;
-	static int nodeNum = 0;
-	char nodeNumStr[4] = {0,};
-	int txLteMsg[8] = {0,};
-
-
 
 	Master_Event();
 
 	if(eventFlag==1) return;
 	
+
+	Master_poling();	
+
+}
+
+void Master_poling()
+{
+	static uint8_t step = STEP1;
+	uint32_t callbackTime= 0;
+	static uint32_t timestemp = 0;
+	char txBuff[20] = {0,};
+	static int success_rx_num = 0;
+	static int failRxNum = 0;
+	static int txRxNum = 0;
+	static int nodeNum = 0;
+	char nodeNumStr[4] = {0,};
+	int txLteMsg[8] = {0,};
+
 	switch(step)
 	{	
 		case STEP1:
@@ -334,7 +338,7 @@ void Master_Pass()//
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
-			tx_rx_num++;
+			txRxNum++;
 			
 		break;
 
@@ -343,9 +347,9 @@ void Master_Pass()//
 
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
-				fail_rx_num++;
+				failRxNum++;
 
-				if(fail_rx_num>20)
+				if(failRxNum>20)
 				{
 					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
 					
@@ -353,7 +357,7 @@ void Master_Pass()//
 					txLteMsg[1] = 99;
 					HTTP_Config(1, txLteMsg);
 					LTE_Init();			
-					fail_rx_num = 0;
+					failRxNum = 0;
 					//nodeNum++;
 					
 				}
@@ -364,11 +368,11 @@ void Master_Pass()//
 			{
 				LED1_TOGGLE;
 				//nodeNum++;
-				fail_rx_num = 0;
+				failRxNum = 0;
 				success_rx_num++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&MN0(%d,%d,%d,)", tmpBuff, tmpBuff+1, tmpBuff+2);
-				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+4, tx_rx_num, success_rx_num, callbackTime);
+				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+4, txRxNum, success_rx_num, callbackTime);
 				memcpy(readMag,buffer,50);
 
 				memset(m_uart2.msgBuff,0,30);
@@ -385,16 +389,14 @@ void Master_Pass()//
 				step = STEP1;
 			}
 		break;
-	}
-		
-
+	}	
 }
 
 void Master_Event()
 {
 	static char cannel = 0;
 	static int eventMsg[8] = {0,};
-	char eventNode = 0;
+	int eventNode = 0;
 	int rawEventNum = 0;
 	int eventNum = 0;
 	int eventData = 0;
@@ -597,7 +599,6 @@ void Node_Nomal_Response()
 void Node_Nomal_Response2()
 {
 	char txBuff[50] = {0,};
-	static uint16_t cnt = 0;
 
 	LED1_TOGGLE;
 	HAL_Delay(LORA_DELAY);

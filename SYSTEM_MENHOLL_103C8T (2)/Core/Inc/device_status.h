@@ -126,6 +126,7 @@ void Set_Error(ERROR_E error);
 void Error_Watchdog(ERROR_E error);
 void Poling_Str_Add(uint16_t data);
 void Led_Toggle_Config();
+void MX_IWDG_Init(void);
 
 
 /*  			function end  			*/

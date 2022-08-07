@@ -13,58 +13,46 @@ void LTE_Init()
   HAL_Delay(100);
   RESET_HIGH;
 
-  HAL_Delay(2000); // 	
+  HAL_Delay(2000); 	
 }
 uint8_t rxBuff1[1300] = {0,};
 int rxCnt1 = 0;
 
-void Terminal_Send(uint8_t* buff)
+void Terminal_Send(char * buff)
 {
-	HAL_UART_Transmit(&huart2, buff, strlen(buff),1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)buff, strlen(buff),1000);
 }
 void Rx_Buff1Clear()
 {
-	memset(rxBuff1,0,strlen(rxBuff1));
+	memset(rxBuff1,0,strlen((char*)rxBuff1));
 	rxCnt1 = 0;
 }
 
-uint8_t ATbuff[15] = "AT+CPSMS=0\r\n";
-//uint8_t ATbuff[15] = "etegg\r\n";
 
-void AT_CMD(uint8_t * buff)
+void AT_CMD(char * buff)
 {
-	HAL_UART_Transmit(&huart1, buff, strlen(buff), 100);
+	HAL_UART_Transmit(&huart1, (uint8_t *)buff, strlen(buff), 100);
 	HAL_UART_Transmit(&huart1, "\r\n", 2, 100);
 	HAL_Delay(1000);
-//	HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
-//	HAL_Delay(100);
+
 }
 
-void AT_CMD_College(uint8_t * buff, ...)
+void AT_CMD_College(char * buff, ...)
 {
 	va_list ap;
-	//char str[256];
 	char str[500];
 
 	va_start(ap, buff);
 	vsprintf(str, buff, ap);
 	
-	HAL_UART_Transmit_IT(&huart1, str, strlen(str));
+	HAL_UART_Transmit_IT(&huart1, (uint8_t *)str, strlen(str));
 
 	va_end(ap);
 	HAL_UART_Transmit(&huart1, "\r\n", 2, 100);
-//	HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 		
 	return;
 
 }
-char qqStr[50] = {0,};
-char qqStr2[50] = {0,};
-
-char qq1 = 0;
-char qq2 = 0;
-char qq3 = 0;
-
 
 
 void CMD_Init()
@@ -79,15 +67,11 @@ void CMD_Init()
 
 }
 
-char ccbuff[20] = "AAA$ABCDEF$";
-char ccstr[10] = {0,};
 
 void CMD_Reset()
 {
 	AT_CMD("AT+CFUN=1,1");	
 	OK_Check();
-	//sscanf(ccbuff,"AAA$%[^$]",ccstr );
-	//sscanf(ccbuff,"AAA$%s$",ccstr );
 
 }
 //==============================
@@ -133,7 +117,7 @@ void CMD_Set_APN()
 void CMD_Get_APN()
 {
 	
-	AT_CMD("AT%PDNACT?");	//?뙆?떛 
+	AT_CMD("AT%PDNACT?");	//?????
 }
 
 
@@ -246,20 +230,20 @@ void Basic_Config()
 }
 
 
-
+//
 //==============================
 char ipAdd[30] = {0,};
-void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ???씪臾? 
+void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????�臾? 
 {
 	while(1)
 	{
 		memset(dstAdd,0,30);
 		AT_CMD_College("AT%DNSRSLV=0,\"%s\"\r\n",scrAdd);	
 		HAL_Delay(2000);
-		char* ptr = strstr(rxBuff1,"DNSRSLV:0,");
+		char* ptr = strstr((char*)rxBuff1,"DNSRSLV:0,");
 
 
-		sscanf(ptr,"DNSRSLV:0,\"%[^\"]\r\n",dstAdd ); //臾몄옄?뿴 ?뙆?떛 二쇰ぉ
+		sscanf(ptr,"DNSRSLV:0,\"%[^\"]\r\n",dstAdd ); //?�몄??�??????二쇰??
 
 		if(dstAdd[0] != NULL)
 		{
@@ -274,12 +258,11 @@ void CMD_SoketCreate(char* ipAdd, uint8_t port)
 	char *service[] = {"UDP", "TCP"};
 	int service_type = 1;
 
-	AT_CMD_College("AT%SOCKETCMD=\"ALLOCATE\",0,\"%s\",\"OPEN\",\"%s\",%d,1500\r\n",
-	service[service_type], ipAdd, port);
+	AT_CMD_College("AT%SOCKETCMD=\"ALLOCATE\",0,\"%s\",\"OPEN\",\"%s\",%d,1500\r\n",service[service_type], ipAdd, port);
+	
 	OK_Check();
 
 }
-int _nSocket = 1; ////諛쏆?媛믪쑝濡? ?뙆?떛?빐?빞?븿
 
 void CMD_SoketActivate()
 {
@@ -294,13 +277,9 @@ void CMD_SoketInfo()
 	
 }
 
-//char str_q1[200] = {0,};
-void CMD_SoketSend(char* str)// ?닔?젙?빐?빞?븿 ?뼱?젮??
+void CMD_SoketSend(char* str)// ?????�?�?�??�????
 {
 	char outputStr[500] = {0,};
-	//char outputStr[232] = {0,};
-
-	//memcpy(str_q1,str,strlen(str));
 	
 	String_to_hexString(str,outputStr);
 	AT_CMD_College("AT%SOCKETDATA=\"SEND\",1,%d,\"%s\"\r\n",strlen(outputStr)/2,outputStr);
@@ -312,7 +291,7 @@ void CMD_SoketRecv()
 {
 	AT_CMD("AT%SOCKETDATA=\"RECEIVE\",1,1000");
 
-	char* ptr = strstr(rxBuff1,"SOCKETDATA:");
+	char* ptr = strstr((char*)rxBuff1,"SOCKETDATA:");
 
 //	sscanf(ptr,"SOCKETDATA:%d,%d,%d,\"%s\"",&qq1,&qq2,&qq3,qqStr );
 	
@@ -454,7 +433,7 @@ void CMD_Set_MQTT_Disconnect()
 
 
 
-
+//
 void HTTP_Config(uint8_t channel, int* txBuff)
 {
 	Terminal_Send("START\r\n");
@@ -487,21 +466,20 @@ void HTTP_Config(uint8_t channel, int* txBuff)
 	HAL_Delay(CMD_DELAY);
 	Terminal_Send("<7>\r\n");
 	
-	//char WApiKey[18] = {0,};
-	char* WApiKey  = "R23GE8B1UPOM1RR4";//test1
+	char WApiKey[18] = {0,};
 	char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
 	char* WApiKey2  = "YHS7XLM9Y6NJWNOF";//test2
 	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
 	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
 
 	
-//	switch(channel)
-//	{
-//		case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
-//		case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
-//		case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
-//		case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
-//	}
+	switch(channel)
+	{
+		case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
+		case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
+		case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
+		case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
+	}
 	
 	char sendMsg[200] = "GET /update";
 	//int testData[10]={110,220,330,440,550,660};
@@ -612,7 +590,7 @@ void OK_Check()
 			if(rxBuff1[i]==NULL)i++;
 			else break;
 		}
-		char* ptr = strstr(rxBuff1+i,"OK\r\n");
+		char* ptr = strstr((char*)(rxBuff1+i),"OK\r\n");
 		
 		if(ptr !=NULL)
 		{
@@ -660,14 +638,7 @@ void MQTT_Config()
 	CMD_CanConnect();
 	HAL_Delay(CMD_DELAY);
 	Terminal_Send("<3>\r\n");
-
-
-  char _Topic[] = "type1sc/0/test";
-  char _message[64];
-  float t = 0.0;
-  float h = 0.0;
-  char temp[8]; // Stores temperature value
-  char humi[8]; // Stores humidity value	
+	
 
   CMD_Set_MQTT_EV(1);
   HAL_Delay(CMD_DELAY);

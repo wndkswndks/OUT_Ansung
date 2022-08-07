@@ -1,7 +1,7 @@
 //common.h
 #ifndef COMMON_H
 #define COMMON_H
-
+//
 /*  			include start  			*/
 #include <string.h>
 #include <stdlib.h>

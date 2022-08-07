@@ -315,7 +315,7 @@ void Pc_Command_Response()
 		memset(m_uart1.msgBuff, 0, 30);
 	}
 }
-void Rute_Cmd(uint8_t* msg)
+void Rute_Cmd(char* msg)
 {
 	char rute[10][10] = {0,};
 	char node[5] = {0,};
@@ -353,12 +353,12 @@ void Rute_Cmd(uint8_t* msg)
 void PCPrintf(char *format, ...)
 {
 	va_list	ap;
-	char str[256];
+	char  str[256];
 
 	va_start(ap, format);
 	vsprintf(str, format, ap);
 	
-	HAL_UART_Transmit_IT(&huart2, str, strlen(str));
+	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
 
 	va_end(ap);
 	
@@ -370,7 +370,7 @@ void PCPuts(char *msg)
 	char str[256] = {0,};
 	memcpy(str, msg, strlen(msg));
 	
-	HAL_UART_Transmit_IT(&huart1, str, strlen(str));
+	HAL_UART_Transmit_IT(&huart1, (uint8_t* )str, strlen(str));
 }
 
 uint32_t String_To_Hex(char* str)
@@ -397,21 +397,4 @@ uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str)
 }
 
 
-uint8_t E22HeadMsg[6] = {0x11, 0x01, 0x03,0xAA,0xBB,0xCC};
-uint8_t E22ReadStatus[3] = {0xC1, 0x00, 0x09}; 
-uint8_t E22_buff[40] = {0,};
-uint8_t dddata[] = "[AABBCC]";
-int wwee = 0;
-void E22_Send(uint8_t* buff)
-{
-	uint8_t str_e22[40] = "[";
-
-	strcat(str_e22, buff);
-	strcat(str_e22, "]");
-
-	//memcpy(E22_buff,str_e22,strlen(str_e22) );
-	
-	HAL_UART_Transmit(&huart2, str_e22, strlen(str_e22),1000);
-	//HAL_UART_Transmit_IT(&huart2, dddata, 9);
-}
 /* USER CODE END 1 */

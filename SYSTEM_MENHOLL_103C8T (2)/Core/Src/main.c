@@ -67,8 +67,7 @@ uint8_t rxData2[1] = {0,};
 char rxMsg1[30] ={0,};
 uint8_t rxMsg2[30] ={0,};
 
-uint32_t hexbuff[4] = {0,};
-
+int httpTemp[8]={100,200,333};
 /* USER CODE END 0 */
 
 /**
@@ -135,8 +134,8 @@ int main(void)
 
 
 
-  MQTT_Config();
-  //HTTP_Config();
+  //MQTT_Config();
+  HTTP_Config(1,httpTemp );
 
   //GPS_config();
 
@@ -291,7 +290,6 @@ extern char buffer[512];
 void Main_config()
 {	
 	static uint32_t startTime = 0;
-	uint8_t timeFlag = 0;
 	//Eco_Config();
 	//Battery_Config();
 	//Menholl_Open_Config(); 

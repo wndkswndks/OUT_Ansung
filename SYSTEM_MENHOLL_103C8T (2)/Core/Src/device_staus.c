@@ -1,6 +1,8 @@
 //device_staus.c
 #include"common.h"
 
+
+
 STATUS_T m_status;
 void Battery_Config()
 {
