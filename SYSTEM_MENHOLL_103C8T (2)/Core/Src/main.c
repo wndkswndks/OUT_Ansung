@@ -302,7 +302,8 @@ void Main_config()
 	}
 	if(eventFlag)
 	{
-		Node_event(18,33);
+		//Node_event(18,33);
+		Node_event(EVENT_H2,22);
 		eventFlag = 0;
 	}
 //	if(HAL_GetTick()-startTime>60000)

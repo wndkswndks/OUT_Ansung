@@ -86,7 +86,7 @@ typedef enum
 	SEC_100 = 100000,
 	SEC_110 = 110000,
 	SEC_120 = 1200000,
-} ENUM_E;
+} SEC_E;
 /*  			enum end  				*/
 
 

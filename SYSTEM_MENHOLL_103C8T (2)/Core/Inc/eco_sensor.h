@@ -249,12 +249,11 @@ typedef struct
 
 typedef struct
 {
-    MQ_VALUE_T H2;//H2
+    MQ_VALUE_T H2;
 	MQ_VALUE_T LPG;
     MQ_VALUE_T CO;
-    MQ_VALUE_T Propane;
+    MQ_VALUE_T PROPANE;
 	MQ_VALUE_T METHANE;
-	MQ_VALUE_T CARBON_MONOXIDE;
 	MQ_VALUE_T ALCOHOL;
 	MQ_VALUE_T SMOKE;	
     float R0;
@@ -262,9 +261,9 @@ typedef struct
 
 typedef struct
 {
-	MQ_VALUE_T Alcohol;
-	MQ_VALUE_T Co2;
-	MQ_VALUE_T Ammonia;
+	MQ_VALUE_T ALCOHOL;
+	MQ_VALUE_T CO2;
+	MQ_VALUE_T AMMONIA;
 	MQ_VALUE_T CARBON_DIOXIDE;
 	MQ_VALUE_T CARBON_MONOXIDE;
 	MQ_VALUE_T TOLUENE;
@@ -308,7 +307,6 @@ void I2c_write(uint8_t reg, uint16_t txWord);
 int compare(const void *a, const void *b); 
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ);
 float Set_MQ_PPM(float* sensor, float MQ_ratio);
-void All_Send();
 void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum);
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio );
 

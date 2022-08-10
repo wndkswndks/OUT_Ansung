@@ -320,8 +320,10 @@ void Master_poling()
 	static uint32_t timestemp = 0;
 	char txBuff[20] = {0,};
 	static int successRxNum = 0;
+	static int successRxBuff[8] = {0,};
 	static int failRxNum = 0;
 	static int txRxNum = 0;
+	static int txRxBuff[8] = {0,};
 	static int nodeNum = 0;
 	char nodeNumStr[4] = {0,};
 	int txLteMsg[8] = {0,};
@@ -332,13 +334,16 @@ void Master_poling()
 			LED2_TOGGLE;
 			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,"N");
+			
 			sprintf(nodeNumStr,"%d",nodeNum);
 			strcat(txBuff,nodeNumStr);
+			
 			strcat(txBuff,"NO");	
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
 			txRxNum++;
+			txRxBuff[nodeNum]++;
 			
 		break;
 
@@ -352,14 +357,16 @@ void Master_poling()
 				if(failRxNum>20)
 				{
 					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
-					
+					HAL_Delay(100);
+					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
+					HAL_Delay(100);
 					txLteMsg[0] = nodeNum;
 					txLteMsg[1] = 99;
 					HTTP_Config(1, txLteMsg);
 					LTE_Init();			
 					failRxNum = 0;
-					nodeNum++;
-					nodeNum %=3;
+					//nodeNum++;
+					//nodeNum %=2;
 					
 				}
 				step = STEP1;
@@ -368,14 +375,15 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
-				nodeNum++;
-				nodeNum %=2;
+				//nodeNum++;
+				//nodeNum %=2;
 				
 				failRxNum = 0;
 				successRxNum++;
+				successRxBuff[nodeNum]++;
 				callbackTime = HAL_GetTick() - timestemp;
 				//sscanf(buffer, "&MN0(%d,%d,%d,)", tmpBuff, tmpBuff+1, tmpBuff+2);
-				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxNum, successRxNum, callbackTime);
+				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[nodeNum], successRxBuff[nodeNum], callbackTime);
 				memcpy(readMag,buffer,50);
 
 				memset(m_uart2.msgBuff,0,30);
