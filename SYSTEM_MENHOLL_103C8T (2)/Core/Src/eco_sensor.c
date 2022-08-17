@@ -88,7 +88,7 @@ void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum)
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 {
 	MQ->value =  Set_MQ_PPM(MQ->graph, MQ135_ratio);
-	if(MQ->value > MQ_OVER_PERSENT) Lora_Event_Send_Msg(MQ->eventNum,(uint16_t)MQ->value);
+	if(MQ->value > MQ_OVER_PERSENT) Node_event(MQ->eventNum,(uint16_t)MQ->value);
 	HAL_Delay(1000);
 
 }

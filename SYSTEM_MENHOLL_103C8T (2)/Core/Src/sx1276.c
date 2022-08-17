@@ -356,17 +356,13 @@ void Master_poling()
 
 				if(failRxNum>20)
 				{
-					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
 					HAL_Delay(100);
 					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
-					HAL_Delay(100);
-					txLteMsg[0] = nodeNum;
-					txLteMsg[1] = 99;
-					HTTP_Config(1, txLteMsg);
-					LTE_Init();			
+					txLteMsg[(nodeNum%6)+2] = 99;
 					failRxNum = 0;
-					//nodeNum++;
-					//nodeNum %=2;
+
+					nodeNum++;
+					nodeNum %=3;
 					
 				}
 				step = STEP1;
@@ -375,8 +371,16 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
-				//nodeNum++;
-				//nodeNum %=2;
+				if((nodeNum %5 == 0)&&(nodeNum != 0))
+				{
+					//HTTP_Config(4, txLteMsg);
+					//LTE_Init();
+					memset(txLteMsg, 0, 4*8);
+					txLteMsg[0] = nodeNum + 1;
+					txLteMsg[1] = nodeNum + 1 + 5;
+				}
+				nodeNum++;
+				nodeNum %=3;
 				
 				failRxNum = 0;
 				successRxNum++;
