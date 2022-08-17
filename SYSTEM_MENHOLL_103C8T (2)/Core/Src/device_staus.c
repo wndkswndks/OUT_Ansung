@@ -13,8 +13,10 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
     	m_status.fan_Battery = (adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
+    	if(m_status.fan_Battery<=10) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
+    	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
+    	else if(m_status.fan_Battery>14) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
+    	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
     }
  	HAL_Delay(1000);
     HAL_ADC_Start(&hadc2);  //ADC 시작
@@ -23,8 +25,10 @@ void Battery_Config()
     	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
     	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.pump_Battery<=10) Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
-    	else if(m_status.pump_Battery>14) Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+    	if(m_status.pump_Battery<=10) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+    	else if(m_status.pump_Battery>14) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
     }
 
   
@@ -35,7 +39,8 @@ void Menholl_Open_Config()
 	if(IS_MENHOLL_OPEN ==0)
 	{
 		m_status.MenhollOpenFlag = 1;
-		Node_event(EVENT_MENHOLL,1);
+		m_sx1276.buffCh3[EVENT_MENHOLL%8]= 1; 
+		//Node_event(EVENT_MENHOLL,1);
 	}
 
 }
@@ -68,7 +73,8 @@ void Pump_Active_Config()
 		break;
 
 		case ON_OFF:
-			Node_event(EVENT_PUMPACTIVE,1);	
+			//Node_event(EVENT_PUMPACTIVE,1);	
+			m_sx1276.buffCh3[EVENT_PUMPACTIVE%8]= 1; 
 		break;
 
 		case ON_ON:
@@ -80,7 +86,8 @@ void Pump_Active_Config()
 	if(Active_flag == 1) 
 	{
 		m_status.PumpActiveFlag = 1;
-		Node_event(EVENT_PUMPACTIVE,2);
+		//Node_event(EVENT_PUMPACTIVE,2);
+		m_sx1276.buffCh3[EVENT_PUMPACTIVE%8]= 2; 
 	}
 
 	

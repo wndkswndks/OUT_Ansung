@@ -260,6 +260,32 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 	
 }
 
+void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
+{
+	char txBuff[30] = {0,};
+	char event_msg[15] = {0,};
+	uint8_t length = 0;
+
+	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
+	strcat(txBuff,"&E");
+	strcat(txBuff,m_status.myNodeName);
+	
+	sprintf(event_msg, "[%d:%u,%u,%u,%u,%u,%u,%u]",ch, buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],buff[6]);
+
+	strcat(txBuff,event_msg);
+
+	length = strlen(txBuff);
+
+	loraSand = 1;
+	SX1276_Change_rx_tx(TX_DEVICE);
+	SX1276_TX_Entry(length, 2000);
+			
+	SX1276_TX_Packet(txBuff,length,2000);
+	SX1276_Change_rx_tx(RX_DEVICE);
+	loraSand = 0;
+	
+}
+
 
 uint32_t preT = 0;
 uint32_t termT = 0;
@@ -356,13 +382,13 @@ void Master_poling()
 
 				if(failRxNum>20)
 				{
-					HAL_Delay(100);
-					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
-					txLteMsg[(nodeNum%6)+2] = 99;
+					//HAL_Delay(100);
+					//PCPrintf("Lora fail node : %d  \r\n", nodeNum);
+					//txLteMsg[(nodeNum%6)+2] = 99;
 					failRxNum = 0;
 
-					nodeNum++;
-					nodeNum %=3;
+					//nodeNum++;
+					//nodeNum %=3;
 					
 				}
 				step = STEP1;
@@ -375,12 +401,12 @@ void Master_poling()
 				{
 					//HTTP_Config(4, txLteMsg);
 					//LTE_Init();
-					memset(txLteMsg, 0, 4*8);
-					txLteMsg[0] = nodeNum + 1;
-					txLteMsg[1] = nodeNum + 1 + 5;
+					//memset(txLteMsg, 0, 4*8);
+					//txLteMsg[0] = nodeNum + 1;
+					//txLteMsg[1] = nodeNum + 1 + 5;
 				}
-				nodeNum++;
-				nodeNum %=3;
+				//nodeNum++;
+				//nodeNum %=3;
 				
 				failRxNum = 0;
 				successRxNum++;
@@ -415,6 +441,7 @@ void Master_Event()
 	int rawEventNum = 0;
 	int eventNum = 0;
 	int eventData = 0;
+	int evnetBuff[8] = {0,};
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 
@@ -429,12 +456,15 @@ void Master_Event()
 				Lora_Send_Msg("&R", NONE_VALUE);
 
 				
-				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
-				eventMsg[0] = eventNode;
-				cannel = (rawEventNum/8) + 1;
-				eventNum = (rawEventNum%8) + 1;	
-				eventMsg[eventNum] = eventData;
+//				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
+//				eventMsg[0] = eventNode;
+//				cannel = (rawEventNum/8) + 1;
+//				eventNum = (rawEventNum%8) + 1;	
+//				eventMsg[eventNum] = eventData;
 
+				
+				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d]",evnetBuff,&cannel, evnetBuff+1,evnetBuff+2,evnetBuff+3,evnetBuff+4,evnetBuff+5,evnetBuff+6,evnetBuff+7 );
+				
 				memset(buffer,0,512);
 				
 				
@@ -565,6 +595,59 @@ uint8_t Node_event(char   num, uint16_t data)
 		}
 	}
 }
+
+uint8_t Node_event2(char   ch, uint16_t* buff)
+
+{
+	
+	static uint8_t step = STEP1;
+	static int fail_event_num = 0;
+	static uint32_t timestemp = 0;
+
+	while(1)
+	{
+		switch(step)
+		{
+			case STEP1 :
+				eventFlag = 1;
+				Lora_Send_Msg("1234567", NONE_VALUE); // 더미
+				HAL_Delay(200);
+				step = STEP2;
+			break;
+			
+			case STEP2 :
+				Lora_Event_Send_Msg2(ch, buff); //
+				timestemp = HAL_GetTick();
+				step = STEP3;
+			break;
+
+			case STEP3 :
+				if(HAL_GetTick() - timestemp >m_status.txTimeOut)
+				{
+					fail_event_num++;
+
+					if(fail_event_num>20)
+					{
+						fail_event_num = 0;
+						eventFlag = 0;
+						step = STEP1;
+					}
+					step = STEP2;	
+				}
+				if(Is_Include_ThisStr( buffer, 0, "&R"))
+				{
+					fail_event_num = 0;
+					timestemp = 0;
+					eventFlag = 0;
+					memset(buffer,0,512);
+					step = STEP1;
+					return 1;
+				}
+			break;
+		}
+	}
+}
+
 void Node_SF_Response()
 {
 	uint8_t num = 0;

@@ -135,7 +135,7 @@ int main(void)
 
 
   //MQTT_Config();
-  HTTP_Config(1,httpTemp );
+  //HTTP_Config(1,httpTemp );
 
   //GPS_config();
 
@@ -144,9 +144,9 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
-  //MX_FREERTOS_Init();
+  MX_FREERTOS_Init();
   /* Start scheduler */
-  //osKernelStart();
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
@@ -291,10 +291,12 @@ void Main_config()
 {	
 	static uint32_t startTime = 0;
 	uint8_t eventFlag = 0;
-//	Eco_Config();
-//	Battery_Config();
-//	Menholl_Open_Config(); 
-//	Pump_Active_Config();
+	//Eco_Config();
+	
+	//Battery_Config();
+	//Menholl_Open_Config(); 
+	//Pump_Active_Config();
+	//Node_event2(3, m_sx1276.buffCh3);
 
 	if(WATER_SENSOR_HIGH == 0)
 	{
@@ -302,8 +304,17 @@ void Main_config()
 	}
 	if(eventFlag)
 	{
-		//Node_event(18,33);
-		Node_event(EVENT_H2,22);
+		m_sx1276.buffCh1[0] = 2;
+		m_sx1276.buffCh1[1] = 10;
+		m_sx1276.buffCh1[2] = 20;
+		m_sx1276.buffCh1[3] = 0;
+		m_sx1276.buffCh1[4] = 30;
+		m_sx1276.buffCh1[5] = 40;
+		m_sx1276.buffCh1[6] = 0;
+		m_sx1276.buffCh1[7] = 60;
+		
+		Node_event2(1, m_sx1276.buffCh1);
+		//Node_event(EVENT_H2,22);
 		eventFlag = 0;
 	}
 //	if(HAL_GetTick()-startTime>60000)

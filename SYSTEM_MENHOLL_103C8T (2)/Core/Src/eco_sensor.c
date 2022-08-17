@@ -21,7 +21,7 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
 		
-
+	Node_event2(1, m_sx1276.buffCh1);
     float MQ135_ratio = 0.0;
 	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
 
@@ -32,6 +32,7 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
 	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
 	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
+	Node_event2(2, m_sx1276.buffCh2);
 	
 //	ADC_to_Volt(AIN0_GND);
 //	ADC_to_Volt(AIN1_GND);
@@ -88,7 +89,15 @@ void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum)
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 {
 	MQ->value =  Set_MQ_PPM(MQ->graph, MQ135_ratio);
-	if(MQ->value > MQ_OVER_PERSENT) Node_event(MQ->eventNum,(uint16_t)MQ->value);
+	if(MQ->value > MQ_OVER_PERSENT) 
+	{
+		//Node_event(MQ->eventNum,(uint16_t)MQ->value);
+		if(MQ->eventNum < 7)
+			m_sx1276.buffCh1[MQ->eventNum]= (uint16_t)MQ->value;
+		else if(MQ->eventNum > 7)
+			m_sx1276.buffCh2[MQ->eventNum%8]= (uint16_t)MQ->value;
+		
+	}
 	HAL_Delay(1000);
 
 }
