@@ -117,7 +117,7 @@ int main(void)
   Poling_Str_Add(66);
   My_Device();
 
-  //Eco_Init();
+  Eco_Init();
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
   LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
@@ -291,7 +291,7 @@ void Main_config()
 {	
 	static uint32_t startTime = 0;
 	uint8_t eventFlag = 0;
-	//Eco_Config();
+	Eco_Config();
 	
 	//Battery_Config();
 	//Menholl_Open_Config(); 
@@ -311,10 +311,10 @@ void Main_config()
 		m_sx1276.buffCh1[4] = 30;
 		m_sx1276.buffCh1[5] = 40;
 		m_sx1276.buffCh1[6] = 0;
-		m_sx1276.buffCh1[7] = 60;
 		
 		Node_event2(1, m_sx1276.buffCh1);
-		//Node_event(EVENT_H2,22);
+		memset(m_sx1276.buffCh1, 0, 8*4);
+		//Node_event(EVENT_H2,47);
 		eventFlag = 0;
 	}
 //	if(HAL_GetTick()-startTime>60000)

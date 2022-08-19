@@ -262,8 +262,8 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 
 void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 {
-	char txBuff[30] = {0,};
-	char event_msg[15] = {0,};
+	char txBuff[80] = {0,};
+	char event_msg[50] = {0,};
 	uint8_t length = 0;
 
 	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
@@ -437,11 +437,11 @@ void Master_Event()
 {
 	static char cannel = 0;
 	static int eventMsg[8] = {0,};
+	int evnetBuff[8] = {0,};
 	int eventNode = 0;
 	int rawEventNum = 0;
 	int eventNum = 0;
 	int eventData = 0;
-	int evnetBuff[8] = {0,};
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 
@@ -463,7 +463,7 @@ void Master_Event()
 //				eventMsg[eventNum] = eventData;
 
 				
-				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d]",evnetBuff,&cannel, evnetBuff+1,evnetBuff+2,evnetBuff+3,evnetBuff+4,evnetBuff+5,evnetBuff+6,evnetBuff+7 );
+				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
 				
 				memset(buffer,0,512);
 				
@@ -618,6 +618,7 @@ uint8_t Node_event2(char   ch, uint16_t* buff)
 			case STEP2 :
 				Lora_Event_Send_Msg2(ch, buff); //
 				timestemp = HAL_GetTick();
+				LED2_TOGGLE;
 				step = STEP3;
 			break;
 

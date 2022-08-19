@@ -4,14 +4,14 @@
 
 
 STATUS_T m_status;
+uint16_t adc = 0;
 void Battery_Config()
 {
-	uint16_t adc = 0;
   	HAL_ADC_Start(&hadc1);  //ADC 시작
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	m_status.fan_Battery = (adc * 3.3 /4095) * 12/3.3 ;
+    	m_status.fan_Battery = ((float)adc * 3.3 /4095) * 12/3.3 ;
 
     	if(m_status.fan_Battery<=10) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
     	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);

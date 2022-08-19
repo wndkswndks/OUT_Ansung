@@ -149,7 +149,7 @@
 
 #endif
 
-#define MQ_OVER_PERSENT		0
+#define MQ_OVER_PERSENT		100
 
 
 
@@ -244,6 +244,8 @@ typedef struct
 {
 	float graph[2];
 	float value;
+	float max;
+	float pre;
 	char eventNum;
 } MQ_VALUE_T;
 

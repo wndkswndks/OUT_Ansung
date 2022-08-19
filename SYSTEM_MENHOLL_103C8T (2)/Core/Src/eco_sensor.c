@@ -11,8 +11,9 @@ ECO_T m_eco;
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
 	float MQ2_ratio = 0.0;
-	MQ2_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ2.R0);
-		
+	//LED1_ON;
+	MQ2_ratio = Get_MQ_Sensor(AIN0_GND, m_eco.MQ2.R0);
+	//LED1_OFF;	
 	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.CO,MQ2_ratio);
@@ -20,19 +21,41 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ2.METHANE,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
-		
-	Node_event2(1, m_sx1276.buffCh1);
-    float MQ135_ratio = 0.0;
-	MQ135_ratio = Get_MQ_Sensor(AIN2_GND, m_eco.MQ135.R0);
 
-	MQ_Config(&m_eco.MQ135.ALCOHOL,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.CO2,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.AMMONIA,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
-	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
-	Node_event2(2, m_sx1276.buffCh2);
+	for(int i =0 ;i < 8;i++)
+	{
+		if(m_sx1276.buffCh1[i] != 0)
+		{
+			Node_event2(1, m_sx1276.buffCh1);
+			memset(m_sx1276.buffCh1, 0, 8*4);			
+		}
+	}
+
+
+
+	
+//    float MQ135_ratio = 0.0;
+//    //LED2_ON;
+//	MQ135_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ135.R0);
+//	//LED2_OFF;
+//
+//	MQ_Config(&m_eco.MQ135.ALCOHOL,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.CO2,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.AMMONIA,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.CARBON_DIOXIDE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.CARBON_MONOXIDE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
+//	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
+//	
+//for(int i =0 ;i < 8;i++)
+//{
+//	if(m_sx1276.buffCh2[i] != 0)
+//	{
+//		Node_event2(2, m_sx1276.buffCh2);
+//		memset(m_sx1276.buffCh2, 0, 8*4);			
+//	}
+//}
+
 	
 //	ADC_to_Volt(AIN0_GND);
 //	ADC_to_Volt(AIN1_GND);
@@ -85,11 +108,15 @@ void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum)
 	MQ->graph[0]= a;
 	MQ->graph[1]= b;
 	MQ->eventNum = eventNum;
+	MQ->pre = 99999;
 }
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 {
 	MQ->value =  Set_MQ_PPM(MQ->graph, MQ135_ratio);
-	if(MQ->value > MQ_OVER_PERSENT) 
+
+	if(MQ->value > MQ->max) MQ->max = MQ->value;
+	
+	if(MQ->value > MQ->pre+2) 
 	{
 		//Node_event(MQ->eventNum,(uint16_t)MQ->value);
 		if(MQ->eventNum < 7)
@@ -98,7 +125,9 @@ void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio )
 			m_sx1276.buffCh2[MQ->eventNum%8]= (uint16_t)MQ->value;
 		
 	}
-	HAL_Delay(1000);
+	MQ->pre = MQ->value;
+	
+	HAL_Delay(500);
 
 }
 
@@ -236,7 +265,7 @@ int compare(const void *a, const void *b)    // 오름차순 비교 함수 구�
     return 0;    // a와 b가 같을 때는 0 반환
 }
 
-
+uint16_t mq_vu = 0;
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 {
 
@@ -262,6 +291,8 @@ float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 	}
 	
 	MQ_adc_avg = MQ_adc_sum/(num-half_except*2); // 가운데 16개로만 평균냄
+
+	mq_vu = MQ_adc_avg;
 
 	MQ_volt = MQ_adc_avg * ADS_FS_VALUE/ADS_MAX_ADC_VALUE;
 
