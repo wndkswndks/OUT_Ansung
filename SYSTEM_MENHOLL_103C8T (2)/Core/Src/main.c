@@ -116,10 +116,13 @@ int main(void)
   Poling_Str_Add(215);
   Poling_Str_Add(66);
   My_Device();
-
-  Eco_Init();
+  
+  if(m_status.device != 1)
+  {
+  	  Eco_Init();
+  }	
+  
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
-  LED3_ON;
   if(m_sx1276.device == TX_DEVICE)
   {
 	  SX1276_TX_Entry(16, 2000);
@@ -139,7 +142,7 @@ int main(void)
 
   //GPS_config();
 
-  //Lora_Send_Msg("Device_start",NONE_VALUE);
+  Lora_Send_Msg("Device_start",NONE_VALUE);
 
   /* USER CODE END 2 */
 
@@ -304,26 +307,16 @@ void Main_config()
 	}
 	if(eventFlag)
 	{
-		m_sx1276.buffCh1[0] = 2;
-		m_sx1276.buffCh1[1] = 10;
-		m_sx1276.buffCh1[2] = 20;
-		m_sx1276.buffCh1[3] = 0;
-		m_sx1276.buffCh1[4] = 30;
-		m_sx1276.buffCh1[5] = 40;
-		m_sx1276.buffCh1[6] = 0;
-		
 		Node_event2(1, m_sx1276.buffCh1);
 		memset(m_sx1276.buffCh1, 0, 8*4);
-		//Node_event(EVENT_H2,47);
 		eventFlag = 0;
 	}
-//	if(HAL_GetTick()-startTime>60000)
+//	if(HAL_GetTick()-startTime>120000)
 //	{
-//		startTime = HAL_GetTick();
-//			Node_event(18,33);
-//
+//		startTime = HAL_GetTick();		
+//		Node_event2(1, m_sx1276.buffCh1);
+//		memset(m_sx1276.buffCh1, 0, 8*4);
 //	}
-	//Error_Config();
 }
 
 /* USER CODE END 4 */

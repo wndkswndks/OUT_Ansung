@@ -259,23 +259,44 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 	loraSand = 0;
 	
 }
-
+uint32_t pre_mytime = 0;
+uint32_t my_termtime = 0;
 void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 {
 	char txBuff[80] = {0,};
 	char event_msg[50] = {0,};
+	char event_msg_s[7] = {0,};
 	uint8_t length = 0;
 
 	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 	strcat(txBuff,"&E");
 	strcat(txBuff,m_status.myNodeName);
-	
-	sprintf(event_msg, "[%d:%u,%u,%u,%u,%u,%u,%u]",ch, buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],buff[6]);
+	strcat(txBuff,"[");
 
-	strcat(txBuff,event_msg);
+	sprintf(event_msg_s,"%d",ch);
+	strcat(txBuff,event_msg_s);
+
+	strcat(txBuff,":");
+
+	for(int i =0 ;i < 7;i++)
+	{
+		sprintf(event_msg_s,"%u",buff[i]);
+		strcat(txBuff,event_msg_s);
+		strcat(txBuff,",");
+	}
+	strcat(txBuff,"]");
+	//sprintf(event_msg, "[%d:%u,%u,%u,%u,%u,%u,%u]",ch, buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],buff[6]);
+
+	//strcat(txBuff,"[1:431,255,0,275,1594,1262,1628]");
+
+	
+
+	//sprintf(event_msg, "[%d:%u]",ch, buff[0],buff[1]);
+
+	//strcat(txBuff,event_msg);
 
 	length = strlen(txBuff);
-
+	//pre_mytime = HAL_GetTick();
 	loraSand = 1;
 	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
@@ -283,6 +304,7 @@ void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 	SX1276_TX_Packet(txBuff,length,2000);
 	SX1276_Change_rx_tx(RX_DEVICE);
 	loraSand = 0;
+	//my_termtime = HAL_GetTick() - pre_mytime;
 	
 }
 
@@ -332,10 +354,10 @@ void Master_Pass()//
 
 	Master_Event();
 
-	if(eventFlag==1) return;
+	//if(eventFlag==1) return;
 	
 
-	Master_poling();	
+	//Master_poling();	
 
 }
 
@@ -451,6 +473,7 @@ void Master_Event()
 		case STEP1:
 			if(Is_Include_ThisStr( buffer, 0, NODE_EVENT))
 			{
+				LED3_ON;
 				eventFlag = 1;
 				HAL_Delay(100);
 				Lora_Send_Msg("&R", NONE_VALUE);
@@ -485,6 +508,7 @@ void Master_Event()
 			cannel = 0;
 			memset(eventMsg, 0 ,8);
 			step = STEP1;
+			LED3_OFF;
 			eventFlag = 0;
 		break;
 		
@@ -564,6 +588,7 @@ uint8_t Node_event(char   num, uint16_t data)
 			break;
 			
 			case STEP2 :
+				LED2_TOGGLE;
 				Lora_Event_Send_Msg(num, data); //
 				timestemp = HAL_GetTick();
 				step = STEP3;
@@ -611,7 +636,7 @@ uint8_t Node_event2(char   ch, uint16_t* buff)
 			case STEP1 :
 				eventFlag = 1;
 				Lora_Send_Msg("1234567", NONE_VALUE); // 더미
-				HAL_Delay(200);
+				HAL_Delay(1000);
 				step = STEP2;
 			break;
 			
@@ -623,7 +648,7 @@ uint8_t Node_event2(char   ch, uint16_t* buff)
 			break;
 
 			case STEP3 :
-				if(HAL_GetTick() - timestemp >m_status.txTimeOut)
+				if(HAL_GetTick() - timestemp >m_status.txTimeOut+3000)
 				{
 					fail_event_num++;
 
