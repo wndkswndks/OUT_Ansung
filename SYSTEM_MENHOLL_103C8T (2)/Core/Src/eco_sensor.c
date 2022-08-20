@@ -39,25 +39,23 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	
 	for(int i =0 ;i < 8;i++)
 	{
-		if(m_sx1276.buffCh1[i] != 0 && evntFlag !=1)
+		if(m_sx1276.buffCh1[i] != 0)
 		{
-			Node_event2(1, m_sx1276.buffCh1);
-			memset(m_sx1276.buffCh1, 0, 8*4);
+			Node_event(i, m_sx1276.buffCh1[i]);
 			evntFlag = 1;
-			HAL_Delay(60000);
+			HAL_Delay(2000);
 		}
 
-		if(m_sx1276.buffCh2[i] != 0 && evntFlag !=2)
+		if(m_sx1276.buffCh2[i] != 0)
 		{
-			Node_event2(2, m_sx1276.buffCh2);
-			memset(m_sx1276.buffCh2, 0, 8*4);
+			Node_event2(i+8, m_sx1276.buffCh2);
 			evntFlag = 2;
-			HAL_Delay(60000);
+			HAL_Delay(2000);
 		}	
-
-		
 	}
 
+	memset(m_sx1276.buffCh1, 0, 8*4);
+	memset(m_sx1276.buffCh2, 0, 8*4);
 
 	
 //	for(int i =0 ;i < 8;i++)

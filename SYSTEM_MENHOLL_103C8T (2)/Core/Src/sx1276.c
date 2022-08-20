@@ -360,7 +360,7 @@ void Master_Pass()//
 	if(eventFlag==1) return;
 	
 
-	Master_poling();	
+	//Master_poling();	
 
 }
 
@@ -457,11 +457,14 @@ void Master_poling()
 		break;
 	}	
 }
-char buffccPy[50] = {0,};
+char buffccPy[16][50] = {0,};
+char cccnt = 0;
 void Master_Event()
 {
 	static char cannel = 0;
 	static int eventMsg[8] = {0,};
+	char txBuff[8] = {0,};
+	char numBuff[8] = {0,};
 	int evnetBuff[8] = {0,};
 	int eventNode = 0;
 	int rawEventNum = 0;
@@ -469,7 +472,7 @@ void Master_Event()
 	int eventData = 0;
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
-
+	static char endFlag = 0;
 
 	switch(step)
 	{
@@ -478,30 +481,51 @@ void Master_Event()
 			{
 				LED3_ON;
 				eventFlag = 1;
+				
+				memcpy(buffccPy[cccnt++], buffer, strlen(buffer));
+				cccnt %= 16;
+
+				
+				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
+
+				if(rawEventNum==44 && eventData ==44)
+				{
+					endFlag = 1;
+				}
+				else
+				{
+					cannel = (rawEventNum/8) + 1;
+					eventNum = (rawEventNum%8) + 1; 
+					eventMsg[eventNum] = eventData;
+				}
+				
+				eventMsg[0] = eventNode;
+				strcat(txBuff,"&R");
+				strcat(txBuff,"N");
+				sprintf(numBuff ,"%d",eventNode );
+				strcat(txBuff,numBuff);
+				
 				HAL_Delay(100);
-				Lora_Send_Msg("&R", NONE_VALUE);
+				Lora_Send_Msg(txBuff, NONE_VALUE);
 
 				
-//				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
-//				eventMsg[0] = eventNode;
-//				cannel = (rawEventNum/8) + 1;
-//				eventNum = (rawEventNum%8) + 1;	
-//				eventMsg[eventNum] = eventData;
-
 				
-				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d,]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
-				memcpy(buffccPy, buffer, strlen(buffer));
+//				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d,]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
 				memset(buffer,0,512);
 				
 				
 				timestemp = HAL_GetTick();
 			}
-			if((timestemp != 0) && (HAL_GetTick()-timestemp >2000))
+			if((timestemp != 0) && (HAL_GetTick()-timestemp >4000) && (endFlag==1))
 			{
 				timestemp = 0;
+				endFlag = 0;
 				step = STEP2;
 			}
 		break;
+
+
+
 
 		case STEP2:
 			HTTP_Config(cannel, eventMsg);
@@ -587,7 +611,7 @@ uint8_t Node_event(char   num, uint16_t data)
 			case STEP1 :
 				eventFlag = 1;
 				Lora_Send_Msg("1234567", NONE_VALUE); // 더미
-				HAL_Delay(200);
+				HAL_Delay(1000);
 				step = STEP2;
 			break;
 			
@@ -611,7 +635,7 @@ uint8_t Node_event(char   num, uint16_t data)
 					}
 					step = STEP2;	
 				}
-				if(Is_Include_ThisStr( buffer, 0, "&R"))
+				if(Is_Include_ThisStr( buffer, 0, "&R") && Is_Include_ThisStr( buffer, 2, m_status.myNodeName) )
 				{
 					fail_event_num = 0;
 					timestemp = 0;
