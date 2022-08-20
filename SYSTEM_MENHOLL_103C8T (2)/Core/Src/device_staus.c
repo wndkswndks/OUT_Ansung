@@ -4,44 +4,61 @@
 
 
 STATUS_T m_status;
-uint16_t adc = 0;
 void Battery_Config()
 {
+	uint16_t adc = 0;
   	HAL_ADC_Start(&hadc1);  //ADC 시작
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	m_status.fan_Battery = ((float)adc * 3.3 /4095) * 12/3.3 ;
+    	m_status.fan_Battery = ((float)adc * 3.3 /4095) * 12/3.3 +1.7 ;
 
     	if(m_status.fan_Battery<=10) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
     	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>14) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
+    	else if(m_status.fan_Battery>13) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
     	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
     }
- 	HAL_Delay(1000);
-    HAL_ADC_Start(&hadc2);  //ADC 시작
-  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
-    {
-    	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
-    	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
-
-    	if(m_status.pump_Battery<=10) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
-    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
-    	else if(m_status.pump_Battery>14) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
-    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
-    }
+ 	HAL_Delay(500);
+//    HAL_ADC_Start(&hadc2);  //ADC 시작
+//  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
+//    {
+//    	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
+//    	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
+//
+//    	if(m_status.pump_Battery<=10) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+//    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+//    	else if(m_status.pump_Battery>14) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+//    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+//    }
 
   
 }
 
+uint16_t Madc = 0;
 void Menholl_Open_Config()
 {
-	if(IS_MENHOLL_OPEN ==0)
-	{
-		m_status.MenhollOpenFlag = 1;
-		m_sx1276.buffCh3[EVENT_MENHOLL%8]= 1; 
-		//Node_event(EVENT_MENHOLL,1);
-	}
+//	if(IS_MENHOLL_OPEN ==0)
+//	{
+//		m_status.MenhollOpenFlag = 1;
+//		m_sx1276.buffCh3[EVENT_MENHOLL%8]= 1; 
+//		//Node_event(EVENT_MENHOLL,1);
+//	}
+	;
+
+    HAL_ADC_Start(&hadc2);  //ADC 시작
+  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
+    {
+    	Madc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
+		if(Madc<500)
+		{
+					m_status.MenhollOpenFlag = 1;
+					m_sx1276.buffCh3[EVENT_MENHOLL%8]= 77; 
+					//Node_event(EVENT_MENHOLL,1);
+
+		}
+    }
+    HAL_Delay(500);
+
 
 }
 
@@ -134,7 +151,7 @@ void My_Device()
 
 	m_status.txWateTime = 10000;
 	m_status.txTimeOut = 1000;
-
+	m_status.maxNodeNum = 2;
 
 }
 

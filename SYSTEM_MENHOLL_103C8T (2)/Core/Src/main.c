@@ -295,12 +295,31 @@ void Main_config()
 	static uint32_t startTime = 0;
 	uint8_t eventFlag = 0;
 	uint8_t evntFlag = 0; 
-	//Eco_Config();
+	Eco_Config();
 	
-	//Battery_Config();
-	//Menholl_Open_Config(); 
+	Battery_Config();
+	Menholl_Open_Config(); 
 	//Pump_Active_Config();
-	//Node_event2(3, m_sx1276.buffCh3);
+	for(int i =0 ;i < 5;i++)
+	{
+		if(m_sx1276.buffCh3[i] != 0)
+		{
+			Node_event(i+16, m_sx1276.buffCh3[i]);
+			HAL_Delay(2000);
+			evntFlag = 3;
+		}
+		
+	}
+	
+	if(evntFlag==3)
+	{
+		Node_event(44, 44);
+		memset(m_sx1276.buffCh3, 0, 8*4);
+		evntFlag = 0;
+		HAL_Delay(60000);
+	}	
+
+
 
 	if(WATER_SENSOR_HIGH == 0)
 	{
