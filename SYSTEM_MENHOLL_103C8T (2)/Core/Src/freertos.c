@@ -121,7 +121,7 @@ void MX_FREERTOS_Init(void) {
   xTaskCreate(vTask1, "Task 1", 256, NULL, 4, &xTask1Handle);
   //xTaskCreate(vTask2, "Task 2", 128, NULL, 4, &xTask2Handle);
   if(m_status.device != 0x01)
-  		xTaskCreate(vTask3, "Task 3", 128, NULL, 4, &xTask3Handle);
+  		xTaskCreate(vTask3, "Task 3", 256, NULL, 4, &xTask3Handle);
   		
   		//uxTaskPriorityGet(xTask2Handle);
   /* USER CODE END RTOS_THREADS */
@@ -155,7 +155,7 @@ void vTask1(void* pvPrameters)
 		if(m_status.device == 0x01)
 		{
 			Master_Pass();
-			//Pc_Command_Response();
+			Pc_Command_Response();
 		}
 		if(m_status.device != 0x01)
 		{
@@ -174,15 +174,18 @@ void vTask2(void* pvPrameters)
 		osDelay(100);
 	}
 }
+extern uint8_t eventFlag;
 
 void vTask3(void* pvPrameters)
 {
 	while(1)
 	{
-		//LED2_TOGGLE;
-		//osDelay(500);
-		Main_config();	
-                //osDelay(100);
+
+		if(m_status.device != 0x01)
+		{
+			Main_config();
+		}
+
 	}
 }
 

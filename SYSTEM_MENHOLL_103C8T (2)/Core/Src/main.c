@@ -294,7 +294,7 @@ void Main_config()
 {	
 	static uint32_t startTime = 0;
 	uint8_t eventFlag = 0;
-	Eco_Config();
+	//Eco_Config();
 	
 	//Battery_Config();
 	//Menholl_Open_Config(); 
@@ -311,12 +311,20 @@ void Main_config()
 		memset(m_sx1276.buffCh1, 0, 8*4);
 		eventFlag = 0;
 	}
-//	if(HAL_GetTick()-startTime>120000)
-//	{
-//		startTime = HAL_GetTick();		
-//		Node_event2(1, m_sx1276.buffCh1);
-//		memset(m_sx1276.buffCh1, 0, 8*4);
-//	}
+	if(HAL_GetTick()-startTime>60000)
+	{
+		startTime = HAL_GetTick();	
+		m_sx1276.buffCh1[0] = startTime/1000;
+		m_sx1276.buffCh1[1] = startTime/1000+1;
+		m_sx1276.buffCh1[2] = startTime/1000+2;
+		m_sx1276.buffCh1[3] = startTime/1000+3;
+		m_sx1276.buffCh1[4] = startTime/1000+4;
+		m_sx1276.buffCh1[5] = startTime/1000+5;
+		m_sx1276.buffCh1[6] = startTime/1000+6;
+		m_sx1276.buffCh1[7] = startTime/1000+7;
+		Node_event2(1, m_sx1276.buffCh1);
+		//memset(m_sx1276.buffCh1, 0, 8*4);
+	}
 }
 
 /* USER CODE END 4 */

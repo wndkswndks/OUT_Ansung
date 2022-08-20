@@ -261,6 +261,8 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 }
 uint32_t pre_mytime = 0;
 uint32_t my_termtime = 0;
+char txBuffCpy[80] = {0,};
+
 void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 {
 	char txBuff[80] = {0,};
@@ -290,6 +292,7 @@ void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 	//strcat(txBuff,"[1:431,255,0,275,1594,1262,1628]");
 
 	
+	memcpy(txBuffCpy, txBuff,80);
 
 	//sprintf(event_msg, "[%d:%u]",ch, buff[0],buff[1]);
 
@@ -354,10 +357,10 @@ void Master_Pass()//
 
 	Master_Event();
 
-	//if(eventFlag==1) return;
+	if(eventFlag==1) return;
 	
 
-	//Master_poling();	
+	Master_poling();	
 
 }
 
@@ -410,7 +413,7 @@ void Master_poling()
 					failRxNum = 0;
 
 					//nodeNum++;
-					//nodeNum %=3;
+					//nodeNum %= m_status.maxNodeNum;
 					
 				}
 				step = STEP1;
@@ -428,7 +431,7 @@ void Master_poling()
 					//txLteMsg[1] = nodeNum + 1 + 5;
 				}
 				//nodeNum++;
-				//nodeNum %=3;
+				//nodeNum %= m_status.maxNodeNum;
 				
 				failRxNum = 0;
 				successRxNum++;
@@ -454,7 +457,7 @@ void Master_poling()
 		break;
 	}	
 }
-
+char buffccPy[50] = {0,};
 void Master_Event()
 {
 	static char cannel = 0;
@@ -486,8 +489,8 @@ void Master_Event()
 //				eventMsg[eventNum] = eventData;
 
 				
-				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
-				
+				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d,]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
+				memcpy(buffccPy, buffer, strlen(buffer));
 				memset(buffer,0,512);
 				
 				
@@ -503,10 +506,11 @@ void Master_Event()
 		case STEP2:
 			HTTP_Config(cannel, eventMsg);
 			LTE_Init();	
+			HAL_Delay(15000);
 			
 			timestemp = 0;
 			cannel = 0;
-			memset(eventMsg, 0 ,8);
+			memset(eventMsg, 0 ,8*4);
 			step = STEP1;
 			LED3_OFF;
 			eventFlag = 0;

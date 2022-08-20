@@ -307,7 +307,11 @@ void Pc_Command_Response()
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
 		}
-
+		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "MX"))
+		{
+			m_status.maxNodeNum = num;	
+			PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
+		}
 		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "RU"))
 		{				
 			Rute_Cmd(m_uart1.msgBuff);

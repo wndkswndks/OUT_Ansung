@@ -133,6 +133,7 @@ typedef struct
 	char nodeNum[40];
 	uint16_t txWateTime;
 	uint16_t txTimeOut;
+	uint16_t maxNodeNum;
 } STATUS_T;
 /*  			stuct end  				*/
 

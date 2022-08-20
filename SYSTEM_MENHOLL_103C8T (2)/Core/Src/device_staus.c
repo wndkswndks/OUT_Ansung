@@ -132,7 +132,7 @@ void My_Device()
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 
-	m_status.txWateTime = 200;
+	m_status.txWateTime = 10000;
 	m_status.txTimeOut = 1000;
 
 
