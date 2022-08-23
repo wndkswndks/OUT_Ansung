@@ -108,9 +108,8 @@ int main(void)
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-	//HAL_UART_Receive_IT(&huart1, rxData1, 1);
+	HAL_UART_Receive_IT(&huart1, rxData1, 1);
 	HAL_UART_Receive_IT(&huart1, m_uart1.rxByte, 1);
-	HAL_UART_Receive_IT(&huart2, rxData2, 1);
   //GPS_Init();
   Poling_Str_Add(44);
   Poling_Str_Add(215);
@@ -300,24 +299,8 @@ void Main_config()
 	Battery_Config();
 	Menholl_Open_Config(); 
 	//Pump_Active_Config();
-	for(int i =0 ;i < 5;i++)
-	{
-		if(m_sx1276.buffCh3[i] != 0)
-		{
-			Node_event(i+16, m_sx1276.buffCh3[i]);
-			HAL_Delay(2000);
-			evntFlag = 3;
-		}
-		
-	}
-	
-	if(evntFlag==3)
-	{
-		Node_event(44, 44);
-		memset(m_sx1276.buffCh3, 0, 8*4);
-		evntFlag = 0;
-		HAL_Delay(60000);
-	}	
+	Event_Config(m_sx1276.buffCh3 ,2);
+
 
 
 
@@ -327,8 +310,7 @@ void Main_config()
 	}
 	if(eventFlag)
 	{
-//		Node_event2(1, m_sx1276.buffCh1);
-//		memset(m_sx1276.buffCh1, 0, 8*4);
+
 
 		m_sx1276.buffCh1[0] = 111;
 		m_sx1276.buffCh1[1] = 222;
@@ -346,51 +328,17 @@ void Main_config()
 		m_sx1276.buffCh2[5] = 0;
 		m_sx1276.buffCh2[6] = 66;
 
-		for(int i =0 ;i < 8;i++)
-		{
-			if(m_sx1276.buffCh1[i] != 0)
-			{
-				Node_event(i, m_sx1276.buffCh1[i]);
-				HAL_Delay(2000);
-				evntFlag = 1;
-			}
-			
-		}
-		
-		if(evntFlag==1)
-		{
-			Node_event(44, 44);
-			evntFlag = 0;
-			HAL_Delay(60000);
-		}	
+		Event_Config(m_sx1276.buffCh1,0);
 
-		for(int i =0 ;i < 8;i++)
-		{
-
-			if(m_sx1276.buffCh2[i] != 0)
-			{
-				Node_event(i+8, m_sx1276.buffCh2[i]);
-				HAL_Delay(2000);
-				evntFlag = 2;
-			}	
-		}
+		Event_Config(m_sx1276.buffCh2,1);
 		
-		if(evntFlag==2)
-		{
-			Node_event(44, 44);
-			evntFlag = 0;
-			HAL_Delay(60000);
-		}	
-		
-		//memset(m_sx1276.buffCh1, 0, 8*4);
-		//memset(m_sx1276.buffCh2, 0, 8*4);
 
 		eventFlag = 0;
 	}
 
 
 	
-//	if(HAL_GetTick()-startTime>60000)
+//	if(HAL_GetTick()-startTime>120000)
 //	{
 //		startTime = HAL_GetTick();	
 //		m_sx1276.buffCh1[0] = startTime/1000;
@@ -401,11 +349,36 @@ void Main_config()
 //		m_sx1276.buffCh1[5] = startTime/1000+5;
 //		m_sx1276.buffCh1[6] = startTime/1000+6;
 //		m_sx1276.buffCh1[7] = startTime/1000+7;
-//		Node_event2(1, m_sx1276.buffCh1);
-//		//memset(m_sx1276.buffCh1, 0, 8*4);
+//
+//		Event_Config(m_sx1276.buffCh1);
+//
 //	}
 }
 
+
+
+void Event_Config(uint16_t* buffCh, uint8_t chAdd)
+{
+	uint8_t evntFlag = 0; 
+	
+		for(int i =0 ;i < 8;i++)
+		{
+			if(buffCh[i] != 0)
+			{
+				Node_event(i + (chAdd*8), buffCh[i]);
+				HAL_Delay(500);
+				evntFlag = 1;
+			}
+			
+		}
+		
+		if(evntFlag==1)
+		{
+			Node_event(44, 44);
+			HAL_Delay(1000);
+			memset(buffCh, 0 , 8*2);
+		}	
+}
 /* USER CODE END 4 */
 
 /**

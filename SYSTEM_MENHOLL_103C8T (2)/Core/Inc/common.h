@@ -66,6 +66,7 @@ typedef enum
 
 
 void Main_config();
+void Event_Config(uint16_t* buffCh, uint8_t chAdd);
 /*  			define end  			*/
 
 

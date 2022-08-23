@@ -35,45 +35,12 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ135.TOLUENE,MQ135_ratio);
 	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
 
-	uint8_t evntFlag = 0; 
 	
-	for(int i =0 ;i < 8;i++)
-	{
-		if(m_sx1276.buffCh1[i] != 0)
-		{
-			Node_event(i, m_sx1276.buffCh1[i]);
-			HAL_Delay(2000);
-			evntFlag = 1;
-		}
-		
-	}
+	Event_Config(m_sx1276.buffCh1 ,0);
+
 	
-	if(evntFlag==1)
-	{
-		Node_event(44, 44);
-		memset(m_sx1276.buffCh1, 0, 8*4);
-		evntFlag = 0;
-		HAL_Delay(60000);
-	}	
-	
-	for(int i =0 ;i < 8;i++)
-	{
-	
-		if(m_sx1276.buffCh2[i] != 0)
-		{
-			Node_event(i+8, m_sx1276.buffCh2[i]);
-			HAL_Delay(2000);
-			evntFlag = 2;
-		}	
-	}
-	
-	if(evntFlag==2)
-	{
-		Node_event(44, 44);
-		memset(m_sx1276.buffCh2, 0, 8*4);
-		evntFlag = 0;
-		HAL_Delay(60000);
-	}	
+	Event_Config(m_sx1276.buffCh2 ,1);
+
 
 
 

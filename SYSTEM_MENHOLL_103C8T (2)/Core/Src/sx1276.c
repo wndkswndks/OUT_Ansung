@@ -354,11 +354,16 @@ char bCnt = 0;
 uint8_t eventFlag = 0;
 void Master_Pass()//
 {
-
+	static uint32_t pre_time = 0;
+	if(HAL_GetTick()-pre_time >500)
+	{
+		LED1_TOGGLE;
+		pre_time =HAL_GetTick();
+	}
 	Master_Event();
 
 	if(eventFlag==1) return;
-	
+
 
 	//Master_poling();	
 
@@ -517,7 +522,7 @@ void Master_Event()
 				
 				timestemp = HAL_GetTick();
 			}
-			if((timestemp != 0) && (HAL_GetTick()-timestemp >4000) && (endFlag==1))
+			if((timestemp != 0) && (HAL_GetTick()-timestemp >2000) && (endFlag==1))
 			{
 				timestemp = 0;
 				endFlag = 0;
@@ -529,6 +534,14 @@ void Master_Event()
 
 
 		case STEP2:
+
+			PCPrintf("cannel = %d \r\n ",cannel );
+			HAL_Delay(100);
+			for(int i =0 ;i < 8;i++)
+			{
+				PCPrintf("Msg[%d] = %d \r\n ",i,eventMsg[i] );
+				HAL_Delay(100);
+			}
 			HTTP_Config(cannel, eventMsg);
 			LTE_Init();	
 			HAL_Delay(15000);
@@ -536,6 +549,7 @@ void Master_Event()
 			timestemp = 0;
 			cannel = 0;
 			memset(eventMsg, 0 ,8*4);
+			memset(buffccPy, 0 ,16*50);
 			step = STEP1;
 			LED3_OFF;
 			eventFlag = 0;

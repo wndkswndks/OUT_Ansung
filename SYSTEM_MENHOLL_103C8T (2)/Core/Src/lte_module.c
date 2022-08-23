@@ -235,6 +235,7 @@ void Basic_Config()
 char ipAdd[30] = {0,};
 void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ช่พ? 
 {
+	uint32_t startTime = HAL_GetTick();
 	while(1)
 	{
 		memset(dstAdd,0,30);
@@ -247,6 +248,16 @@ void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ช่พ?
 
 		if(dstAdd[0] != NULL)
 		{
+			break;
+		}
+
+		
+		if(HAL_GetTick() - startTime >10000)
+		{
+			Terminal_Send("GetIPAddr FAIL CMD!!\r\n");
+			
+			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			Rx_Buff1Clear();
 			break;
 		}
 	}
