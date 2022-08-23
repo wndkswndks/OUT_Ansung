@@ -374,7 +374,7 @@ void PCPuts(char *msg)
 	char str[256] = {0,};
 	memcpy(str, msg, strlen(msg));
 	
-	HAL_UART_Transmit_IT(&huart1, (uint8_t* )str, strlen(str));
+	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
 }
 
 uint32_t String_To_Hex(char* str)

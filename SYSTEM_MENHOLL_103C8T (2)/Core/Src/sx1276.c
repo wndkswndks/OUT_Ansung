@@ -473,6 +473,7 @@ void Master_Event()
 	char numBuff[8] = {0,};
 	int evnetBuff[8] = {0,};
 	int eventNode = 0;
+	static int ongoingNode = 0;
 	int rawEventNum = 0;
 	int eventNum = 0;
 	int eventData = 0;
@@ -485,7 +486,7 @@ void Master_Event()
 		case STEP1:
 			if(Is_Include_ThisStr( buffer, 0, NODE_EVENT))
 			{
-				LED3_ON;
+				LED2_TOGGLE;
 				eventFlag = 1;
 				
 				memcpy(buffccPy[cccnt++], buffer, strlen(buffer));
@@ -493,7 +494,7 @@ void Master_Event()
 
 				
 				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
-
+				
 				if(rawEventNum==44 && eventData ==44)
 				{
 					endFlag = 1;
@@ -534,7 +535,7 @@ void Master_Event()
 
 
 		case STEP2:
-
+			LED3_ON;
 			PCPrintf("cannel = %d \r\n ",cannel );
 			HAL_Delay(100);
 			for(int i =0 ;i < 8;i++)
@@ -544,8 +545,9 @@ void Master_Event()
 			}
 			HTTP_Config(cannel, eventMsg);
 			LTE_Init();	
+			PCPuts("Cool start \r\n");
 			HAL_Delay(15000);
-			
+			PCPuts("Cool end \r\n");
 			timestemp = 0;
 			cannel = 0;
 			memset(eventMsg, 0 ,8*4);
