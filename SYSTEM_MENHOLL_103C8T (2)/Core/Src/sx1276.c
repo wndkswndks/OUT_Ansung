@@ -380,7 +380,7 @@ void Master_poling()
 	static int failRxNum = 0;
 	static int txRxNum = 0;
 	static int txRxBuff[8] = {0,};
-	static int nodeNum = 0;
+	static int nodeNum = 1;
 	char nodeNumStr[4] = {0,};
 	static int txLteMsg[8] = {0,};
 
@@ -418,7 +418,7 @@ void Master_poling()
 					failRxNum = 0;
 
 					//nodeNum++;
-					//nodeNum %= m_status.maxNodeNum;
+					//if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
 					
 				}
 				step = STEP1;
@@ -437,7 +437,7 @@ void Master_poling()
 //
 //				}
 				//nodeNum++;
-				//nodeNum %= m_status.maxNodeNum;
+				//if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
 				
 				failRxNum = 0;
 				successRxNum++;
@@ -480,7 +480,7 @@ void Master_Event()
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 	static char endFlag = 0;
-
+	uint8_t passFlag = 0;
 	switch(step)
 	{
 		case STEP1:
@@ -494,7 +494,6 @@ void Master_Event()
 
 				
 				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
-				
 				if(rawEventNum==44 && eventData ==44)
 				{
 					endFlag = 1;
@@ -543,17 +542,26 @@ void Master_Event()
 				PCPrintf("Msg[%d] = %d \r\n ",i,eventMsg[i] );
 				HAL_Delay(100);
 			}
-			HTTP_Config(cannel, eventMsg);
+			step = STEP3;
+		break;	
+		
+		case STEP3:
+			passFlag = HTTP_Config(cannel, eventMsg);
+			if(passFlag) step = STEP4;
+		break;	
+		
+		case STEP4:
 			LTE_Init();	
+			LED3_OFF;
 			PCPuts("Cool start \r\n");
 			HAL_Delay(15000);
 			PCPuts("Cool end \r\n");
+			
 			timestemp = 0;
 			cannel = 0;
 			memset(eventMsg, 0 ,8*4);
 			memset(buffccPy, 0 ,16*50);
 			step = STEP1;
-			LED3_OFF;
 			eventFlag = 0;
 		break;
 		

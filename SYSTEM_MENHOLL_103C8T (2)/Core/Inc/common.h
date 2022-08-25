@@ -56,14 +56,32 @@ typedef enum
 	STEP4,
 	STEP5,
 	STEP6,
+	STEP7,
+	STEP8,
+	STEP9,
+	STEP10,
+	STEP11,
+	STEP12,
+	STEP13,
+	STEP14,
+	STEP15,
+	
 } STEP_E;
 
 
 
+typedef enum
+{
+	ERR =0,
+	OK = 1,
+} OK_E;
 
 
-
-
+typedef enum
+{
+	UNCOMPLETE =0,
+	COMPLETE = 1,
+} COMPLETE_E;
 
 void Main_config();
 void Event_Config(uint16_t* buffCh, uint8_t chAdd);

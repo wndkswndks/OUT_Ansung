@@ -41,11 +41,11 @@ void AT_CMD_College(char * buff, ...);
 
 void Basic_Config();
 void TCP_Config();
-void HTTP_Config(uint8_t channel, int* txBuff);
+uint8_t HTTP_Config(uint8_t channel, int* txBuff);
 void MQTT_Config();
 
-void CMD_Init();
-void CMD_Reset();
+uint8_t CMD_Init();
+uint8_t CMD_Reset();
 
 
 void APN_Config();
@@ -54,7 +54,7 @@ void CMD_Set_APN();
 void CMD_Get_APN();
 
 
-void CMD_CanConnect();
+uint8_t CMD_CanConnect();
 void CMD_GetCIMI();
 void CMD_GetIMEI();
 void CMD_GetCGMR();
@@ -66,20 +66,20 @@ void CMD_GetSINR();
 void CMD_GetServingCell();
 void CMD_GetTxPower();
 
-void CMD_GetIPAddr(char* scrAdd, char* dstAdd);
-void CMD_SoketCreate(char* ipAdd,uint8_t port);
-void CMD_SoketActivate();
-void CMD_SoketInfo();
-void CMD_SoketSend(char* str);
-void CMD_SoketRecv();
-void CMD_SoketDeActivate();
-void CMD_SoketClose();
+uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd);
+uint8_t CMD_SoketCreate(char* ipAdd,uint8_t port);
+uint8_t CMD_SoketActivate();
+uint8_t CMD_SoketInfo();
+uint8_t CMD_SoketSend(char* str);
+uint8_t CMD_SoketRecv();
+uint8_t CMD_SoketDeActivate();
+uint8_t CMD_SoketClose();
 
 void String_to_hexString(char* inputStr, char*outputStr);
 void HexString_to_String();
 
 void Rx_Buff1Clear();
-void OK_Check();
+uint8_t OK_Check();
 void Passing_field(uint8_t num, int data, char* str);
 /*  			function end  			*/
 

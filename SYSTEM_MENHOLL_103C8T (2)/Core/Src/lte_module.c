@@ -21,6 +21,7 @@ int rxCnt1 = 0;
 void Terminal_Send(char * buff)
 {
 	HAL_UART_Transmit(&huart2, (uint8_t *)buff, strlen(buff),1000);
+	HAL_Delay(100);
 }
 void Rx_Buff1Clear()
 {
@@ -55,23 +56,27 @@ void AT_CMD_College(char * buff, ...)
 }
 
 
-void CMD_Init()
+uint8_t CMD_Init()
 {
 	AT_CMD("AT");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
 	//AT_CMD("ATE0");	
 	AT_CMD("AT+CEREG=2");	
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
 	AT_CMD("AT%CMATT=1");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 
 }
 
 
-void CMD_Reset()
+uint8_t CMD_Reset()
 {
 	AT_CMD("AT+CFUN=1,1");	
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 
 }
 //==============================
@@ -124,10 +129,12 @@ void CMD_Get_APN()
 
 //==============================
 // basic
-void CMD_CanConnect()
+uint8_t CMD_CanConnect()
 {
 	AT_CMD("AT+CEREG?");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
 void CMD_GetCIMI()
@@ -233,7 +240,7 @@ void Basic_Config()
 //
 //==============================
 char ipAdd[30] = {0,};
-void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾? 
+uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾? 
 {
 	uint32_t startTime = HAL_GetTick();
 	while(1)
@@ -248,57 +255,68 @@ void CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾?
 
 		if(dstAdd[0] != NULL)
 		{
-			break;
+			Terminal_Send("GetIPAddr GOOD!!\r\n");
+			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			Rx_Buff1Clear();
+			return OK;
 		}
 
 		
 		if(HAL_GetTick() - startTime >10000)
 		{
-			Terminal_Send("GetIPAddr FAIL CMD!!\r\n");
+			Terminal_Send("GetIPAddr FAIL!!\r\n");
 			
 			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 			Rx_Buff1Clear();
-			break;
+			return ERR;
 		}
 	}
-	OK_Check();
+	//if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
-void CMD_SoketCreate(char* ipAdd, uint8_t port)
+uint8_t CMD_SoketCreate(char* ipAdd, uint8_t port)
 {
 	char *service[] = {"UDP", "TCP"};
 	int service_type = 1;
 
 	AT_CMD_College("AT%SOCKETCMD=\"ALLOCATE\",0,\"%s\",\"OPEN\",\"%s\",%d,1500\r\n",service[service_type], ipAdd, port);
 	
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 
 }
 
-void CMD_SoketActivate()
+uint8_t CMD_SoketActivate()
 {
 	AT_CMD("AT%SOCKETCMD=\"ACTIVATE\",1");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
-void CMD_SoketInfo()
+uint8_t CMD_SoketInfo()
 {
 	AT_CMD("AT%SOCKETCMD=\"INFO\",1");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
 
-	
+	return OK;
 }
 
-void CMD_SoketSend(char* str)// ?????ë¹?ë¹?ë¸??ë¼????
+uint8_t CMD_SoketSend(char* str)// ?????ë¹?ë¹?ë¸??ë¼????
 {
 	char outputStr[500] = {0,};
 	
 	String_to_hexString(str,outputStr);
 	AT_CMD_College("AT%SOCKETDATA=\"SEND\",1,%d,\"%s\"\r\n",strlen(outputStr)/2,outputStr);
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
 
-void CMD_SoketRecv()
+uint8_t CMD_SoketRecv()
 {
 	AT_CMD("AT%SOCKETDATA=\"RECEIVE\",1,1000");
 
@@ -306,19 +324,25 @@ void CMD_SoketRecv()
 
 //	sscanf(ptr,"SOCKETDATA:%d,%d,%d,\"%s\"",&qq1,&qq2,&qq3,qqStr );
 	
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
-void CMD_SoketDeActivate()
+uint8_t CMD_SoketDeActivate()
 {
 	//AT_CMD_College("AT%SOCKETCMD=\"DEACTIVATE\",%d", _nSocket);
 	AT_CMD("AT%SOCKETCMD=\"DEACTIVATE\",1");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
-void CMD_SoketClose()
+uint8_t CMD_SoketClose()
 {
 	//AT_CMD_College("AT%SOCKETCMD=\"DELETE\",%d", _nSocket);	
 	AT_CMD("AT%SOCKETCMD=\"DELETE\",1");
-	OK_Check();
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
 void TCP_Config()
@@ -445,88 +469,180 @@ void CMD_Set_MQTT_Disconnect()
 
 
 //
-void HTTP_Config(uint8_t channel, int* txBuff)
+uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 {
-	Terminal_Send("START\r\n");
-	CMD_Reset();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<1>\r\n");
-
-	
-	CMD_Init();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<2>\r\n");
-	
-	CMD_CanConnect();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<3>\r\n");
-        
-	CMD_GetIPAddr("api.thingspeak.com",ipAdd);
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<4>\r\n");
-	
-	CMD_SoketCreate(ipAdd,80);
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<5>\r\n");
-	
-	CMD_SoketActivate();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<6>\r\n");
-	
-	CMD_SoketInfo();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<7>\r\n");
-	
+	static uint32_t preTime = 0;
+	static uint8_t step = STEP1;
 	char WApiKey[18] = {0,};
 	char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
 	char* WApiKey2  = "YHS7XLM9Y6NJWNOF";//test2
 	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
 	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
-
+	uint8_t passFlag = 1;
 	
-	switch(channel)
+	switch(step)
 	{
-		case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
-		case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
-		case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
-		case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
+		case STEP1:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{			
+				Terminal_Send("START\r\n");
+				CMD_Reset();
+
+				Terminal_Send("<1>\r\n");
+				preTime  =HAL_GetTick();
+				
+				step = STEP2;
+				
+			}
+		break;
+
+		case STEP2:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				CMD_Init();
+				Terminal_Send("<2>\r\n");
+				preTime  =HAL_GetTick();
+				step = STEP3;
+			}
+		break;
+
+		case STEP3:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_CanConnect();
+				Terminal_Send("<3>\r\n");
+				preTime  =HAL_GetTick();
+				step = STEP4;
+			}
+		break;
+
+		case STEP4:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{				
+				passFlag = CMD_GetIPAddr("api.thingspeak.com",ipAdd);
+				Terminal_Send("<4>\r\n");
+				preTime  =HAL_GetTick();
+				step = STEP5;
+			}
+		break;
+
+		case STEP5:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketCreate(ipAdd,80);
+				Terminal_Send("<5>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP6;
+			}
+		break;
+
+		case STEP6:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketActivate();
+				Terminal_Send("<6>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP7;
+			}
+		break;
+
+		case STEP7:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketInfo();
+				Terminal_Send("<7>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP8;
+			}
+		break;
+
+		case STEP8:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				switch(channel)
+				{
+					case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
+					case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
+					case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
+					case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
+				}
+				
+				char sendMsg[200] = "GET /update";
+				//int testData[10]={110,220,330,440,550,660};
+
+				strcat(sendMsg,"?api_key=");
+				strcat(sendMsg,WApiKey);
+
+				for(int i =0 ; i < 8; i++)
+				{
+					Passing_field(i+1,txBuff[i],sendMsg);
+				}
+
+				strcat(sendMsg," HTTP/1.1\r\n");
+				strcat(sendMsg,"Host: api.thingspeak.com\r\n");
+				strcat(sendMsg,"Connection: close\r\n\r\n");
+
+				passFlag = CMD_SoketSend(sendMsg);
+				Terminal_Send("<8>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP9;
+			}
+		break;
+
+		case STEP9:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketRecv();
+				Terminal_Send("<9>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP10;
+			}
+		break;
+
+		case STEP10:
+			if( HAL_GetTick()-preTime >CMD_DELAY)
+			{
+				passFlag = CMD_SoketDeActivate();
+				Terminal_Send("<10>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP11;
+			}
+		break;
+
+		case STEP11:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketInfo();
+				Terminal_Send("<11>\r\n");				
+				preTime  =HAL_GetTick();
+				step = STEP12;
+			}
+		break;
+
+		case STEP12:
+			if( HAL_GetTick()-preTime >CMD_DELAY )
+			{
+				passFlag = CMD_SoketClose();
+				Terminal_Send("<12>\r\n");
+				Terminal_Send("END\r\n");
+				preTime  = 0;
+				
+				step = STEP1;
+				return COMPLETE;
+			}
+		break;
+
 	}
-	
-	char sendMsg[200] = "GET /update";
-	//int testData[10]={110,220,330,440,550,660};
 
-	strcat(sendMsg,"?api_key=");
-	strcat(sendMsg,WApiKey);
-
-	for(int i =0 ; i < 8; i++)
+	if(passFlag == ERR) 
 	{
-		Passing_field(i+1,txBuff[i],sendMsg);
+		PCPrintf("Err step = %d\r\n",step);
+		LTE_Init();
+		HAL_Delay(5000);
+		step = STEP1;
 	}
 
-	strcat(sendMsg," HTTP/1.1\r\n");
-	strcat(sendMsg,"Host: api.thingspeak.com\r\n");
-	strcat(sendMsg,"Connection: close\r\n\r\n");
-
-	CMD_SoketSend(sendMsg);
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<8>\r\n");
-
-	CMD_SoketRecv();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<9>\r\n");
-
-	CMD_SoketDeActivate();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<10>\r\n");
-
-	CMD_SoketInfo();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<11>\r\n");
-
-	CMD_SoketClose();
-	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<12>\r\n");
-
+	return UNCOMPLETE;
 }
 
 
@@ -589,7 +705,7 @@ void HexString_to_String()
 	//ddd = HEX_TO_ASKI('C');
 }
 
-void OK_Check()
+uint8_t OK_Check()
 {
 	int i;
 	uint32_t startTime = HAL_GetTick();
@@ -605,17 +721,18 @@ void OK_Check()
 		
 		if(ptr !=NULL)
 		{
+			Terminal_Send("GOOD CMD!!\r\n");
 			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 			Rx_Buff1Clear();
-			break;
+			return OK;
 		}
-		if(HAL_GetTick() - startTime >4000)
+		if(HAL_GetTick() - startTime >8000)
 		{
 			Terminal_Send("FAIL CMD!!\r\n");
 			
 			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 			Rx_Buff1Clear();
-			break;
+			return ERR;
 		}
 
 	}
