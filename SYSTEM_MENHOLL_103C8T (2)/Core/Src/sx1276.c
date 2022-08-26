@@ -494,6 +494,12 @@ void Master_Event()
 
 				
 				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
+
+				if(ongoingNode != eventNode && eventNode != 0 && ongoingNode != 0 )
+				{
+					return;
+				}
+				ongoingNode = eventNode;
 				if(rawEventNum==44 && eventData ==44)
 				{
 					endFlag = 1;
@@ -556,7 +562,8 @@ void Master_Event()
 			PCPuts("Cool start \r\n");
 			HAL_Delay(15000);
 			PCPuts("Cool end \r\n");
-			
+
+			ongoingNode = 0;
 			timestemp = 0;
 			cannel = 0;
 			memset(eventMsg, 0 ,8*4);

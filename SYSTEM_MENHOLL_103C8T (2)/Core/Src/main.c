@@ -297,14 +297,14 @@ void Main_config()
 	//Eco_Config();
 	
 	Battery_Config();
-	Menholl_Open_Config(); 
+	//Menholl_Open_Config(); 
 	//Pump_Active_Config();
 	Event_Config(m_sx1276.buffCh3 ,2);
 
 
 
 
-	if(WATER_SENSOR_HIGH == 0)
+	if(WATER_SENSOR_LOW == 0)
 	{
 		eventFlag = 1;
 	}

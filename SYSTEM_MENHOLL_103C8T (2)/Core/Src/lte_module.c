@@ -479,6 +479,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
 	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
 	uint8_t passFlag = 1;
+	static int errCnt = 0;
 	
 	switch(step)
 	{
@@ -509,7 +510,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 		case STEP3:
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
-				passFlag = CMD_CanConnect();
+				CMD_CanConnect();
 				Terminal_Send("<3>\r\n");
 				preTime  =HAL_GetTick();
 				step = STEP4;
@@ -627,6 +628,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 				Terminal_Send("END\r\n");
 				preTime  = 0;
 				
+				errCnt = 0;
 				step = STEP1;
 				return COMPLETE;
 			}
@@ -640,6 +642,14 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 		LTE_Init();
 		HAL_Delay(5000);
 		step = STEP1;
+		errCnt++;
+		if(errCnt>10)
+		{
+			Terminal_Send("HTTP Cermunication Err \r\n");
+			errCnt = 0;
+			return COMPLETE;
+		}
+
 	}
 
 	return UNCOMPLETE;

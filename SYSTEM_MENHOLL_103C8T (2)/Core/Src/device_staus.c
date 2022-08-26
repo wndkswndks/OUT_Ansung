@@ -11,25 +11,25 @@ void Battery_Config()
   	if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK)  //ADC가 이상없으면
     {
     	adc = HAL_ADC_GetValue(&hadc1);                    //ADC값을 저장
-    	m_status.fan_Battery = ((float)adc * 3.3 /4095) * 12/3.3 +1.7 ;
+    	m_status.fan_Battery = ((float)adc * 3.3 /4095) * 12/3.3 ;
 
-    	if(m_status.fan_Battery<=10) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
+    	///if(m_status.fan_Battery<=9) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
     	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
-    	else if(m_status.fan_Battery>13) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
+    	//else if(m_status.fan_Battery>14) m_sx1276.buffCh3[EVENT_FANBETTERY%8]= (uint16_t)m_status.fan_Battery; 
     	//Node_event(EVENT_FANBETTERY,(uint16_t)m_status.fan_Battery);
     }
  	HAL_Delay(500);
-//    HAL_ADC_Start(&hadc2);  //ADC 시작
-//  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
-//    {
-//    	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
-//    	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
-//
-//    	if(m_status.pump_Battery<=10) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
-//    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
-//    	else if(m_status.pump_Battery>14) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
-//    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
-//    }
+    HAL_ADC_Start(&hadc2);  //ADC 시작
+  	if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK)  //ADC가 이상없으면
+    {
+    	adc = HAL_ADC_GetValue(&hadc2);                    //ADC값을 저장
+    	m_status.pump_Battery =(adc * 3.3 /4095) * 12/3.3 ;
+
+    	//if(m_status.pump_Battery<=9) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+    	//else if(m_status.pump_Battery>14) m_sx1276.buffCh3[EVENT_PUMPBETTERY%8]= (uint16_t)m_status.pump_Battery; 
+    	//Node_event(EVENT_PUMPBETTERY,(uint16_t)m_status.pump_Battery);
+    }
 
   
 }
@@ -130,22 +130,22 @@ void My_Device()
 	if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
 	if(m_status.device==2) 
 	{
-		memcpy(m_status.myNodeName, NODE0, strlen(NODE0));
+		memcpy(m_status.myNodeName, NODE1, strlen(NODE1));
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 	if(m_status.device==3) 
 	{
-		memcpy(m_status.myNodeName, NODE1, strlen(NODE0));
+		memcpy(m_status.myNodeName, NODE2, strlen(NODE2));
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 	if(m_status.device==4) 
 	{
-		memcpy(m_status.myNodeName, NODE2, strlen(NODE0));
+		memcpy(m_status.myNodeName, NODE3, strlen(NODE3));
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 	if(m_status.device==5) 
 	{
-		memcpy(m_status.myNodeName, NODE3, strlen(NODE0));
+		memcpy(m_status.myNodeName, NODE4, strlen(NODE4));
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 
