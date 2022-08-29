@@ -67,7 +67,7 @@ void Error_Handler(void);
 #define DIP_OUT_GPIO_Port GPIOA
 #define DIP_IN_Pin GPIO_PIN_7
 #define DIP_IN_GPIO_Port GPIOA
-#define WATER_L_Pin GPIO_PIN_2
+#define WATER_L_Pin GPIO_PIN_1
 #define WATER_L_GPIO_Port GPIOB
 #define WATER_H_Pin GPIO_PIN_10
 #define WATER_H_GPIO_Port GPIOB

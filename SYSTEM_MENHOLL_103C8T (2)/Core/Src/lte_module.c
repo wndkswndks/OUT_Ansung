@@ -643,7 +643,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 		HAL_Delay(5000);
 		step = STEP1;
 		errCnt++;
-		if(errCnt>10)
+		if(errCnt>4)
 		{
 			Terminal_Send("HTTP Cermunication Err \r\n");
 			errCnt = 0;
