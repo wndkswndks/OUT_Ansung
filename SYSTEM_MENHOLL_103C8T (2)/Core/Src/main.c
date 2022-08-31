@@ -110,6 +110,7 @@ int main(void)
 
 	HAL_UART_Receive_IT(&huart1, rxData1, 1);
 	HAL_UART_Receive_IT(&huart1, m_uart1.rxByte, 1);
+
   //GPS_Init();
   Poling_Str_Add(44);
   Poling_Str_Add(215);
@@ -118,7 +119,7 @@ int main(void)
   
   if(m_status.device != 1)
   {
-  	  Eco_Init();
+  	  //Eco_Init();
   }	
   
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
@@ -134,6 +135,7 @@ int main(void)
   LTE_Init();
 
 
+  HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
 
 
   //MQTT_Config();
@@ -289,6 +291,7 @@ void SystemClock_Config(void)
 //}
 extern uint8_t eventFlag;
 extern char buffer[512];
+uint8_t ddFFlag = 0;
 void Main_config()
 {	
 	static uint32_t startTime = 0;
@@ -296,63 +299,80 @@ void Main_config()
 	uint8_t evntFlag = 0; 
 	//Eco_Config();
 	
-	Battery_Config();
+	//Battery_Config();
 	//Menholl_Open_Config(); 
 	//Pump_Active_Config();
-	Event_Config(m_sx1276.buffCh3 ,2);
+	//Event_Config(m_sx1276.buffCh3 ,2);
 
-
-
-
-	if(WATER_SENSOR_LOW == 0)
+	if(IS_MENHOLL_OPEN == 0 && WATER_SENSOR_HIGH == 0 && WATER_SENSOR_LOW == 0)
 	{
-		eventFlag = 1;
+		ddFFlag = 1;
 	}
-	if(eventFlag)
+	else
 	{
+		ddFFlag = 0;
+	}
 
+	//O2_Sensor();
+	if(HAL_GetTick()-startTime>5000)
+	{
+		startTime = HAL_GetTick();
 
-		m_sx1276.buffCh1[0] = 111;
-		m_sx1276.buffCh1[1] = 222;
-		m_sx1276.buffCh1[2] = 0;
-		m_sx1276.buffCh1[3] = 444;
-		m_sx1276.buffCh1[4] = 555;
-		m_sx1276.buffCh1[5] = 0;
-		m_sx1276.buffCh1[6] = 666;
-		
-		m_sx1276.buffCh2[0] = 11;
-		m_sx1276.buffCh2[1] = 22;
-		m_sx1276.buffCh2[2] = 0;
-		m_sx1276.buffCh2[3] = 44;
-		m_sx1276.buffCh2[4] = 55;
-		m_sx1276.buffCh2[5] = 0;
-		m_sx1276.buffCh2[6] = 66;
-
-		Event_Config(m_sx1276.buffCh1,0);
-
-		Event_Config(m_sx1276.buffCh2,1);
+		O2_Sensor();
 		
 
-		eventFlag = 0;
 	}
+
+
+//	if(WATER_SENSOR_LOW == 0)
+//	{
+//		eventFlag = 1;
+//	}
+//	if(eventFlag)
+//	{
+//
+//
+//		m_sx1276.buffCh1[0] = 111;
+//		m_sx1276.buffCh1[1] = 222;
+//		m_sx1276.buffCh1[2] = 0;
+//		m_sx1276.buffCh1[3] = 444;
+//		m_sx1276.buffCh1[4] = 555;
+//		m_sx1276.buffCh1[5] = 0;
+//		m_sx1276.buffCh1[6] = 666;
+//		
+//		m_sx1276.buffCh2[0] = 11;
+//		m_sx1276.buffCh2[1] = 22;
+//		m_sx1276.buffCh2[2] = 0;
+//		m_sx1276.buffCh2[3] = 44;
+//		m_sx1276.buffCh2[4] = 55;
+//		m_sx1276.buffCh2[5] = 0;
+//		m_sx1276.buffCh2[6] = 66;
+//
+//		Event_Config(m_sx1276.buffCh1,0);
+//
+//		Event_Config(m_sx1276.buffCh2,1);
+//		
+//
+//		eventFlag = 0;
+//	}
 
 
 	
-	if(HAL_GetTick()-startTime>120000)
-	{
-		startTime = HAL_GetTick();	
-		m_sx1276.buffCh1[0] = startTime/1000;
-		m_sx1276.buffCh1[1] = startTime/1000+1;
-		m_sx1276.buffCh1[2] = startTime/1000+2;
-		m_sx1276.buffCh1[3] = startTime/1000+3;
-		m_sx1276.buffCh1[4] = startTime/1000+4;
-		m_sx1276.buffCh1[5] = startTime/1000+5;
-		m_sx1276.buffCh1[6] = startTime/1000+6;
-		m_sx1276.buffCh1[7] = startTime/1000+7;
-
-		Event_Config(m_sx1276.buffCh1,0);
-
-	}
+//	if(HAL_GetTick()-startTime>120000)
+//	{
+//		startTime = HAL_GetTick();	
+//		m_sx1276.buffCh1[0] = startTime/1000;
+//		m_sx1276.buffCh1[1] = startTime/1000+1;
+//		m_sx1276.buffCh1[2] = startTime/1000+2;
+//		m_sx1276.buffCh1[3] = startTime/1000+3;
+//		m_sx1276.buffCh1[4] = startTime/1000+4;
+//		m_sx1276.buffCh1[5] = startTime/1000+5;
+//		m_sx1276.buffCh1[6] = startTime/1000+6;
+//		m_sx1276.buffCh1[7] = startTime/1000+7;
+//
+//		Event_Config(m_sx1276.buffCh1,0);
+//
+//	}
 }
 
 

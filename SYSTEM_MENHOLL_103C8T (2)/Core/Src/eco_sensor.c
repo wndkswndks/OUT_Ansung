@@ -304,3 +304,17 @@ float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 	return MQ_ratio;
 }
 
+
+char ccfsBuff[50] = {0,};
+int qqwe = 0;
+void O2_Sensor()
+{
+	memset(rxBuff1,0,1300);
+	rxCnt1 = 0;
+	HAL_UART_Transmit_IT(&huart1, "%\r\n", 3);
+	HAL_Delay(1000);
+	qqwe = 0;
+	qqwe = atoi((char*)(rxBuff1+3)); 
+	HAL_UART_Transmit_IT(&huart2, rxBuff1, strlen(rxBuff1));
+	HAL_Delay(100);
+}

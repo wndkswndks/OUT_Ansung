@@ -312,6 +312,7 @@ float Set_MQ_PPM(float* sensor, float MQ_ratio);
 void MQ_Init(MQ_VALUE_T* MQ, float a, float b, char eventNum);
 void MQ_Config(MQ_VALUE_T* MQ, float MQ135_ratio );
 
+void O2_Sensor();
 
 
 
