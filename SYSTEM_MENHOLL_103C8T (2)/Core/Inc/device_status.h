@@ -133,7 +133,8 @@ typedef struct
 	char nodeNum[40];
 	uint16_t txWateTime;
 	uint16_t txTimeOut;
-	uint16_t maxNodeNum;
+	uint32_t maxNodeNum;
+	uint32_t minNodeNum;
 } STATUS_T;
 /*  			stuct end  				*/
 
@@ -150,6 +151,8 @@ void Error_Watchdog(ERROR_E error);
 void Poling_Str_Add(uint16_t data);
 void Led_Toggle_Config();
 void MX_IWDG_Init(void);
+void Flash_Write(uint16_t data, uint16_t add);
+uint32_t Flash_Read(uint16_t add);
 
 
 /*  			function end  			*/

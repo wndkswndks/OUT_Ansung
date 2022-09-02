@@ -149,9 +149,11 @@ void My_Device()
 		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
 	}
 
-	m_status.txWateTime = 10000;
-	m_status.txTimeOut = 1000;
-	m_status.maxNodeNum = 2;
+
+	m_status.maxNodeNum = Flash_Read(0);
+	m_status.minNodeNum = Flash_Read(1);
+	m_status.txTimeOut =  1000;
+	m_status.txWateTime = 700;
 
 }
 
@@ -232,3 +234,39 @@ void Led_Toggle_Config()
 		time_stamp = HAL_GetTick(); 
 	}
 }
+void Flash_Write(uint16_t data, uint16_t add)
+{
+	
+	 uint32_t PAGEError;
+	 uint32_t Address = 0x08010000;
+	 //PAGES44TO47_value =  *(__IO uint32_t *)Address;
+
+	  static FLASH_EraseInitTypeDef EraseInitStruct;
+
+	  EraseInitStruct.TypeErase   = FLASH_TYPEERASE_PAGES;  //0x00
+	  EraseInitStruct.PageAddress = Address +0x400*add;  // 지우기 페이지의 시작 어드레스
+	  EraseInitStruct.NbPages =1; //지울 페이지 수
+	  HAL_FLASH_Unlock();
+	  		
+	  if (HAL_FLASHEx_Erase(&EraseInitStruct, &PAGEError) != HAL_OK) 
+	  {
+		  printf("Eraser Error\r\n");
+		  while(1);
+	  }
+	  
+	  if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,Address+0x400*add, ((uint32_t)data)) != HAL_OK)
+	  {
+		printf("Write Error\r\n");
+		while(1);
+	  }
+	  HAL_FLASH_Lock();
+}
+uint32_t Flash_Read(uint16_t add)
+{
+	uint32_t Address = 0x08010000;
+	uint32_t readData = 0;
+
+	readData = *(__IO uint32_t *)(Address+0x400*add);
+	return readData;
+}
+

@@ -68,6 +68,9 @@ char rxMsg1[30] ={0,};
 uint8_t rxMsg2[30] ={0,};
 
 int httpTemp[8]={100,200,333};
+
+__IO uint32_t PAGES44TO47_value;
+
 /* USER CODE END 0 */
 
 /**
@@ -107,9 +110,8 @@ int main(void)
   MX_USART1_UART_Init();
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-
-	HAL_UART_Receive_IT(&huart1, rxData1, 1);
-	HAL_UART_Receive_IT(&huart1, m_uart1.rxByte, 1);
+  HAL_UART_Receive_IT(&huart1, rxData1, 1);
+  HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
 
   //GPS_Init();
   Poling_Str_Add(44);
@@ -120,6 +122,8 @@ int main(void)
   if(m_status.device != 1)
   {
   	  //Eco_Init();
+  	  
+	  HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
   }	
   
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
@@ -134,8 +138,7 @@ int main(void)
 
   LTE_Init();
 
-
-  HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
+   
 
 
   //MQTT_Config();

@@ -60,6 +60,14 @@ void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
+  if(m_status.device == 1)
+  {
+	 huart1.Init.BaudRate = 115200; 
+	 if (HAL_UART_Init(&huart1) != HAL_OK)
+	 {
+	    Error_Handler();
+	 }
+  }
 
   /* USER CODE END USART1_Init 2 */
 
@@ -265,18 +273,18 @@ void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	char rxLen = 0;
-	rxLen = strlen(m_uart1.msgBuff);
+	rxLen = strlen(m_uart2.msgBuff);
 
 	if(rxLen != NULL)
 	{
-		if(m_uart1.msgBuff[DIVISION_POS] !='_') return;
+		if(m_uart2.msgBuff[DIVISION_POS] !='_') return;
 		
-		if(atoi(m_uart1.msgBuff+VALUE_POS) != 0)
+		if(atoi(m_uart2.msgBuff+VALUE_POS) != 0)
 		{
-			num = atoi(m_uart1.msgBuff+VALUE_POS);
+			num = atoi(m_uart2.msgBuff+VALUE_POS);
 		}
 		
-		if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "SF"))
+		if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "SF"))
 		{
 			if(SF_07<= num && num<= SF_12 )
 			{
@@ -297,27 +305,34 @@ void Pc_Command_Response()
 			}										
 		}
 		
-		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "WT"))
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "WT"))
 		{
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "TO"))
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "TO"))
 		{
 			m_status.txTimeOut = num;	
-			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );
+			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );		
 		}
-		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "MX"))
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "MX"))
 		{
 			m_status.maxNodeNum = num;	
 			PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
+			Flash_Write(num,0);
 		}
-		else if(Is_Include_ThisStr( m_uart1.msgBuff, 0, "RU"))
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "MN"))
+		{
+			m_status.minNodeNum = num;	
+			PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
+			Flash_Write(num,1);
+		}
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "RU"))
 		{				
-			Rute_Cmd(m_uart1.msgBuff);
+			Rute_Cmd(m_uart2.msgBuff);
 		}
-		memset(m_uart1.msgBuff, 0, 30);
+		memset(m_uart2.msgBuff, 0, 30);
 	}
 }
 void Rute_Cmd(char* msg)
