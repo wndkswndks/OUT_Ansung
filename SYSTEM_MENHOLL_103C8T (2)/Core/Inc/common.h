@@ -48,6 +48,15 @@
 #define MOVE_BIT_14	 14
 #define MOVE_BIT_15	 15
 
+
+#define MASTER_DEVICE	 1
+
+
+/*  			define end  			*/
+
+
+
+/*  			enum start  			*/
 typedef enum
 {
 	STEP1,
@@ -82,14 +91,6 @@ typedef enum
 	UNCOMPLETE =0,
 	COMPLETE = 1,
 } COMPLETE_E;
-
-void Main_config();
-void Event_Config(uint16_t* buffCh, uint8_t chAdd);
-/*  			define end  			*/
-
-
-
-/*  			enum start  			*/
 typedef enum
 {
 	SEC_5 =  5000,
@@ -117,7 +118,8 @@ typedef enum
 
 
 /*  			function start  		*/
-
+void Main_config();
+void Event_Config(uint16_t* buffCh, uint8_t chAdd);
 /*  			function end  			*/
 
 extern SPI_HandleTypeDef hspi2;

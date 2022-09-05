@@ -135,6 +135,7 @@ typedef struct
 	uint16_t txTimeOut;
 	uint32_t maxNodeNum;
 	uint32_t minNodeNum;
+	int myNodeNameInt;
 } STATUS_T;
 /*  			stuct end  				*/
 

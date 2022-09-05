@@ -112,48 +112,25 @@ void Pump_Active_Config()
 
 void My_Device()
 {
-	uint8_t sw_flag[4] = {0,};
-	if(!SW1_STATUS)sw_flag[0] =1;
-	else sw_flag[0] =0;
+	char str[5] = {0,};
 
-	if(!SW2_STATUS)sw_flag[1] =1;
-	else sw_flag[1] =0;
-
-	if(!SW3_STATUS)sw_flag[2] =1;
-	else sw_flag[2] =0;
-
-
-	m_status.nodeMaxNum =10;
-	m_status.device = (sw_flag[2]<<2)|(sw_flag[1]<<1)|(sw_flag[0]<<0);
 	
-
-	if(m_status.device==1) memcpy(m_status.toNodeRute, TO_NODE_ROUTE2, strlen(TO_NODE_ROUTE2));
-	if(m_status.device==2) 
+	if(!SW4_STATUS)
 	{
-		memcpy(m_status.myNodeName, NODE1, strlen(NODE1));
-		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+		m_status.device = MASTER_DEVICE;		
+		m_status.maxNodeNum = Flash_Read(0);
+		m_status.minNodeNum = Flash_Read(1);
 	}
-	if(m_status.device==3) 
+	else
 	{
-		memcpy(m_status.myNodeName, NODE2, strlen(NODE2));
-		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
-	}
-	if(m_status.device==4) 
-	{
-		memcpy(m_status.myNodeName, NODE3, strlen(NODE3));
-		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
-	}
-	if(m_status.device==5) 
-	{
-		memcpy(m_status.myNodeName, NODE4, strlen(NODE4));
-		memcpy(m_status.toMasterRute, TO_MASTER_ROUTE2, strlen(TO_MASTER_ROUTE2));
+		m_status.myNodeNameInt = Flash_Read(2);
+		sprintf(str,"%d",m_status.myNodeNameInt);
+		memcpy(m_status.myNodeName,str,strlen(str));
 	}
 
-
-	m_status.maxNodeNum = Flash_Read(0);
-	m_status.minNodeNum = Flash_Read(1);
+	
 	m_status.txTimeOut =  1000;
-	m_status.txWateTime = 700;
+	m_status.txWateTime = 20000;
 
 }
 

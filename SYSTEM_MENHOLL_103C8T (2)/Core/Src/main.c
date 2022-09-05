@@ -43,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-int cnt = 0;
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -62,14 +62,7 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t rxData1[1] = {0,};
-uint8_t rxData2[1] = {0,};
 
-char rxMsg1[30] ={0,};
-uint8_t rxMsg2[30] ={0,};
-
-int httpTemp[8]={100,200,333};
-
-__IO uint32_t PAGES44TO47_value;
 
 /* USER CODE END 0 */
 
@@ -114,12 +107,9 @@ int main(void)
   HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
 
   //GPS_Init();
-  Poling_Str_Add(44);
-  Poling_Str_Add(215);
-  Poling_Str_Add(66);
   My_Device();
   
-  if(m_status.device != 1)
+  if(m_status.device != MASTER_DEVICE)
   {
   	  //Eco_Init();
   	  
@@ -127,9 +117,10 @@ int main(void)
   }	
   
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
-  if(m_sx1276.device == TX_DEVICE)
+  if(m_sx1276.device == MASTER_DEVICE)
   {
 	  SX1276_TX_Entry(16, 2000);
+	  Lora_Send_Msg("Device_start",NONE_VALUE);
   }
   else
   {
@@ -146,7 +137,7 @@ int main(void)
 
   //GPS_config();
 
-  Lora_Send_Msg("Device_start",NONE_VALUE);
+  //Lora_Send_Msg("Device_start",NONE_VALUE);
 
   /* USER CODE END 2 */
 
@@ -298,7 +289,6 @@ uint8_t ddFFlag = 0;
 void Main_config()
 {	
 	static uint32_t startTime = 0;
-	uint8_t eventFlag = 0;
 	uint8_t evntFlag = 0; 
 	//Eco_Config();
 	
@@ -307,24 +297,24 @@ void Main_config()
 	//Pump_Active_Config();
 	//Event_Config(m_sx1276.buffCh3 ,2);
 
-	if(IS_MENHOLL_OPEN == 0 && WATER_SENSOR_HIGH == 0 && WATER_SENSOR_LOW == 0)
-	{
-		ddFFlag = 1;
-	}
-	else
-	{
-		ddFFlag = 0;
-	}
+//	if(IS_MENHOLL_OPEN == 0 && WATER_SENSOR_HIGH == 0 && WATER_SENSOR_LOW == 0)
+//	{
+//		ddFFlag = 1;
+//	}
+//	else
+//	{
+//		ddFFlag = 0;
+//	}
 
 	//O2_Sensor();
-	if(HAL_GetTick()-startTime>5000)
-	{
-		startTime = HAL_GetTick();
-
-		O2_Sensor();
-		
-
-	}
+//	if(HAL_GetTick()-startTime>5000)
+//	{
+//		startTime = HAL_GetTick();
+//
+//		O2_Sensor();
+//		
+//
+//	}
 
 
 //	if(WATER_SENSOR_LOW == 0)
@@ -361,21 +351,26 @@ void Main_config()
 
 
 	
-//	if(HAL_GetTick()-startTime>120000)
-//	{
-//		startTime = HAL_GetTick();	
-//		m_sx1276.buffCh1[0] = startTime/1000;
-//		m_sx1276.buffCh1[1] = startTime/1000+1;
-//		m_sx1276.buffCh1[2] = startTime/1000+2;
-//		m_sx1276.buffCh1[3] = startTime/1000+3;
-//		m_sx1276.buffCh1[4] = startTime/1000+4;
-//		m_sx1276.buffCh1[5] = startTime/1000+5;
-//		m_sx1276.buffCh1[6] = startTime/1000+6;
-//		m_sx1276.buffCh1[7] = startTime/1000+7;
-//
-//		Event_Config(m_sx1276.buffCh1,0);
-//
-//	}
+	//if(HAL_GetTick()-startTime>120000)
+	//{
+		static uint8_t oneF = 1;
+		if(oneF)
+		{
+			oneF = 0;
+		startTime = HAL_GetTick();	
+		m_sx1276.buffCh1[0] = startTime/1000;
+		m_sx1276.buffCh1[1] = startTime/1000+1;
+		m_sx1276.buffCh1[2] = startTime/1000+2;
+		m_sx1276.buffCh1[3] = startTime/1000+3;
+		m_sx1276.buffCh1[4] = startTime/1000+4;
+		m_sx1276.buffCh1[5] = startTime/1000+5;
+		m_sx1276.buffCh1[6] = startTime/1000+6;
+		m_sx1276.buffCh1[7] = startTime/1000+7;
+
+		Event_Config(m_sx1276.buffCh1,0);
+		}
+
+	//}
 }
 
 
@@ -383,13 +378,37 @@ void Main_config()
 void Event_Config(uint16_t* buffCh, uint8_t chAdd)
 {
 	uint8_t evntFlag = 0; 
+	static uint32_t startTime = 0;
+	uint8_t okFlag = 0;
 	
+		startTime = HAL_GetTick();
+
+		while(HAL_GetTick()-startTime<4000)
+		{
+			if(strlen(buffer) != 0)
+			{
+
+					HAL_Delay(m_status.myNodeNameInt *13000);
+					startTime = HAL_GetTick();
+					memset(buffer,0,512);
+			}	
+		}
+		
+		eventFlag = 1;
+		Lora_Send_Msg("1234567", NONE_VALUE); // 더미
+		HAL_Delay(1000);
+		
 		for(int i =0 ;i < 8;i++)
 		{
 			if(buffCh[i] != 0)
 			{
-				Node_event(i + (chAdd*8), buffCh[i]);
+				okFlag = Node_event(i + (chAdd*8), buffCh[i]);
 				HAL_Delay(500);
+				if(okFlag== 2)
+				{
+					i = -1; // 다음턴에에서 0을 만들기 위하여
+					HAL_Delay(m_status.myNodeNameInt *13000);
+				}
 				evntFlag = 1;
 			}
 			
@@ -401,6 +420,7 @@ void Event_Config(uint16_t* buffCh, uint8_t chAdd)
 			HAL_Delay(1000);
 			memset(buffCh, 0 , 8*2);
 		}	
+		eventFlag = 0;
 }
 /* USER CODE END 4 */
 

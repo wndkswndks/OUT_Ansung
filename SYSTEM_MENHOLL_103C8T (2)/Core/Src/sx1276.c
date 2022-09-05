@@ -240,8 +240,8 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 	char event_msg[15] = {0,};
 	uint8_t length = 0;
 
-	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 	strcat(txBuff,"&E");
+	strcat(txBuff,"N");
 	strcat(txBuff,m_status.myNodeName);
 	
 	sprintf(event_msg, "[%d:%u]",num, data);
@@ -270,8 +270,8 @@ void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 	char event_msg_s[7] = {0,};
 	uint8_t length = 0;
 
-	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 	strcat(txBuff,"&E");
+	strcat(txBuff,"N");
 	strcat(txBuff,m_status.myNodeName);
 	strcat(txBuff,"[");
 
@@ -343,8 +343,6 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 }
 
 uint8_t readMag[50] = {0,};
-int no_rx_num[3] = {0,};
-int tmpBuff[5] = {0,};
 
 
 
@@ -383,12 +381,12 @@ void Master_poling()
 	static int nodeNum = 1;
 	char nodeNumStr[4] = {0,};
 	static int txLteMsg[8] = {0,};
+	uint8_t passFlag = 0;
 
 	switch(step)
 	{	
 		case STEP1:
 			LED2_TOGGLE;
-			memcpy(txBuff, m_status.toNodeRute, strlen(m_status.toNodeRute));
 			strcat(txBuff,"N");
 			
 			sprintf(nodeNumStr,"%d",nodeNum);
@@ -404,21 +402,22 @@ void Master_poling()
 		break;
 
 		case STEP2:
-			//SX1276_RX_Packet(buffer);
-
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
 				failRxNum++;
 
 				if(failRxNum>20)
 				{
-//					HAL_Delay(100);
-//					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
-//					txLteMsg[nodeNum+2] = 99;
+					HAL_Delay(100);
+					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
 					failRxNum = 0;
 
-					//nodeNum++;
-					//if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
+					txLteMsg[2] = nodeNum;
+					
+					nodeNum++;
+					if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
+					step = STEP4;
+					return;
 					
 				}
 				step = STEP1;
@@ -427,17 +426,14 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
-//				if(nodeNum == m_status.maxNodeNum)
-//				{
-//					txLteMsg[0]=0;
-//					txLteMsg[1]=m_status.maxNodeNum;
-//					HTTP_Config(4, txLteMsg);
-//					LTE_Init();
-//					memset(txLteMsg, 0, 4*8);
-//
-//				}
-				//nodeNum++;
-				//if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
+
+				if(txLteMsg[0]==0) txLteMsg[0] = nodeNum;
+					
+				txLteMsg[1] = nodeNum;
+
+
+
+
 				
 				failRxNum = 0;
 				successRxNum++;
@@ -450,6 +446,16 @@ void Master_poling()
 				memset(m_uart2.msgBuff,0,30);
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
+
+				if(m_status.maxNodeNum == nodeNum)
+				{
+					txLteMsg[3] = 99;
+					step = STEP4;
+					nodeNum = 1;
+					return;
+				}
+				nodeNum++;
+				
 				step = STEP3;
 			}
 			
@@ -458,6 +464,17 @@ void Master_poling()
 		case STEP3:
 			if(HAL_GetTick() - timestemp >m_status.txWateTime)
 			{
+				step = STEP1;
+			}
+		break;
+
+		case STEP4:
+
+			passFlag = HTTP_Config(4, txLteMsg);
+			if(passFlag) 
+			{
+				LTE_Init();
+				memset(txLteMsg, 0, 4*8);
 				step = STEP1;
 			}
 		break;
@@ -497,6 +514,7 @@ void Master_Event()
 
 				if(ongoingNode != eventNode && eventNode != 0 && ongoingNode != 0 )
 				{
+					memset(buffer,0,512);
 					return;
 				}
 				ongoingNode = eventNode;
@@ -534,6 +552,10 @@ void Master_Event()
 				endFlag = 0;
 				step = STEP2;
 			}
+			else if((timestemp != 0) && (HAL_GetTick()-timestemp >8000))
+			{
+				step = STEP4;
+			}
 		break;
 
 
@@ -553,16 +575,19 @@ void Master_Event()
 		
 		case STEP3:
 			passFlag = HTTP_Config(cannel, eventMsg);
-			if(passFlag) step = STEP4;
+			if(passFlag)
+			{
+				LTE_Init();	
+				LED3_OFF;
+				PCPuts("Cool start \r\n");
+				HAL_Delay(10000);
+				PCPuts("Cool end \r\n");
+				step = STEP4;
+				
+			}
 		break;	
 		
 		case STEP4:
-			LTE_Init();	
-			LED3_OFF;
-			PCPuts("Cool start \r\n");
-			HAL_Delay(15000);
-			PCPuts("Cool end \r\n");
-
 			ongoingNode = 0;
 			timestemp = 0;
 			cannel = 0;
@@ -602,7 +627,7 @@ void Node_Pass()
 	
 	//SX1276_RX_Packet(buffer);
 	if(eventFlag) return;
-	if(Is_Include_ThisStr( buffer, 0, m_status.myNodeName))
+	if(Is_Include_ThisStr( buffer, 0, "N") && Is_Include_ThisStr( buffer, 1, m_status.myNodeName))
 	{
 		
 		if(Is_Include_ThisStr( buffer, 2, "NO")) Node_Nomal_Response2();
@@ -633,48 +658,43 @@ uint8_t Node_event(char   num, uint16_t data)
 {
 	
 	static uint8_t step = STEP1;
-	static int fail_event_num = 0;
+	int fail_event = 0;
 	static uint32_t timestemp = 0;
+	
 
 	while(1)
 	{
 		switch(step)
 		{
-			case STEP1 :
-				eventFlag = 1;
-				Lora_Send_Msg("1234567", NONE_VALUE); // 더미
-				HAL_Delay(1000);
-				step = STEP2;
-			break;
 			
-			case STEP2 :
+			case STEP1 :
 				LED2_TOGGLE;
 				Lora_Event_Send_Msg(num, data); //
 				timestemp = HAL_GetTick();
-				step = STEP3;
+				step = STEP2;
 			break;
 
-			case STEP3 :
+			case STEP2 :
 				if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 				{
-					fail_event_num++;
+					fail_event++;
 
-					if(fail_event_num>20)
+					if(fail_event>5)
 					{
-						fail_event_num = 0;
-						eventFlag = 0;
+						memset(buffer,0,512);
 						step = STEP1;
+						return 2;
 					}
-					step = STEP2;	
+					step = STEP1;	
 				}
-				if(Is_Include_ThisStr( buffer, 0, "&R") && Is_Include_ThisStr( buffer, 2, m_status.myNodeName) )
+				if(Is_Include_ThisStr( buffer, 0, "&R"))
 				{
-					fail_event_num = 0;
-					timestemp = 0;
-					eventFlag = 0;
-					memset(buffer,0,512);
-					step = STEP1;
-					return 1;
+					if(Is_Include_ThisStr( buffer, 3, m_status.myNodeName))
+					{
+						memset(buffer,0,512);
+						step = STEP1;
+						return OK;
+					}
 				}
 			break;
 		}
@@ -762,8 +782,8 @@ void Node_Nomal_Response()
 
 	LED1_TOGGLE;
 	HAL_Delay(LORA_DELAY);
-	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 	strcat(txBuff,MASTER);
+	strcat(txBuff,"N");
 	strcat(txBuff,m_status.myNodeName);
 	strcat(txBuff,"(");
 	strcat(txBuff,m_status.polingDataStr);
@@ -786,8 +806,8 @@ void Node_Nomal_Response2()
 
 	LED1_TOGGLE;
 	HAL_Delay(LORA_DELAY);
-	memcpy(txBuff, m_status.toMasterRute, strlen(m_status.toMasterRute));
 	strcat(txBuff,NODE_LORA_OK);
+	strcat(txBuff,"N");
 	strcat(txBuff,m_status.myNodeName);
 	strcat(txBuff,"(");
 	strcat(txBuff,"OK");
@@ -927,7 +947,7 @@ void SX1276_BurstRead(uint8_t reg, uint8_t* rxBuff, uint8_t length)
 
 void SX1276_Init(uint64_t frequency,uint8_t SF, uint8_t Bw, uint8_t CR, uint8_t CRC_enable)
 {
-	if(m_status.device == 0x01)
+	if(m_status.device == MASTER_DEVICE)
 	{
 		m_sx1276.device = TX_DEVICE;
 	}

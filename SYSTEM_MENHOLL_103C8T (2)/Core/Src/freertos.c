@@ -120,7 +120,7 @@ void MX_FREERTOS_Init(void) {
 
   xTaskCreate(vTask1, "Task 1", 256, NULL, 4, &xTask1Handle);
   //xTaskCreate(vTask2, "Task 2", 128, NULL, 4, &xTask2Handle);
-  if(m_status.device != 0x01)
+  if(m_status.device != MASTER_DEVICE)
   		xTaskCreate(vTask3, "Task 3", 256, NULL, 4, &xTask3Handle);
   		
   		//uxTaskPriorityGet(xTask2Handle);
@@ -152,15 +152,15 @@ void vTask1(void* pvPrameters)
 {
 	while(1)
 	{
-		if(m_status.device == 0x01)
+		if(m_status.device == MASTER_DEVICE)
 		{
 			Master_Pass();
-			Pc_Command_Response();
 		}
-		if(m_status.device != 0x01)
+		if(m_status.device != MASTER_DEVICE)
 		{
 			Node_Pass();
 		}
+		Pc_Command_Response();
 
 	}
 }
@@ -181,7 +181,7 @@ void vTask3(void* pvPrameters)
 	while(1)
 	{
 
-		if(m_status.device != 0x01)
+		if(m_status.device != MASTER_DEVICE)
 		{
 			Main_config();
 		}

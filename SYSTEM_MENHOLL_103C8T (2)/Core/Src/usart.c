@@ -25,10 +25,6 @@
 #include"common.h"
 
 extern uint8_t rxData1[1];
-extern uint8_t rxData2[1];
-
-extern uint8_t rxMsg1[30];
-extern uint8_t rxMsg2[30];
 
 /* USER CODE END 0 */
 
@@ -60,8 +56,10 @@ void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-  if(m_status.device == 1)
+ 
+  if(!SW4_STATUS)
   {
+  	 HAL_Delay(100);
 	 huart1.Init.BaudRate = 115200; 
 	 if (HAL_UART_Init(&huart1) != HAL_OK)
 	 {
@@ -273,6 +271,7 @@ void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	char rxLen = 0;
+	char str[5] = {0,};
 	rxLen = strlen(m_uart2.msgBuff);
 
 	if(rxLen != NULL)
@@ -327,6 +326,15 @@ void Pc_Command_Response()
 			m_status.minNodeNum = num;	
 			PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
 			Flash_Write(num,1);
+		}
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "NO"))
+		{
+			m_status.myNodeNameInt = num;
+			sprintf(str,"%d",num);
+			memset(m_status.myNodeName,0,strlen(m_status.myNodeName));
+			memcpy(m_status.myNodeName,str,strlen(str));
+			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
+			Flash_Write(num,2);
 		}
 		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "RU"))
 		{				

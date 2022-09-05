@@ -103,11 +103,11 @@
 
 
 
-#define NODE0	  	"N0"
-#define NODE1	  	"N1"
-#define NODE2	  	"N2"
-#define NODE3	  	"N3"
-#define NODE4	  	"N4"
+#define NODE0	  	"0"
+#define NODE1	  	"1"
+#define NODE2	  	"2"
+#define NODE3	  	"3"
+#define NODE4	  	"4"
 
 #define MASTER				"&M"
 #define NODE_LORA_OK		"&L"
