@@ -246,6 +246,9 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 	
 	sprintf(event_msg, "[%d:%u]",num, data);
 
+	PCPrintf("event_msg = %s \r\n",event_msg);
+	HAL_Delay(100);
+	
 	strcat(txBuff,event_msg);
 
 	length = strlen(txBuff);
@@ -350,12 +353,14 @@ uint8_t readMag[50] = {0,};
 char bufferCheck[30][20] = {0,};
 char bCnt = 0;
 uint8_t eventFlag = 0;
+uint8_t lteOngoing = 0;
 void Master_Pass()//
 {
 	static uint32_t pre_time = 0;
-	if(HAL_GetTick()-pre_time >500)
+	if(HAL_GetTick()-pre_time >500 && lteOngoing)
 	{
 		LED1_TOGGLE;
+		Lora_Send_Msg("Ongoing",NONE_VALUE);
 		pre_time =HAL_GetTick();
 	}
 	Master_Event();
@@ -497,7 +502,6 @@ void Master_Event()
 	static uint8_t step = STEP1;
 	static uint32_t timestemp = 0;
 	static char endFlag = 0;
-	uint8_t passFlag = 0;
 	switch(step)
 	{
 		case STEP1:
@@ -537,10 +541,8 @@ void Master_Event()
 				
 				HAL_Delay(100);
 				Lora_Send_Msg(txBuff, NONE_VALUE);
-
+	
 				
-				
-//				sscanf(buffer, "&EN%d[%d:%d,%d,%d,%d,%d,%d,%d,]",eventMsg,&cannel, eventMsg+1,eventMsg+2,eventMsg+3,eventMsg+4,eventMsg+5,eventMsg+6,eventMsg+7 );
 				memset(buffer,0,512);
 				
 				
@@ -554,7 +556,7 @@ void Master_Event()
 			}
 			else if((timestemp != 0) && (HAL_GetTick()-timestemp >8000))
 			{
-				step = STEP4;
+				step = STEP5;
 			}
 		break;
 
@@ -574,20 +576,31 @@ void Master_Event()
 		break;	
 		
 		case STEP3:
-			passFlag = HTTP_Config(cannel, eventMsg);
-			if(passFlag)
+			lteOngoing = 1;
+			if(HTTP_Config(cannel, eventMsg))
 			{
 				LTE_Init();	
 				LED3_OFF;
 				PCPuts("Cool start \r\n");
-				HAL_Delay(10000);
-				PCPuts("Cool end \r\n");
+				timestemp = HAL_GetTick();
 				step = STEP4;
 				
 			}
 		break;	
-		
+
 		case STEP4:
+			if(HAL_GetTick()-timestemp >10000)
+			{
+				PCPuts("Cool end \r\n");
+				lteOngoing = 0;
+				step = STEP5;
+			}
+
+		break;	
+
+		
+		
+		case STEP5:
 			ongoingNode = 0;
 			timestemp = 0;
 			cannel = 0;
@@ -681,6 +694,7 @@ uint8_t Node_event(char   num, uint16_t data)
 
 					if(fail_event>5)
 					{
+						PCPuts("No E OUT \r\n");
 						memset(buffer,0,512);
 						step = STEP1;
 						return 2;

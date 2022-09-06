@@ -640,10 +640,10 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 	{
 		PCPrintf("Err step = %d\r\n",step);
 		LTE_Init();
-		HAL_Delay(5000);
+		HAL_Delay(25000);
 		step = STEP1;
 		errCnt++;
-		if(errCnt>4)
+		if(errCnt>1)
 		{
 			Terminal_Send("HTTP Cermunication Err \r\n");
 			errCnt = 0;

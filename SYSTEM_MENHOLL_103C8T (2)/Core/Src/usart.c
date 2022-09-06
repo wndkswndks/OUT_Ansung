@@ -387,6 +387,7 @@ void PCPrintf(char *format, ...)
 	vsprintf(str, format, ap);
 	
 	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
+	HAL_Delay(10);
 
 	va_end(ap);
 	

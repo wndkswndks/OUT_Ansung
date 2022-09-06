@@ -351,12 +351,12 @@ void Main_config()
 
 
 	
-	//if(HAL_GetTick()-startTime>120000)
-	//{
-		static uint8_t oneF = 1;
-		if(oneF)
-		{
-			oneF = 0;
+	if(HAL_GetTick()-startTime>120000)
+	{
+//		static uint8_t oneF = 1;
+//		if(oneF)
+//		{
+//			oneF = 0;
 		startTime = HAL_GetTick();	
 		m_sx1276.buffCh1[0] = startTime/1000;
 		m_sx1276.buffCh1[1] = startTime/1000+1;
@@ -368,59 +368,91 @@ void Main_config()
 		m_sx1276.buffCh1[7] = startTime/1000+7;
 
 		Event_Config(m_sx1276.buffCh1,0);
-		}
+//		}
 
-	//}
+	}
 }
 
 
 
-void Event_Config(uint16_t* buffCh, uint8_t chAdd)
+uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 {
-	uint8_t evntFlag = 0; 
+	uint8_t actionFlag = 0; 
 	static uint32_t startTime = 0;
-	uint8_t okFlag = 0;
+	uint8_t onGoing = 1;
+	static uint8_t step = STEP1;
 	
-		startTime = HAL_GetTick();
 
-		while(HAL_GetTick()-startTime<4000)
+		while(onGoing)
 		{
-			if(strlen(buffer) != 0)
+			switch(step)
 			{
-
-					HAL_Delay(m_status.myNodeNameInt *13000);
+				case STEP1:
+					
 					startTime = HAL_GetTick();
-					memset(buffer,0,512);
-			}	
-		}
-		
-		eventFlag = 1;
-		Lora_Send_Msg("1234567", NONE_VALUE); // 더미
-		HAL_Delay(1000);
-		
-		for(int i =0 ;i < 8;i++)
-		{
-			if(buffCh[i] != 0)
-			{
-				okFlag = Node_event(i + (chAdd*8), buffCh[i]);
-				HAL_Delay(500);
-				if(okFlag== 2)
-				{
-					i = -1; // 다음턴에에서 0을 만들기 위하여
-					HAL_Delay(m_status.myNodeNameInt *13000);
-				}
-				evntFlag = 1;
+					actionFlag = 0;
+					step = STEP2;
+				break;
+				case STEP2:
+					if(strlen(buffer) != 0)
+					{
+
+							//HAL_Delay(m_status.myNodeNameInt *13000);
+							startTime = HAL_GetTick();
+							memset(buffer,0,512);
+					}	
+					if(HAL_GetTick()-startTime>4000+(m_status.myNodeNameInt *1000))
+					{
+						step = STEP3;
+					}
+					
+				break;
+
+				case STEP3:
+					eventFlag = 1;
+					Lora_Send_Msg("1234567", NONE_VALUE); // 더미
+					HAL_Delay(1000);
+					
+					for(int i =0 ;i < 8;i++)
+					{
+						if(buffCh[i] != 0)
+						{
+							actionFlag = 1;
+							if(Node_event(i + (chAdd*8), buffCh[i])==2)
+							{
+								step = STEP1;
+								goto EXIT;
+							}
+							HAL_Delay(100);
+						}
+					}
+					
+					if(actionFlag==1)
+					{
+						if(Node_event(44, 44) == 2)
+						{
+							step = STEP1;
+							goto EXIT;
+						}
+						HAL_Delay(100);
+					}	
+					
+					step = STEP4;
+				break;
+
+				case STEP4:
+					memset(buffCh, 0 , 8*2);
+					eventFlag = 0;
+					step = STEP1;
+					onGoing = 0;
+				break;
+
 			}
-			
+
+			EXIT:
 		}
-		
-		if(evntFlag==1)
-		{
-			Node_event(44, 44);
-			HAL_Delay(1000);
-			memset(buffCh, 0 , 8*2);
-		}	
-		eventFlag = 0;
+
+
 }
 /* USER CODE END 4 */
 
