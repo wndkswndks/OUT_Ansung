@@ -271,7 +271,6 @@ void Pc_Command_Response()
 {
 	uint16_t num = 0;
 	char rxLen = 0;
-	char str[5] = {0,};
 	rxLen = strlen(m_uart2.msgBuff);
 
 	if(rxLen != NULL)
@@ -330,9 +329,11 @@ void Pc_Command_Response()
 		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "NO"))
 		{
 			m_status.myNodeNameInt = num;
-			sprintf(str,"%d",num);
+						
 			memset(m_status.myNodeName,0,strlen(m_status.myNodeName));
-			memcpy(m_status.myNodeName,str,strlen(str));
+			
+			memcpy(m_status.myNodeName,IntToStr(num),strlen(IntToStr(num)));
+			
 			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
 			Flash_Write(num,2);
 		}

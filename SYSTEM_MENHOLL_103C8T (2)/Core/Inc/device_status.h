@@ -13,7 +13,9 @@
 
 /*  			define start  			*/
 
-#define IS_MENHOLL_OPEN			HAL_GPIO_ReadPin(COVER_GPIO_Port, COVER_Pin)
+#define IS_MENHOLL_OPEN1		HAL_GPIO_ReadPin(DOOR1_GPIO_Port, DOOR1_Pin)
+#define IS_MENHOLL_OPEN2		HAL_GPIO_ReadPin(DOOR2_GPIO_Port, DOOR2_Pin)
+#define IS_MENHOLL_OPEN3		HAL_GPIO_ReadPin(DOOR3_GPIO_Port, DOOR3_Pin)
 
 #define WATER_SENSOR_HIGH		HAL_GPIO_ReadPin(WATER_H_GPIO_Port, WATER_H_Pin)
 #define WATER_SENSOR_LOW		HAL_GPIO_ReadPin(WATER_L_GPIO_Port, WATER_L_Pin)
@@ -108,6 +110,7 @@ typedef enum
 	EVENT_PUMPBETTERY,		
 	EVENT_MENHOLL,			
 	EVENT_PUMPACTIVE,			
+	EVENT_O2,
 } EVENT_E;
 /*  			enum end  				*/
 
@@ -154,6 +157,8 @@ void Led_Toggle_Config();
 void MX_IWDG_Init(void);
 void Flash_Write(uint16_t data, uint16_t add);
 uint32_t Flash_Read(uint16_t add);
+char* IntToStr(int data);
+uint8_t Get_Size(uint16_t* buff);
 
 
 /*  			function end  			*/

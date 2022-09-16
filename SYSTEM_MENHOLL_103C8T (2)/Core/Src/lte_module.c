@@ -751,16 +751,14 @@ uint8_t OK_Check()
 void Passing_field(uint8_t num, int data, char* str)
 {
 	char numstr[2] = {0,};
-	char datastr[10] = {0,};
 	
 	numstr[0] = num+'0';
-	sprintf(datastr,"%d",data);
 	
 	strcat(str,"&");
 	strcat(str,"field");
 	strcat(str,numstr);
 	strcat(str,"=");
-	strcat(str,datastr);
+	strcat(str,IntToStr(data));
 }
 void MQTT_Config()
 {

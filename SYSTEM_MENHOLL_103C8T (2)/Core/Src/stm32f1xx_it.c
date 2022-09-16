@@ -43,7 +43,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern uint8_t loraSand;
 extern char buffer[512];
 int loraRxCnt = 0;
 extern char bufferCheck[30][20];
@@ -174,7 +173,7 @@ void DebugMon_Handler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-	if(loraSand != 1)
+	if(m_sx1276.direction!= TX_MODE)
 	{
 		loraRxCnt++;
 		SX1276_RX_Packet(buffer);

@@ -6,18 +6,14 @@
 ECO_T m_eco;
 
 
-extern uint32_t pre_mytime;
-extern uint32_t my_termtime;
 
 void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 {
-	static uint32_t startTime = 0;
 
 	float MQ2_ratio = 0.0;
 	float MQ135_ratio = 0.0;
 	
 	MQ2_ratio = Get_MQ_Sensor(AIN0_GND, m_eco.MQ2.R0);
-	MQ135_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ135.R0);
 	
 	MQ_Config(&m_eco.MQ2.H2,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.LPG,MQ2_ratio);
@@ -27,6 +23,7 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ2.ALCOHOL,MQ2_ratio);
 	MQ_Config(&m_eco.MQ2.SMOKE,MQ2_ratio);
 
+	MQ135_ratio = Get_MQ_Sensor(AIN1_GND, m_eco.MQ135.R0);
 	MQ_Config(&m_eco.MQ135.ALCOHOL,MQ135_ratio);
 	MQ_Config(&m_eco.MQ135.CO2,MQ135_ratio);
 	MQ_Config(&m_eco.MQ135.AMMONIA,MQ135_ratio);
@@ -36,25 +33,8 @@ void Eco_Config()// 실제값 : 디버깅값 + 0.0103(전압값) - 0.0717
 	MQ_Config(&m_eco.MQ135.ACETONE,MQ135_ratio);	
 
 	
-	Event_Config(m_sx1276.buffCh1 ,0);
-
-	
+	Event_Config(m_sx1276.buffCh1 ,0);	
 	Event_Config(m_sx1276.buffCh2 ,1);
-
-
-
-
-	
-//	for(int i =0 ;i < 8;i++)
-//	{
-//		if(m_sx1276.buffCh2[i] != 0)
-//		{
-//			Node_event2(2, m_sx1276.buffCh2);
-//			memset(m_sx1276.buffCh2, 0, 8*4);			
-//		}
-//	}
-
-	
 
 	
 //	ADC_to_Volt(AIN0_GND);
@@ -305,16 +285,18 @@ float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)
 }
 
 
-char ccfsBuff[50] = {0,};
-int qqwe = 0;
 void O2_Sensor()
 {
+	int O2 = 0;
 	memset(rxBuff1,0,1300);
 	rxCnt1 = 0;
 	HAL_UART_Transmit_IT(&huart1, "%\r\n", 3);
 	HAL_Delay(1000);
-	qqwe = 0;
-	qqwe = atoi((char*)(rxBuff1+3)); 
+	O2 = atoi((char*)(rxBuff1+3)); 
+	if(O2 < 19)
+	{
+		m_sx1276.buffCh3[EVENT_O2%8]= 1; 
+	}
 	HAL_UART_Transmit_IT(&huart2, rxBuff1, strlen(rxBuff1));
 	HAL_Delay(100);
 }

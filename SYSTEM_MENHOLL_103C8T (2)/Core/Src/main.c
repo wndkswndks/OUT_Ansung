@@ -62,8 +62,8 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t rxData1[1] = {0,};
-
-
+uint16_t rtyrtt[10] = {111,222,333};
+int rrffgt = 0;
 /* USER CODE END 0 */
 
 /**
@@ -101,17 +101,20 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
-  //MX_IWDG_Init();
+ // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart1, rxData1, 1);
   HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
 
+
+   rrffgt = sizeof(rtyrtt);//strlen((char*)rtyrtt);
+   
   //GPS_Init();
   My_Device();
   
   if(m_status.device != MASTER_DEVICE)
   {
-  	  //Eco_Init();
+  	  Eco_Init();
   	  
 	  HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
   }	
@@ -289,68 +292,29 @@ uint8_t ddFFlag = 0;
 void Main_config()
 {	
 	static uint32_t startTime = 0;
+
+	if(HAL_GetTick()-startTime>60000)
+	{
+		Eco_Config();
+		
+		Battery_Config();
+		Menholl_Open_Config(); 
+		Pump_Active_Config();
+		O2_Sensor();
+		Event_Config(m_sx1276.buffCh3 ,2);
+		
+		startTime = HAL_GetTick();
+
+	}
+
+
+	
+}
+
+void Test_Event()
+{
+	static uint32_t startTime = 0;
 	uint8_t evntFlag = 0; 
-	//Eco_Config();
-	
-	//Battery_Config();
-	//Menholl_Open_Config(); 
-	//Pump_Active_Config();
-	//Event_Config(m_sx1276.buffCh3 ,2);
-
-//	if(IS_MENHOLL_OPEN == 0 && WATER_SENSOR_HIGH == 0 && WATER_SENSOR_LOW == 0)
-//	{
-//		ddFFlag = 1;
-//	}
-//	else
-//	{
-//		ddFFlag = 0;
-//	}
-
-	//O2_Sensor();
-//	if(HAL_GetTick()-startTime>5000)
-//	{
-//		startTime = HAL_GetTick();
-//
-//		O2_Sensor();
-//		
-//
-//	}
-
-
-//	if(WATER_SENSOR_LOW == 0)
-//	{
-//		eventFlag = 1;
-//	}
-//	if(eventFlag)
-//	{
-//
-//
-//		m_sx1276.buffCh1[0] = 111;
-//		m_sx1276.buffCh1[1] = 222;
-//		m_sx1276.buffCh1[2] = 0;
-//		m_sx1276.buffCh1[3] = 444;
-//		m_sx1276.buffCh1[4] = 555;
-//		m_sx1276.buffCh1[5] = 0;
-//		m_sx1276.buffCh1[6] = 666;
-//		
-//		m_sx1276.buffCh2[0] = 11;
-//		m_sx1276.buffCh2[1] = 22;
-//		m_sx1276.buffCh2[2] = 0;
-//		m_sx1276.buffCh2[3] = 44;
-//		m_sx1276.buffCh2[4] = 55;
-//		m_sx1276.buffCh2[5] = 0;
-//		m_sx1276.buffCh2[6] = 66;
-//
-//		Event_Config(m_sx1276.buffCh1,0);
-//
-//		Event_Config(m_sx1276.buffCh2,1);
-//		
-//
-//		eventFlag = 0;
-//	}
-
-
-	
 	if(HAL_GetTick()-startTime>120000)
 	{
 //		static uint8_t oneF = 1;
@@ -369,39 +333,35 @@ void Main_config()
 
 		Event_Config(m_sx1276.buffCh1,0);
 //		}
-
 	}
 }
 
-
-
 uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 {
-	uint8_t actionFlag = 0; 
 	static uint32_t startTime = 0;
 	uint8_t onGoing = 1;
+	int delay = 0;
 	static uint8_t step = STEP1;
 	
-
+	if(Get_Size(buffCh) == 0) return 0;
+	
 		while(onGoing)
 		{
 			switch(step)
 			{
 				case STEP1:
-					
+					eventFlag = 1;
 					startTime = HAL_GetTick();
-					actionFlag = 0;
+					delay = rand()%5;
 					step = STEP2;
 				break;
 				case STEP2:
 					if(strlen(buffer) != 0)
 					{
-
-							//HAL_Delay(m_status.myNodeNameInt *13000);
-							startTime = HAL_GetTick();
-							memset(buffer,0,512);
+						startTime = HAL_GetTick();
+						memset(buffer,0,512);
 					}	
-					if(HAL_GetTick()-startTime>4000+(m_status.myNodeNameInt *1000))
+					if(HAL_GetTick()-startTime>4000+(delay *1000))
 					{
 						step = STEP3;
 					}
@@ -409,15 +369,14 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 				break;
 
 				case STEP3:
-					eventFlag = 1;
-					Lora_Send_Msg("1234567", NONE_VALUE); // ÎçîÎØ∏
+					
+					Lora_Send_Msg("1234567", NONE_VALUE); // ?çîÎØ?
 					HAL_Delay(1000);
 					
 					for(int i =0 ;i < 8;i++)
 					{
 						if(buffCh[i] != 0)
 						{
-							actionFlag = 1;
 							if(Node_event(i + (chAdd*8), buffCh[i])==2)
 							{
 								step = STEP1;
@@ -426,16 +385,13 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 							HAL_Delay(100);
 						}
 					}
-					
-					if(actionFlag==1)
+
+					if(Node_event(MSG_END, MSG_END) == 2)
 					{
-						if(Node_event(44, 44) == 2)
-						{
-							step = STEP1;
-							goto EXIT;
-						}
-						HAL_Delay(100);
-					}	
+						step = STEP1;
+						goto EXIT;
+					}
+					HAL_Delay(100);
 					
 					step = STEP4;
 				break;

@@ -232,7 +232,6 @@ void Lora_config()
 
 
 
-uint8_t loraSand = 0;
 
 void Lora_Event_Send_Msg(char      num, uint16_t data)
 {
@@ -253,17 +252,15 @@ void Lora_Event_Send_Msg(char      num, uint16_t data)
 
 	length = strlen(txBuff);
 
-	loraSand = 1;
+	m_sx1276.direction = TX_MODE;
 	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
 			
 	SX1276_TX_Packet(txBuff,length,2000);
 	SX1276_Change_rx_tx(RX_DEVICE);
-	loraSand = 0;
+	m_sx1276.direction = RX_MODE;
 	
 }
-uint32_t pre_mytime = 0;
-uint32_t my_termtime = 0;
 char txBuffCpy[80] = {0,};
 
 void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
@@ -278,15 +275,13 @@ void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 	strcat(txBuff,m_status.myNodeName);
 	strcat(txBuff,"[");
 
-	sprintf(event_msg_s,"%d",ch);
-	strcat(txBuff,event_msg_s);
+	strcat(txBuff,IntToStr(ch));
 
 	strcat(txBuff,":");
 
 	for(int i =0 ;i < 7;i++)
 	{
-		sprintf(event_msg_s,"%u",buff[i]);
-		strcat(txBuff,event_msg_s);
+		strcat(txBuff,IntToStr(buff[i]));
 		strcat(txBuff,",");
 	}
 	strcat(txBuff,"]");
@@ -303,13 +298,13 @@ void Lora_Event_Send_Msg2(char       ch, uint16_t* buff)
 
 	length = strlen(txBuff);
 	//pre_mytime = HAL_GetTick();
-	loraSand = 1;
+	m_sx1276.direction = TX_MODE;
 	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
 			
 	SX1276_TX_Packet(txBuff,length,2000);
 	SX1276_Change_rx_tx(RX_DEVICE);
-	loraSand = 0;
+	m_sx1276.direction = RX_MODE;
 	//my_termtime = HAL_GetTick() - pre_mytime;
 	
 }
@@ -332,7 +327,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 		length = sprintf(txBuff, "%s%u",msg, data);
 	}
 
-	loraSand = 1;
+	m_sx1276.direction = TX_MODE;
 	preT = HAL_GetTick();
 	SX1276_Change_rx_tx(TX_DEVICE);
 	SX1276_TX_Entry(length, 2000);
@@ -340,7 +335,7 @@ void Lora_Send_Msg(char* msg, uint16_t data)
 	//HAL_Delay(20);
 	SX1276_Change_rx_tx(RX_DEVICE);
 	termT = HAL_GetTick() - preT;
-	loraSand = 0;
+	m_sx1276.direction = RX_MODE;
 	
 	
 }
@@ -378,49 +373,42 @@ void Master_poling()
 	uint32_t callbackTime= 0;
 	static uint32_t timestemp = 0;
 	char txBuff[20] = {0,};
-	static int successRxNum = 0;
-	static int successRxBuff[8] = {0,};
-	static int failRxNum = 0;
-	static int txRxNum = 0;
+	static int failRxCnt = 0;
 	static int txRxBuff[8] = {0,};
-	static int nodeNum = 1;
-	char nodeNumStr[4] = {0,};
+	static int successRxBuff[8] = {0,};
+	static int nodeNum = 1;//m_status.minNodeNum;
 	static int txLteMsg[8] = {0,};
-	uint8_t passFlag = 0;
 
 	switch(step)
 	{	
 		case STEP1:
 			LED2_TOGGLE;
-			strcat(txBuff,"N");
 			
-			sprintf(nodeNumStr,"%d",nodeNum);
-			strcat(txBuff,nodeNumStr);
+			strcat(txBuff, "N");
+			strcat(txBuff, IntToStr(nodeNum));
+			strcat(txBuff, "NO");	
 			
-			strcat(txBuff,"NO");	
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
-			txRxNum++;
 			txRxBuff[nodeNum]++;
-			
 		break;
 
 		case STEP2:
 			if(HAL_GetTick() - timestemp >m_status.txTimeOut)
 			{
-				failRxNum++;
+				failRxCnt++;
 
-				if(failRxNum>20)
+				if(failRxCnt>20)
 				{
 					HAL_Delay(100);
 					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
-					failRxNum = 0;
+					failRxCnt = 0;
 
 					txLteMsg[2] = nodeNum;
 					
 					nodeNum++;
-					if(nodeNum>m_status.maxNodeNum) nodeNum = 1;
+					if(nodeNum>m_status.maxNodeNum) nodeNum = m_status.minNodeNum;
 					step = STEP4;
 					return;
 					
@@ -431,20 +419,22 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
+				int checkNode = 0;
+				sscanf(buffer,"&LN%d(OK)",&checkNode);
 
+
+				if((checkNode>m_status.maxNodeNum)&&(checkNode<m_status.minNodeNum))
+				{
+					memset(buffer,0,512);
+					return;
+				}
+				
 				if(txLteMsg[0]==0) txLteMsg[0] = nodeNum;
 					
 				txLteMsg[1] = nodeNum;
-
-
-
-
-				
-				failRxNum = 0;
-				successRxNum++;
+			
 				successRxBuff[nodeNum]++;
 				callbackTime = HAL_GetTick() - timestemp;
-				//sscanf(buffer, "&MN0(%d,%d,%d,)", tmpBuff, tmpBuff+1, tmpBuff+2);
 				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[nodeNum], successRxBuff[nodeNum], callbackTime);
 				memcpy(readMag,buffer,50);
 
@@ -456,14 +446,13 @@ void Master_poling()
 				{
 					txLteMsg[3] = 99;
 					step = STEP4;
-					nodeNum = 1;
+					nodeNum = m_status.minNodeNum;
 					return;
 				}
 				nodeNum++;
 				
 				step = STEP3;
 			}
-			
 		break;
 
 		case STEP3:
@@ -474,9 +463,7 @@ void Master_poling()
 		break;
 
 		case STEP4:
-
-			passFlag = HTTP_Config(4, txLteMsg);
-			if(passFlag) 
+			if(HTTP_Config(4, txLteMsg) == COMPLETE) 
 			{
 				LTE_Init();
 				memset(txLteMsg, 0, 4*8);
@@ -492,8 +479,6 @@ void Master_Event()
 	static char cannel = 0;
 	static int eventMsg[8] = {0,};
 	char txBuff[8] = {0,};
-	char numBuff[8] = {0,};
-	int evnetBuff[8] = {0,};
 	int eventNode = 0;
 	static int ongoingNode = 0;
 	int rawEventNum = 0;
@@ -516,13 +501,19 @@ void Master_Event()
 				
 				sscanf(buffer, "&EN%d[%d:%d]",&eventNode,&rawEventNum, &eventData );
 
+				if((eventNode>m_status.maxNodeNum)&&(eventNode<m_status.minNodeNum))
+				{
+					memset(buffer,0,512);
+					return;
+				}
+
 				if(ongoingNode != eventNode && eventNode != 0 && ongoingNode != 0 )
 				{
 					memset(buffer,0,512);
 					return;
 				}
 				ongoingNode = eventNode;
-				if(rawEventNum==44 && eventData ==44)
+				if(rawEventNum==MSG_END && eventData ==MSG_END)
 				{
 					endFlag = 1;
 				}
@@ -534,10 +525,9 @@ void Master_Event()
 				}
 				
 				eventMsg[0] = eventNode;
-				strcat(txBuff,"&R");
-				strcat(txBuff,"N");
-				sprintf(numBuff ,"%d",eventNode );
-				strcat(txBuff,numBuff);
+				strcat(txBuff, "&R");
+				strcat(txBuff, "N");
+				strcat(txBuff, IntToStr(eventNode));
 				
 				HAL_Delay(100);
 				Lora_Send_Msg(txBuff, NONE_VALUE);
@@ -554,7 +544,7 @@ void Master_Event()
 				endFlag = 0;
 				step = STEP2;
 			}
-			else if((timestemp != 0) && (HAL_GetTick()-timestemp >8000))
+			else if((timestemp != 0) && (HAL_GetTick()-timestemp >8000))//time out reset
 			{
 				step = STEP5;
 			}
@@ -827,7 +817,7 @@ void Node_Nomal_Response2()
 	strcat(txBuff,"OK");
 	strcat(txBuff,")");
 	memcpy(readMag,txBuff,50);
-	while(loraSand ==1);
+	while(m_sx1276.direction ==TX_MODE);
 	Lora_Send_Msg(txBuff, NONE_VALUE);
 	
 

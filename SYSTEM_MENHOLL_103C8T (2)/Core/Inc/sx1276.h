@@ -80,7 +80,6 @@
 
 
 #define GET_IO0				HAL_GPIO_ReadPin(IO0_GPIO_Port, IO0_Pin)
-#define GET_DEVICE_SELECT	HAL_GPIO_ReadPin(DIP_IN_GPIO_Port, DIP_IN_Pin)
 
 #define RSSI_LF_CONSTANS	164
 #define RSSI_HF_CONSTANS	157
@@ -173,6 +172,13 @@ typedef enum
 	RX_DEVICE,
 	TX_DEVICE,
 } DEVICE_E;
+
+typedef enum
+{
+	RX_MODE,
+	TX_MODE,
+} DIR_E;
+
 typedef enum
 {
 	VALUE_E,
@@ -679,6 +685,7 @@ typedef struct
 	uint16_t buffCh1[8];
 	uint16_t buffCh2[8];
 	uint16_t buffCh3[8];
+	uint8_t direction;
 
 } SX1276_T;
 

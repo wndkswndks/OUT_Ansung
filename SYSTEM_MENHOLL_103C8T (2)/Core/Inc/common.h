@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdarg.h> 
+#include <time.h> 
+
 
 #include"main.h"
 #include"device_status.h"
@@ -51,7 +53,7 @@
 
 #define MASTER_DEVICE	 1
 
-
+#define MSG_END		44
 /*  			define end  			*/
 
 
