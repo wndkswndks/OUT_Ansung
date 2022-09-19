@@ -62,8 +62,7 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t rxData1[1] = {0,};
-uint16_t rtyrtt[10] = {111,222,333};
-int rrffgt = 0;
+int dddata[8] = {1,22,33,44,55,66,77};
 /* USER CODE END 0 */
 
 /**
@@ -103,20 +102,22 @@ int main(void)
   MX_USART1_UART_Init();
  // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart1, rxData1, 1);
-  HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
 
 
-   rrffgt = sizeof(rtyrtt);//strlen((char*)rtyrtt);
    
-  //GPS_Init();
   My_Device();
+
+  HAL_UART_Receive_IT(&huart1, rxData1, 1);
+  
+  if(m_status.gpsEnable)GPS_Init();
+  else Debug_Init();
+
   
   if(m_status.device != MASTER_DEVICE)
   {
   	  Eco_Init();
   	  
-	  HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
+	  if(m_status.o2Enable)HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
   }	
   
   SX1276_Init(922000000, SF_VALUE, KHZ_125, RATE_4_5, CRC_ENABLE);
@@ -132,16 +133,14 @@ int main(void)
 
   LTE_Init();
 
-   
 
+  if(m_status.gpsEnable)GPS_config();
 
-  //MQTT_Config();
-  //HTTP_Config(1,httpTemp );
-
-  //GPS_config();
-
-  //Lora_Send_Msg("Device_start",NONE_VALUE);
-
+  while(1)
+  {
+  	if(HTTP_Config(1, dddata)==COMPLETE)break;
+  }
+  
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -293,19 +292,20 @@ void Main_config()
 {	
 	static uint32_t startTime = 0;
 
-	if(HAL_GetTick()-startTime>60000)
-	{
+//	if(HAL_GetTick()-startTime>60000)
+//	{
 		Eco_Config();
 		
-		Battery_Config();
+		if(m_status.adcEnable) Battery_Config();
 		Menholl_Open_Config(); 
-		Pump_Active_Config();
-		O2_Sensor();
+		//Pump_Active_Config();
+		if(m_status.o2Enable) O2_Sensor();
 		Event_Config(m_sx1276.buffCh3 ,2);
+		//HAL_Delay(2000);
 		
-		startTime = HAL_GetTick();
+//		startTime = HAL_GetTick();
+//	}
 
-	}
 
 
 	
@@ -321,7 +321,7 @@ void Test_Event()
 //		if(oneF)
 //		{
 //			oneF = 0;
-		startTime = HAL_GetTick();	
+			
 		m_sx1276.buffCh1[0] = startTime/1000;
 		m_sx1276.buffCh1[1] = startTime/1000+1;
 		m_sx1276.buffCh1[2] = startTime/1000+2;
@@ -332,6 +332,7 @@ void Test_Event()
 		m_sx1276.buffCh1[7] = startTime/1000+7;
 
 		Event_Config(m_sx1276.buffCh1,0);
+		startTime = HAL_GetTick();
 //		}
 	}
 }

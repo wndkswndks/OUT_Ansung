@@ -124,6 +124,9 @@ typedef struct
 	uint8_t MenhollOpenFlag;
 	uint8_t PumpActiveFlag;
 	uint8_t device;
+	uint8_t o2Enable;
+	uint8_t adcEnable;
+	uint8_t gpsEnable;
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	
@@ -133,11 +136,11 @@ typedef struct
 	char toMasterRute[20];
 	char myNodeName[20];
 	char polingDataStr[40];
-	char nodeNum[40];
 	uint16_t txWateTime;
 	uint16_t txTimeOut;
 	uint32_t maxNodeNum;
 	uint32_t minNodeNum;
+	int nodeNum;
 	int myNodeNameInt;
 } STATUS_T;
 /*  			stuct end  				*/

@@ -358,12 +358,10 @@ void Master_Pass()//
 		Lora_Send_Msg("Ongoing",NONE_VALUE);
 		pre_time =HAL_GetTick();
 	}
-	Master_Event();
+	
+	if(eventFlag !=2)Master_Event();
 
-	if(eventFlag==1) return;
-
-
-	//Master_poling();	
+	//if(eventFlag !=1)Master_poling();	
 
 }
 
@@ -376,7 +374,7 @@ void Master_poling()
 	static int failRxCnt = 0;
 	static int txRxBuff[8] = {0,};
 	static int successRxBuff[8] = {0,};
-	static int nodeNum = 1;//m_status.minNodeNum;
+	//static int nodeNum = 1;
 	static int txLteMsg[8] = {0,};
 
 	switch(step)
@@ -385,13 +383,13 @@ void Master_poling()
 			LED2_TOGGLE;
 			
 			strcat(txBuff, "N");
-			strcat(txBuff, IntToStr(nodeNum));
+			strcat(txBuff, IntToStr(m_status.nodeNum));
 			strcat(txBuff, "NO");	
 			
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
-			txRxBuff[nodeNum]++;
+			txRxBuff[m_status.nodeNum]++;
 		break;
 
 		case STEP2:
@@ -402,13 +400,13 @@ void Master_poling()
 				if(failRxCnt>20)
 				{
 					HAL_Delay(100);
-					PCPrintf("Lora fail node : %d  \r\n", nodeNum);
+					PCPrintf("Lora fail node : %d  \r\n", m_status.nodeNum);
 					failRxCnt = 0;
 
-					txLteMsg[2] = nodeNum;
+					txLteMsg[2] = m_status.nodeNum;
 					
-					nodeNum++;
-					if(nodeNum>m_status.maxNodeNum) nodeNum = m_status.minNodeNum;
+					m_status.nodeNum++;
+					if(m_status.nodeNum>m_status.maxNodeNum) m_status.nodeNum = m_status.minNodeNum;
 					step = STEP4;
 					return;
 					
@@ -429,27 +427,28 @@ void Master_poling()
 					return;
 				}
 				
-				if(txLteMsg[0]==0) txLteMsg[0] = nodeNum;
+				if(txLteMsg[0]==0) txLteMsg[0] = m_status.nodeNum;
 					
-				txLteMsg[1] = nodeNum;
+				txLteMsg[1] = m_status.nodeNum;
 			
-				successRxBuff[nodeNum]++;
+				successRxBuff[m_status.nodeNum]++;
 				callbackTime = HAL_GetTick() - timestemp;
-				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[nodeNum], successRxBuff[nodeNum], callbackTime);
+				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[m_status.nodeNum], successRxBuff[m_status.nodeNum], callbackTime);
 				memcpy(readMag,buffer,50);
 
 				memset(m_uart2.msgBuff,0,30);
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
 
-				if(m_status.maxNodeNum == nodeNum)
+				if(m_status.maxNodeNum == m_status.nodeNum)
 				{
 					txLteMsg[3] = 99;
 					step = STEP4;
-					nodeNum = m_status.minNodeNum;
+					m_status.nodeNum = m_status.minNodeNum;
+					eventFlag = 2;
 					return;
 				}
-				nodeNum++;
+				m_status.nodeNum++;
 				
 				step = STEP3;
 			}
@@ -465,6 +464,7 @@ void Master_poling()
 		case STEP4:
 			if(HTTP_Config(4, txLteMsg) == COMPLETE) 
 			{
+				eventFlag = 0;
 				LTE_Init();
 				memset(txLteMsg, 0, 4*8);
 				step = STEP1;

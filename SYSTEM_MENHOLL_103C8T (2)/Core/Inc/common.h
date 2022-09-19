@@ -122,6 +122,8 @@ typedef enum
 /*  			function start  		*/
 void Main_config();
 uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd);
+void Test_Event();
+
 /*  			function end  			*/
 
 extern SPI_HandleTypeDef hspi2;

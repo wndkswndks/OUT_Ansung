@@ -474,7 +474,8 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 	static uint32_t preTime = 0;
 	static uint8_t step = STEP1;
 	char WApiKey[18] = {0,};
-	char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
+	//char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
+	char* WApiKey1  = "HFNLM5Z5FUBHJ5UV";//test1
 	char* WApiKey2  = "YHS7XLM9Y6NJWNOF";//test2
 	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
 	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
@@ -569,7 +570,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 				}
 				
 				char sendMsg[200] = "GET /update";
-				//int testData[10]={110,220,330,440,550,660};
+				
 
 				strcat(sendMsg,"?api_key=");
 				strcat(sendMsg,WApiKey);
@@ -732,7 +733,7 @@ uint8_t OK_Check()
 		if(ptr !=NULL)
 		{
 			Terminal_Send("GOOD CMD!!\r\n");
-			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			//HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000); //¿Ã∞≈ ªÏ∏Æ∏È UART2 ∏¿≈ ¿Ã∞®
 			Rx_Buff1Clear();
 			return OK;
 		}

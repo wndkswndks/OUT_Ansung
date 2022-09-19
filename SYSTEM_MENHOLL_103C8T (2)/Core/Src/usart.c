@@ -224,9 +224,10 @@ UART_T m_uart2;
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	
-	if(huart == &huart2) //GPS_UART_CallBack();
+	if(huart == &huart2) 
 	{
-		Uart_Rx_Parssing(&huart2, &m_uart2);
+		if(m_status.gpsEnable) GPS_UART_CallBack();
+		else Uart_Rx_Parssing(&huart2, &m_uart2);
 	}
 
 	
@@ -265,7 +266,7 @@ void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
 		}
 }
 
-
+char ssspringj[30] = {0,};
 
 void Pc_Command_Response()
 {
@@ -336,6 +337,10 @@ void Pc_Command_Response()
 			
 			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
 			Flash_Write(num,2);
+		}
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "AK"))
+		{
+			sscanf(m_uart2.msgBuff, "AK_%s",ssspringj );
 		}
 		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "RU"))
 		{				
@@ -427,5 +432,8 @@ uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str)
 	}
 }
 
-
+void Debug_Init()
+{
+	HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
+}
 /* USER CODE END 1 */
