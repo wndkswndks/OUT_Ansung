@@ -266,12 +266,14 @@ void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
 		}
 }
 
-char ssspringj[30] = {0,};
 
 void Pc_Command_Response()
 {
+	char str[30] = {0,};
 	uint16_t num = 0;
 	char rxLen = 0;
+	uint8_t errFlag = 0;
+	
 	rxLen = strlen(m_uart2.msgBuff);
 
 	if(rxLen != NULL)
@@ -338,9 +340,19 @@ void Pc_Command_Response()
 			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
 			Flash_Write(num,2);
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "AK"))
-		{
-			sscanf(m_uart2.msgBuff, "AK_%s",ssspringj );
+		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "A"))
+		{			
+			char apiNum = 0;
+			sscanf(m_uart2.msgBuff, "A%d_%s",&apiNum, str );
+			switch(apiNum)
+			{
+				case 1:	API_Write(str, 0, m_status.apiKey1);  break;
+				case 2:	API_Write(str, 1, m_status.apiKey2);  break;
+				case 3:	API_Write(str, 2, m_status.apiKey3);  break;
+				case 4:	API_Write(str, 3, m_status.apiKey4);  break;
+			}
+			
+		
 		}
 		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "RU"))
 		{				
@@ -393,7 +405,7 @@ void PCPrintf(char *format, ...)
 	vsprintf(str, format, ap);
 	
 	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
-	HAL_Delay(10);
+	HAL_Delay(100);
 
 	va_end(ap);
 	
@@ -436,4 +448,6 @@ void Debug_Init()
 {
 	HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
 }
+
+
 /* USER CODE END 1 */

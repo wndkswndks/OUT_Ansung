@@ -62,7 +62,9 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t rxData1[1] = {0,};
-int dddata[8] = {1,22,33,44,55,66,77};
+//int dddata[8] = {1,2,3,4,5,6,7,8};
+int dddata[8] = {0,0,0,0,0,0,0,0};
+
 /* USER CODE END 0 */
 
 /**
@@ -138,7 +140,7 @@ int main(void)
 
   while(1)
   {
-  	if(HTTP_Config(1, dddata)==COMPLETE)break;
+  	if(HTTP_Config(3, dddata)==COMPLETE)break;
   }
   
   /* USER CODE END 2 */

@@ -474,8 +474,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 	static uint32_t preTime = 0;
 	static uint8_t step = STEP1;
 	char WApiKey[18] = {0,};
-	//char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
-	char* WApiKey1  = "HFNLM5Z5FUBHJ5UV";//test1
+	char* WApiKey1  = "R23GE8B1UPOM1RR4";//test1
 	char* WApiKey2  = "YHS7XLM9Y6NJWNOF";//test2
 	char* WApiKey3  = "CS0K66RJZJILHUM1";//test3
 	char* WApiKey4  = "PVAEO8IIU8VVDXJZ"; //test4
@@ -563,10 +562,10 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			{
 				switch(channel)
 				{
-					case 1 :  memcpy(WApiKey, WApiKey1,16 );  break;
-					case 2 :  memcpy(WApiKey, WApiKey2,16 );  break;
-					case 3 :  memcpy(WApiKey, WApiKey3,16 );  break;
-					case 4 :  memcpy(WApiKey, WApiKey4,16 );  break;
+					case 1 :  memcpy(WApiKey, m_status.apiKey1,16 );  break;
+					case 2 :  memcpy(WApiKey, m_status.apiKey2,16 );  		  break;
+					case 3 :  memcpy(WApiKey, m_status.apiKey3,16 );  		  break;
+					case 4 :  memcpy(WApiKey, m_status.apiKey4,16 );  		  break;
 				}
 				
 				char sendMsg[200] = "GET /update";
@@ -715,6 +714,68 @@ void HexString_to_String()
 
 	//ddd = HEX_TO_ASKI('C');
 }
+
+void API_Read()
+{
+	char ptr[20] = {0,};
+
+	for(int j =0 ;j < 4;j++)
+	{
+		for(int i =0 ;i < 16;i++)
+		{
+			ptr[i] = (char)Flash_Read(((3+j*16)+i)); 
+			HAL_Delay(10);
+			//if(j==3&&i==12)break;
+		}
+		
+		PCPrintf("API %d = %s \r\n",j+1,ptr );
+		switch(j)
+		{
+			case 0: memcpy(m_status.apiKey1, ptr,16); break;
+			case 1: memcpy(m_status.apiKey2, ptr,16); break;
+			case 2: memcpy(m_status.apiKey3, ptr,16); break;
+			case 3: memcpy(m_status.apiKey4, ptr,16); break;
+		}
+		memset(ptr, 0, 20);
+	}
+
+	HAL_Delay(100);
+}
+void API_Write(char* str, uint8_t add, char* buff)
+{
+	uint8_t errFlag = 0;
+	
+	if(strlen(str) != 16)
+	{
+		PCPrintf("len is too shot = %d \r\n",strlen(str) );
+		return;
+	}
+	
+	for(int i =0 ;i < 16;i++)
+	{
+		if(('A'<=str[i] && str[i]<='Z') ||('0'<=str[i] && str[i]<='9'))
+		{
+			errFlag = 0;
+		}
+		else
+		{
+			errFlag = 1;
+			PCPuts("Type A~Z or 0~9 \r\n");
+			return;
+		}
+	}
+	if(!errFlag)
+	{
+		PCPrintf("API Key %d= %s \r\n",add+1,str );
+		for(int i =0 ;i < strlen(str);i++)
+		{
+			Flash_Write(str[i],((3+add*16)+i));
+		}	
+		memcpy(buff, str,16);
+	}
+
+}
+
 
 uint8_t OK_Check()
 {

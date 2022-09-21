@@ -96,6 +96,11 @@ void Pump_Active_Config()
 	
 }
 
+uint32_t MY_1;
+uint32_t MY_2;
+uint32_t MY_3;
+
+
 void My_Device()
 {
 
@@ -111,6 +116,11 @@ void My_Device()
 		PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
 		HAL_Delay(100);
 		PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
+		HAL_Delay(100);
+
+
+		API_Read();
+
 	}
 	else
 	{
@@ -207,8 +217,7 @@ void Flash_Write(uint16_t data, uint16_t add)
 {
 	
 	 uint32_t PAGEError;
-	 uint32_t Address = 0x08010000;
-	 //PAGES44TO47_value =  *(__IO uint32_t *)Address;
+	 uint32_t Address = 0x08010000-0x1400;
 
 	  static FLASH_EraseInitTypeDef EraseInitStruct;
 
@@ -232,7 +241,7 @@ void Flash_Write(uint16_t data, uint16_t add)
 }
 uint32_t Flash_Read(uint16_t add)
 {
-	uint32_t Address = 0x08010000;
+	uint32_t Address = 0x08010000-0x1400;
 	uint32_t readData = 0;
 
 	readData = *(__IO uint32_t *)(Address+0x400*add);

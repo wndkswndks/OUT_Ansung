@@ -78,6 +78,10 @@ uint8_t CMD_SoketClose();
 void String_to_hexString(char* inputStr, char*outputStr);
 void HexString_to_String();
 
+void API_Read();
+void API_Write(char* str, uint8_t add, char* buff);
+
+
 void Rx_Buff1Clear();
 uint8_t OK_Check();
 void Passing_field(uint8_t num, int data, char* str);

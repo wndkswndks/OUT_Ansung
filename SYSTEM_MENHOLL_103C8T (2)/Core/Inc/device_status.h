@@ -136,6 +136,10 @@ typedef struct
 	char toMasterRute[20];
 	char myNodeName[20];
 	char polingDataStr[40];
+	char apiKey1[20];
+	char apiKey2[20];
+	char apiKey3[20];
+	char apiKey4[20];
 	uint16_t txWateTime;
 	uint16_t txTimeOut;
 	uint32_t maxNodeNum;
