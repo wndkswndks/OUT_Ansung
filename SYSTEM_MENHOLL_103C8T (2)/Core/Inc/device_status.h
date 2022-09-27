@@ -111,6 +111,8 @@ typedef enum
 	EVENT_MENHOLL,			
 	EVENT_PUMPACTIVE,			
 	EVENT_O2,
+	EVENT_GPS_LONGITUDE,
+	EVENT_GPS_LATITUDE,
 } EVENT_E;
 /*  			enum end  				*/
 

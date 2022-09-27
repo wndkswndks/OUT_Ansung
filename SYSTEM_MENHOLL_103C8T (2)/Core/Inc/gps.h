@@ -57,6 +57,10 @@ typedef struct{
     char speed_k_unit;
     float speed_km; // speek km/hr
     char speed_km_unit;
+
+	uint8_t buff[GPSBUFSIZE];
+    uint8_t cnt;
+    uint8_t data;
 } GPS_t;
 /*  			stuct end  				*/
 
@@ -71,6 +75,9 @@ void GPS_UART_CallBack();
 int GPS_validate(char *nmeastr);
 void GPS_parse(char *GPSstrParse);
 float GPS_nmea_to_dec(float deg_coord, char nsew);
+void GPS_Enable();
+void GPS_Disable();
+
 /*  			function end  			*/
 
 #endif

@@ -111,8 +111,10 @@ int main(void)
 
   HAL_UART_Receive_IT(&huart1, rxData1, 1);
   
-  if(m_status.gpsEnable)GPS_Init();
-  else Debug_Init();
+  if(m_status.gpsEnable)
+	GPS_Init();
+  else
+  	Debug_Init();
 
   
   if(m_status.device != MASTER_DEVICE)
@@ -136,13 +138,14 @@ int main(void)
   LTE_Init();
 
 
-  if(m_status.gpsEnable)GPS_config();
+// if(m_status.gpsEnable)
+//  GPS_config();
 
-  while(1)
-  {
-  	if(HTTP_Config(3, dddata)==COMPLETE)break;
-  }
-  
+//  while(1)
+//  {
+//  	if(HTTP_Config(3, dddata)==COMPLETE)break;
+//  }
+//  
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -296,47 +299,54 @@ void Main_config()
 
 //	if(HAL_GetTick()-startTime>60000)
 //	{
-		Eco_Config();
+		//Eco_Config();
 		
-		if(m_status.adcEnable) Battery_Config();
-		Menholl_Open_Config(); 
+		//if(m_status.adcEnable) Battery_Config();
+		//Menholl_Open_Config(); 
 		//Pump_Active_Config();
-		if(m_status.o2Enable) O2_Sensor();
-		Event_Config(m_sx1276.buffCh3 ,2);
+		//if(m_status.o2Enable) O2_Sensor();
+		//Event_Config(m_sx1276.buffCh3 ,2);
 		//HAL_Delay(2000);
 		
 //		startTime = HAL_GetTick();
 //	}
 
 
+//		if(HAL_GetTick()-startTime>15000)
+//		{
+//			GPS_config();
+//			startTime = HAL_GetTick();
+//		}
+
+
+
 
 	
 }
 
-void Test_Event()
+void Test_Event(char ch)
 {
 	static uint32_t startTime = 0;
-	uint8_t evntFlag = 0; 
-	if(HAL_GetTick()-startTime>120000)
-	{
-//		static uint8_t oneF = 1;
-//		if(oneF)
-//		{
-//			oneF = 0;
+	uint16_t buff[8] = {0,};
 			
-		m_sx1276.buffCh1[0] = startTime/1000;
-		m_sx1276.buffCh1[1] = startTime/1000+1;
-		m_sx1276.buffCh1[2] = startTime/1000+2;
-		m_sx1276.buffCh1[3] = startTime/1000+3;
-		m_sx1276.buffCh1[4] = startTime/1000+4;
-		m_sx1276.buffCh1[5] = startTime/1000+5;
-		m_sx1276.buffCh1[6] = startTime/1000+6;
-		m_sx1276.buffCh1[7] = startTime/1000+7;
+	startTime = HAL_GetTick();
+	buff[0] = startTime/1000;
+	buff[1] = startTime/1000+1;
+	buff[2] = startTime/1000+2;
+	buff[3] = startTime/1000+3;
+	buff[4] = startTime/1000+4;
+	buff[5] = startTime/1000+5;
+	buff[6] = startTime/1000+6;
+	buff[7] = startTime/1000+7;
 
-		Event_Config(m_sx1276.buffCh1,0);
-		startTime = HAL_GetTick();
-//		}
+	switch(ch)
+	{
+		case 1:	Event_Config(buff,0);	break;
+		case 2:	Event_Config(buff,1);	break;
+		case 3:	Event_Config(buff,2);	break;
 	}
+	
+
 }
 
 uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)

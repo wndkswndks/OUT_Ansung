@@ -726,6 +726,7 @@ void Master_Pass();
 void Master_poling();
 
 void Master_Event();
+void Master_Event_Clear();
 
 void Gateway_Pass();
 void Node_Pass();

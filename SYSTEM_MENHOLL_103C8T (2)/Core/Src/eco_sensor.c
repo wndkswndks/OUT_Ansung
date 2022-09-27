@@ -297,6 +297,7 @@ void O2_Sensor()
 	{
 		m_sx1276.buffCh3[EVENT_O2%8]= 1; 
 	}
-	HAL_UART_Transmit_IT(&huart2, rxBuff1, strlen(rxBuff1));
+	Debug_UartBuff();
+	PCPrintf("O2 = %s\r\n",rxBuff1);
 	HAL_Delay(100);
 }

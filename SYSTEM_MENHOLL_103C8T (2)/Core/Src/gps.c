@@ -37,17 +37,13 @@
 
 
 
-uint8_t rx_data = 0;
-uint8_t rx_buffer[GPSBUFSIZE];
-uint8_t rx_index = 0;
-
 GPS_t m_gps;
 
 
 
 void GPS_Init()
 {
-	HAL_UART_Receive_IT(GPS_USART, &rx_data, 1);
+	HAL_UART_Receive_IT(GPS_USART, &m_gps.data, 1);
 }
 
 void GPS_config()
@@ -58,19 +54,27 @@ void GPS_config()
 	{
 	  GPS_UART_CallBack();
 	}
+
+	m_sx1276.buffCh3[EVENT_GPS_LONGITUDE%8]= (uint16_t)m_gps.nmea_longitude*10000; 
+	m_sx1276.buffCh3[EVENT_GPS_LATITUDE%8]= (uint16_t)m_gps.nmea_latitude*10000;
+
+
+	//PCPrintf("gps_long = %d\r\n",m_sx1276.buffCh3[EVENT_GPS_LONGITUDE%8]);
+	//PCPrintf("gps_lati = %d\r\n",m_sx1276.buffCh3[EVENT_GPS_LATITUDE%8]);
+	//Event_Config(m_sx1276.buffCh3 ,2);
 }
 void GPS_UART_CallBack(){
-	if (rx_data != '\n' && rx_index < sizeof(rx_buffer)) {
-		rx_buffer[rx_index++] = rx_data;
+	if (m_gps.data != '\n' && m_gps.cnt < sizeof(m_gps.buff)) {
+		m_gps.buff[m_gps.cnt++] = m_gps.data;
 	} else {
 
 
-		if(GPS_validate((char*) rx_buffer))
-			GPS_parse((char*) rx_buffer);
-		rx_index = 0;
-		memset(rx_buffer, 0, sizeof(rx_buffer));
+		if(GPS_validate((char*) m_gps.buff))
+			GPS_parse((char*) m_gps.buff);
+		m_gps.cnt = 0;
+		memset(m_gps.buff, 0, sizeof(m_gps.buff));
 	}
-	HAL_UART_Receive(GPS_USART, &rx_data, 1,1000);
+	HAL_UART_Receive_IT(GPS_USART, &m_gps.data, 1);
 }
 
 
@@ -144,5 +148,15 @@ float GPS_nmea_to_dec(float deg_coord, char nsew) {
         decimal *= -1;
     }
     return decimal;
+}
+
+void GPS_Enable()
+{
+	__HAL_UART_ENABLE(&huart2);
+}
+
+void GPS_Disable()
+{
+	__HAL_UART_DISABLE(&huart2);
 }
 

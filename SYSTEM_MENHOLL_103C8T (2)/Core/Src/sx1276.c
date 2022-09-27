@@ -349,6 +349,10 @@ char bufferCheck[30][20] = {0,};
 char bCnt = 0;
 uint8_t eventFlag = 0;
 uint8_t lteOngoing = 0;
+
+
+
+
 void Master_Pass()//
 {
 	static uint32_t pre_time = 0;
@@ -361,7 +365,9 @@ void Master_Pass()//
 	
 	if(eventFlag !=2)Master_Event();
 
-	//if(eventFlag !=1)Master_poling();	
+	//if(eventFlag !=1)Master_poling();
+
+
 
 }
 
@@ -417,6 +423,7 @@ void Master_poling()
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
 				LED1_TOGGLE;
+				failRxCnt = 0;
 				int checkNode = 0;
 				sscanf(buffer,"&LN%d(OK)",&checkNode);
 
@@ -436,7 +443,7 @@ void Master_poling()
 				PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[m_status.nodeNum], successRxBuff[m_status.nodeNum], callbackTime);
 				memcpy(readMag,buffer,50);
 
-				memset(m_uart2.msgBuff,0,30);
+				memset(m_cmd.msgBuff,0,30);
                 memset(buffer,0,512);
 				timestemp = HAL_GetTick();
 
@@ -478,6 +485,7 @@ void Master_Event()
 {
 	static char cannel = 0;
 	static int eventMsg[8] = {0,};
+	int eventClearMsg[8] = {0,};
 	char txBuff[8] = {0,};
 	int eventNode = 0;
 	static int ongoingNode = 0;
@@ -546,7 +554,7 @@ void Master_Event()
 			}
 			else if((timestemp != 0) && (HAL_GetTick()-timestemp >8000))//time out reset
 			{
-				step = STEP5;
+				step = STEP6;
 			}
 		break;
 
@@ -571,7 +579,7 @@ void Master_Event()
 			{
 				LTE_Init();	
 				LED3_OFF;
-				PCPuts("Cool start \r\n");
+				PCPuts("SEND END \r\n");
 				timestemp = HAL_GetTick();
 				step = STEP4;
 				
@@ -579,18 +587,30 @@ void Master_Event()
 		break;	
 
 		case STEP4:
-			if(HAL_GetTick()-timestemp >10000)
+			if(HAL_GetTick()-timestemp >30000)
 			{
-				PCPuts("Cool end \r\n");
-				lteOngoing = 0;
+				LED3_ON;
 				step = STEP5;
 			}
 
 		break;	
 
-		
-		
 		case STEP5:
+			if(HTTP_Config(cannel, eventClearMsg))
+			{
+				LTE_Init();	
+				LED3_OFF;
+				PCPuts("CLEAR END \r\n");
+				timestemp = HAL_GetTick();
+				step = STEP6;
+			}
+			
+
+		break;
+
+		
+		case STEP6:
+			lteOngoing = 0;
 			ongoingNode = 0;
 			timestemp = 0;
 			cannel = 0;
@@ -605,7 +625,6 @@ void Master_Event()
 
 }
 
-
 void Gateway_Pass()
 {
 	SX1276_RX_Packet(buffer);
@@ -618,7 +637,7 @@ void Gateway_Pass()
 		
 		Lora_Send_Msg(buffer+STATION_HEAD_LEN, NONE_VALUE);
 
-		memset(m_uart2.msgBuff,0,30);
+		memset(m_cmd.msgBuff,0,30);
 		memset(buffer,0,512);
 	}
 
@@ -636,7 +655,7 @@ void Node_Pass()
 		if(Is_Include_ThisStr( buffer, 2, "NO")) Node_Nomal_Response2();
 		if(Is_Include_ThisStr( buffer, 2, "RU")) Node_Rute_Response();
 
-			memset(m_uart2.msgBuff,0,30);
+			memset(m_cmd.msgBuff,0,30);
 			memset(buffer,0,512);
 		
 	}
@@ -650,7 +669,7 @@ void Node_Pass()
 			SX1276_Control_SF(num);
 		}	
 
-			memset(m_uart2.msgBuff,0,30);
+			memset(m_cmd.msgBuff,0,30);
 			memset(buffer,0,512);
 	}
 

@@ -216,8 +216,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 /* USER CODE BEGIN 1 */
 
 
-UART_T m_uart1;
-UART_T m_uart2;
+UART_T m_cmd;
 
 
 
@@ -226,15 +225,20 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 	if(huart == &huart2) 
 	{
-		if(m_status.gpsEnable) GPS_UART_CallBack();
-		else Uart_Rx_Parssing(&huart2, &m_uart2);
+		if(m_status.gpsEnable) 
+			GPS_UART_CallBack();
+		else 
+			Uart_Rx_Parssing(&huart2, &m_cmd);
+		
+		
 	}
 
 	
 	else if(huart == &huart1)
 	{
-		//Uart_Rx_Parssing(&huart1, &m_uart1);
 
+		//Uart_Rx_Parssing((&huart1, &m_cmd);
+		
 		HAL_UART_Receive_IT(&huart1, rxData1, 1);				
 
 		rxBuff1[rxCnt1] = rxData1[0];
@@ -267,6 +271,7 @@ void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
 }
 
 
+
 void Pc_Command_Response()
 {
 	char str[30] = {0,};
@@ -274,18 +279,18 @@ void Pc_Command_Response()
 	char rxLen = 0;
 	uint8_t errFlag = 0;
 	
-	rxLen = strlen(m_uart2.msgBuff);
+	rxLen = strlen(m_cmd.msgBuff);
 
 	if(rxLen != NULL)
 	{
-		if(m_uart2.msgBuff[DIVISION_POS] !='_') return;
+		if(m_cmd.msgBuff[DIVISION_POS] !='_') return;
 		
-		if(atoi(m_uart2.msgBuff+VALUE_POS) != 0)
+		if(atoi(m_cmd.msgBuff+VALUE_POS) != 0)
 		{
-			num = atoi(m_uart2.msgBuff+VALUE_POS);
+			num = atoi(m_cmd.msgBuff+VALUE_POS);
 		}
 		
-		if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "SF"))
+		if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "SF"))
 		{
 			if(SF_07<= num && num<= SF_12 )
 			{
@@ -306,30 +311,30 @@ void Pc_Command_Response()
 			}										
 		}
 		
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "WT"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "WT"))
 		{
 			m_status.txWateTime = num;
 			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
 		}	
 
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "TO"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TO"))
 		{
 			m_status.txTimeOut = num;	
 			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );		
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "MX"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MX"))
 		{
 			m_status.maxNodeNum = num;	
 			PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
 			Flash_Write(num,0);
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "MN"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MN"))
 		{
 			m_status.minNodeNum = num;	
 			PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
 			Flash_Write(num,1);
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "NO"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "NO"))
 		{
 			m_status.myNodeNameInt = num;
 						
@@ -340,10 +345,10 @@ void Pc_Command_Response()
 			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
 			Flash_Write(num,2);
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "A"))
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "A"))
 		{			
 			char apiNum = 0;
-			sscanf(m_uart2.msgBuff, "A%d_%s",&apiNum, str );
+			sscanf(m_cmd.msgBuff, "A%d_%s",&apiNum, str );
 			switch(apiNum)
 			{
 				case 1:	API_Write(str, 0, m_status.apiKey1);  break;
@@ -354,11 +359,68 @@ void Pc_Command_Response()
 			
 		
 		}
-		else if(Is_Include_ThisStr( m_uart2.msgBuff, 0, "RU"))
-		{				
-			Rute_Cmd(m_uart2.msgBuff);
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "X"))
+		{
+			if(m_status.device != MASTER_DEVICE)
+			{
+				PCPuts("only Master mode \r\n");
+				return;
+			}
+			char chChannel = 0;
+			int chCmd[8] = {0,};
+			sscanf(m_cmd.msgBuff, "X%d_%d,%d,%d,%d,%d,%d,%d,%d,",&chChannel, chCmd,chCmd+1,chCmd+2,chCmd+3,chCmd+4,chCmd+5,chCmd+6,chCmd+7 );
+			for(int i =0 ;i < 8;i++)
+			{
+
+				PCPrintf("chCmd[%d] = %d\r\n",i,chCmd[i]);
+			}
+		   while(1)
+		   {
+		  	 if(HTTP_Config(chChannel, chCmd)==COMPLETE)break;
+		   }
 		}
-		memset(m_uart2.msgBuff, 0, 30);
+
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "E"))
+		{
+			if(m_status.device == MASTER_DEVICE)
+			{
+				PCPuts("only node mode \r\n");
+				return;
+			}
+			char Channel = 0;
+			sscanf(m_cmd.msgBuff, "E%d_,", &Channel);
+			Test_Event(Channel);
+		}
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "PN"))
+		{
+			if(m_status.device != MASTER_DEVICE)
+			{
+				PCPuts("only Master mode \r\n");
+				return;
+			}
+			APN_Config();
+		}
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TM"))
+		{
+			
+			//CMD_GetCCLK();
+			if(num==1)
+			{
+				GPS_Enable();
+				PCPuts("uart2 enable \r\n");
+			}
+			else if(num==2)
+			{
+				GPS_Disable();
+				PCPuts("uart2 disable \r\n");
+			}	
+
+		}
+		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "RU"))
+		{				
+			Rute_Cmd(m_cmd.msgBuff);
+		}
+		memset(m_cmd.msgBuff, 0, 30);
 	}
 }
 void Rute_Cmd(char* msg)
@@ -401,10 +463,11 @@ void PCPrintf(char *format, ...)
 	va_list	ap;
 	char  str[256];
 
+	if(m_status.gpsEnable) return;
 	va_start(ap, format);
 	vsprintf(str, format, ap);
 	
-	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
+	HAL_UART_Transmit_IT(DEBUG_USART, (uint8_t* )str, strlen(str));
 	HAL_Delay(100);
 
 	va_end(ap);
@@ -415,10 +478,12 @@ void PCPrintf(char *format, ...)
 void PCPuts(char *msg)
 {
 	char str[256] = {0,};
+	if(m_status.gpsEnable) return;
+	
 	memcpy(str, msg, strlen(msg));
 	
-	HAL_UART_Transmit_IT(&huart2, (uint8_t* )str, strlen(str));
-	HAL_Delay(10);
+	HAL_UART_Transmit_IT(DEBUG_USART, (uint8_t* )str, strlen(str));
+	HAL_Delay(100);
 }
 
 uint32_t String_To_Hex(char* str)
@@ -446,8 +511,12 @@ uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str)
 
 void Debug_Init()
 {
-	HAL_UART_Receive_IT(&huart2, m_uart2.rxByte, 1);
+	HAL_UART_Receive_IT(DEBUG_USART, m_cmd.rxByte, 1);
 }
 
-
+void Debug_UartBuff()
+{
+	if(m_status.gpsEnable) return;
+	HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+}
 /* USER CODE END 1 */

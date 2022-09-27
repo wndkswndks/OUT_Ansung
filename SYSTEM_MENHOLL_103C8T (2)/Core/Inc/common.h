@@ -122,7 +122,7 @@ typedef enum
 /*  			function start  		*/
 void Main_config();
 uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd);
-void Test_Event();
+void Test_Event(char ch);
 
 /*  			function end  			*/
 
@@ -133,8 +133,7 @@ extern ADC_HandleTypeDef hadc2;
 extern UART_HandleTypeDef huart2;
 extern STATUS_T m_status;
 extern ECO_T m_eco;
-extern UART_T m_uart1;
-extern UART_T m_uart2;
+extern UART_T m_cmd;
 extern uint8_t rxBuff1[1300];
 extern int rxCnt1;
 

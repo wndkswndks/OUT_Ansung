@@ -18,11 +18,7 @@ void LTE_Init()
 uint8_t rxBuff1[1300] = {0,};
 int rxCnt1 = 0;
 
-void Terminal_Send(char * buff)
-{
-	HAL_UART_Transmit(&huart2, (uint8_t *)buff, strlen(buff),1000);
-	HAL_Delay(100);
-}
+
 void Rx_Buff1Clear()
 {
 	memset(rxBuff1,0,strlen((char*)rxBuff1));
@@ -82,6 +78,7 @@ uint8_t CMD_Reset()
 //==============================
 void APN_Config()
 {
+	PCPuts("APN Setting START \r\n");
 	CMD_Reset();
 	HAL_Delay(2000);
 	
@@ -101,28 +98,32 @@ void APN_Config()
 
 	HAL_Delay(3000);
 
-	HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 
-
-	HAL_UART_Transmit(&huart2, "=====", 5,1000);
+	PCPuts("APN Setting END \r\n");
 }
-void CMD_Set_CFUN()
+uint8_t CMD_Set_CFUN()
 {
 	AT_CMD("AT+CFUN=0");	
+	if(OK_Check() == ERR)return ERR;
 }
 
-void CMD_Set_APN()
+uint8_t CMD_Set_APN()
 {
 	AT_CMD("AT%NWOPER=\"DEFAULT\"");	
+	if(OK_Check() == ERR)return ERR;
 	AT_CMD("AT%SETSYSCFG=\"sw_cfg.3gpp.plmn_roaming\",\"ENABLE\"");	
-	AT_CMD("AT%SETSYSCFG=\"sw_cfg.nb_vendor_scan_plan.plmn_sel_mode\",\"STANDARD\"");	
+	if(OK_Check() == ERR)return ERR;
+	AT_CMD("AT%SETSYSCFG=\"sw_cfg.nb_vendor_scan_plan.plmn_sel_mode\",\"STANDARD\"");
+	if(OK_Check() == ERR)return ERR;
 	AT_CMD("AT%APNN=\"connect.cxn\"");	
+	if(OK_Check() == ERR)return ERR;
 }
 
-void CMD_Get_APN()
+uint8_t CMD_Get_APN()
 {
 	
 	AT_CMD("AT%PDNACT?");	//?????
+	if(OK_Check() == ERR)return ERR;
 }
 
 
@@ -153,9 +154,10 @@ void CMD_GetCGMR()
 	AT_CMD("AT+CGMR");	
 }
 
-void CMD_GetCCLK()
+uint8_t CMD_GetCCLK()
 {
 	AT_CMD("AT+CCLK?");	
+	if(OK_Check() == ERR)return ERR;
 }
 
 void CMD_GetRSSI()
@@ -233,7 +235,6 @@ void Basic_Config()
 	CMD_GetTxPower();
 	HAL_Delay(CMD_DELAY);
 
-	HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
 }
 
 
@@ -255,8 +256,8 @@ uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾?
 
 		if(dstAdd[0] != NULL)
 		{
-			Terminal_Send("GetIPAddr GOOD!!\r\n");
-			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			PCPuts("GetIPAddr GOOD!!\r\n");
+			Debug_UartBuff();
 			Rx_Buff1Clear();
 			return OK;
 		}
@@ -264,9 +265,8 @@ uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾?
 		
 		if(HAL_GetTick() - startTime >10000)
 		{
-			Terminal_Send("GetIPAddr FAIL!!\r\n");
-			
-			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			PCPuts("GetIPAddr FAIL!!\r\n");
+			Debug_UartBuff();
 			Rx_Buff1Clear();
 			return ERR;
 		}
@@ -349,51 +349,51 @@ void TCP_Config()
 {
 	CMD_Reset();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<1>\r\n");
+	PCPuts("<1>\r\n");
 	
 	CMD_Init();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<2>\r\n");
+	PCPuts("<2>\r\n");
 	
 	CMD_CanConnect(); //+CEREG: 2,2 +CEREG: 0 +CEREG: 2  +CEREG: 5,"05FB","010C5802",7
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<3>\r\n");
+	PCPuts("<3>\r\n");
 	
 	CMD_GetIPAddr("echo.mbedcloudtesting.com",ipAdd); // %DNSRSLV:0, %DNSRSLV:1,
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<4>\r\n");
+	PCPuts("<4>\r\n");
 	
 	CMD_SoketCreate(ipAdd,7); // SOCKETCMD:	
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<5>\r\n");
+	PCPuts("<5>\r\n");
 	
 	CMD_SoketActivate();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<6>\r\n");
+	PCPuts("<6>\r\n");
 	
 	CMD_SoketInfo(); //SOCKETCMD:\" ACTIVATED
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<7>\r\n");
+	PCPuts("<7>\r\n");
 	
 	CMD_SoketSend("HELLO KOREA 33"); //SOCKETDATA:
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<8>\r\n");
+	PCPuts("<8>\r\n");
 
 	CMD_SoketRecv(); //SOCKETDATA:
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<9>\r\n");
+	PCPuts("<9>\r\n");
 
 	CMD_SoketDeActivate();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<10>\r\n");
+	PCPuts("<10>\r\n");
 
 	CMD_SoketInfo();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<11>\r\n");
+	PCPuts("<11>\r\n");
 
 	CMD_SoketClose();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<12>\r\n");
+	PCPuts("<12>\r\n");
 
 }
 
@@ -486,10 +486,10 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 		case STEP1:
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{			
-				Terminal_Send("START\r\n");
+				PCPuts("START\r\n");
 				CMD_Reset();
 
-				Terminal_Send("<1>\r\n");
+				PCPuts("<1>\r\n");
 				preTime  =HAL_GetTick();
 				
 				step = STEP2;
@@ -501,7 +501,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				CMD_Init();
-				Terminal_Send("<2>\r\n");
+				PCPuts("<2>\r\n");
 				preTime  =HAL_GetTick();
 				step = STEP3;
 			}
@@ -511,7 +511,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				CMD_CanConnect();
-				Terminal_Send("<3>\r\n");
+				PCPuts("<3>\r\n");
 				preTime  =HAL_GetTick();
 				step = STEP4;
 			}
@@ -521,7 +521,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{				
 				passFlag = CMD_GetIPAddr("api.thingspeak.com",ipAdd);
-				Terminal_Send("<4>\r\n");
+				PCPuts("<4>\r\n");
 				preTime  =HAL_GetTick();
 				step = STEP5;
 			}
@@ -531,7 +531,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketCreate(ipAdd,80);
-				Terminal_Send("<5>\r\n");				
+				PCPuts("<5>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP6;
 			}
@@ -541,7 +541,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketActivate();
-				Terminal_Send("<6>\r\n");				
+				PCPuts("<6>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP7;
 			}
@@ -551,7 +551,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketInfo();
-				Terminal_Send("<7>\r\n");				
+				PCPuts("<7>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP8;
 			}
@@ -584,7 +584,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 				strcat(sendMsg,"Connection: close\r\n\r\n");
 
 				passFlag = CMD_SoketSend(sendMsg);
-				Terminal_Send("<8>\r\n");				
+				PCPuts("<8>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP9;
 			}
@@ -594,7 +594,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketRecv();
-				Terminal_Send("<9>\r\n");				
+				PCPuts("<9>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP10;
 			}
@@ -604,7 +604,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY)
 			{
 				passFlag = CMD_SoketDeActivate();
-				Terminal_Send("<10>\r\n");				
+				PCPuts("<10>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP11;
 			}
@@ -614,7 +614,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketInfo();
-				Terminal_Send("<11>\r\n");				
+				PCPuts("<11>\r\n");				
 				preTime  =HAL_GetTick();
 				step = STEP12;
 			}
@@ -624,8 +624,8 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			if( HAL_GetTick()-preTime >CMD_DELAY )
 			{
 				passFlag = CMD_SoketClose();
-				Terminal_Send("<12>\r\n");
-				Terminal_Send("END\r\n");
+				PCPuts("<12>\r\n");
+				PCPuts("END\r\n");
 				preTime  = 0;
 				
 				errCnt = 0;
@@ -640,15 +640,15 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 	{
 		PCPrintf("Err step = %d\r\n",step);
 		LTE_Init();
-		HAL_Delay(25000);
 		step = STEP1;
 		errCnt++;
-		if(errCnt>1)
+		if(errCnt>2)
 		{
-			Terminal_Send("HTTP Cermunication Err \r\n");
+			PCPuts("HTTP Cermunication Err \r\n");
 			errCnt = 0;
 			return COMPLETE;
 		}
+		HAL_Delay(25000);
 
 	}
 
@@ -793,16 +793,15 @@ uint8_t OK_Check()
 		
 		if(ptr !=NULL)
 		{
-			Terminal_Send("GOOD CMD!!\r\n");
-			//HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000); //ÀÌ°Å »ì¸®¸é UART2 ¸ÀÅÊÀÌ°¨
+			PCPuts("GOOD CMD!!\r\n");
+			//Debug_UartBuff();
 			Rx_Buff1Clear();
 			return OK;
 		}
 		if(HAL_GetTick() - startTime >8000)
 		{
-			Terminal_Send("FAIL CMD!!\r\n");
-			
-			HAL_UART_Transmit(&huart2, rxBuff1, rxCnt1,1000);
+			PCPuts("FAIL CMD!!\r\n");
+			Debug_UartBuff();
 			Rx_Buff1Clear();
 			return ERR;
 		}
@@ -827,55 +826,55 @@ void MQTT_Config()
 	CMD_Reset();
 	HAL_Delay(CMD_DELAY);
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<1>\r\n");
+	PCPuts("<1>\r\n");
 
 	CMD_Init();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<2>\r\n");
+	PCPuts("<2>\r\n");
 
 	CMD_CanConnect();
 	HAL_Delay(CMD_DELAY);
-	Terminal_Send("<3>\r\n");
+	PCPuts("<3>\r\n");
 	
 
   CMD_Set_MQTT_EV(1);
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<4>\r\n");
+  PCPuts("<4>\r\n");
   
   CMD_Set_MQTT_NODES();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<5>\r\n");
+  PCPuts("<5>\r\n");
 
   CMD_Set_MQTT_TIMEOUT();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<6>\r\n");
+  PCPuts("<6>\r\n");
 
   CMD_Set_MQTT_Connect();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<7>\r\n");
+  PCPuts("<7>\r\n");
   
 
   CMD_MQTT_SUBSCRIBE();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<8>\r\n");
+  PCPuts("<8>\r\n");
 
   CMD_MQTT_Publish();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<9>\r\n");
+  PCPuts("<9>\r\n");
 
  // return;
 
   MQTT_UnSUBSCRIBE();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<10>\r\n");
+  PCPuts("<10>\r\n");
 
   CMD_Set_MQTT_Disconnect();
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<11>\r\n");
+  PCPuts("<11>\r\n");
 
   CMD_Set_MQTT_EV(0);
   HAL_Delay(CMD_DELAY);
-  Terminal_Send("<12>\r\n");
+  PCPuts("<12>\r\n");
   
 }
 

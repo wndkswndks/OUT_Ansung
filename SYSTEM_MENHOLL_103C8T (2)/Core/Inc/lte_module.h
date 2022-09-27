@@ -32,7 +32,6 @@
 
 /*  			function start  		*/
 void LTE_Init();
-void Terminal_Send(char * buff);
 
 void AT_CMD(char * buff);
 void AT_CMD_College(char * buff, ...);
@@ -49,16 +48,16 @@ uint8_t CMD_Reset();
 
 
 void APN_Config();
-void CMD_Set_CFUN();
-void CMD_Set_APN();
-void CMD_Get_APN();
+uint8_t CMD_Set_CFUN();
+uint8_t CMD_Set_APN();
+uint8_t CMD_Get_APN();
 
 
 uint8_t CMD_CanConnect();
 void CMD_GetCIMI();
 void CMD_GetIMEI();
 void CMD_GetCGMR();
-void CMD_GetCCLK();
+uint8_t CMD_GetCCLK();
 void CMD_GetRSSI();
 void CMD_GetRSRP();
 void CMD_GetRSRQ();
