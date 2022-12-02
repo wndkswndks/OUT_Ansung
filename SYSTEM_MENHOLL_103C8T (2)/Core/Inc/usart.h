@@ -66,7 +66,7 @@ uint32_t String_To_Hex(char* str);
 uint8_t Is_Include_ThisStr(char* buff, uint8_t order ,char* str);
 
 void Rute_Cmd(char* msg);
-void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart);
+void Debug_Parssing(UART_HandleTypeDef* huart, UART_T* uart);
 void Debug_Init();
 void Debug_UartBuff();
 

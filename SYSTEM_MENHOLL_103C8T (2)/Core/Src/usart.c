@@ -228,7 +228,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		if(m_status.gpsEnable) 
 			GPS_UART_CallBack();
 		else 
-			Uart_Rx_Parssing(&huart2, &m_cmd);
+			Debug_Parssing(&huart2, &m_cmd);
 		
 		
 	}
@@ -236,8 +236,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 	else if(huart == &huart1)
 	{
-
-		//Uart_Rx_Parssing((&huart1, &m_cmd);
 		
 		HAL_UART_Receive_IT(&huart1, rxData1, 1);				
 
@@ -247,7 +245,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
-void Uart_Rx_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
+void Debug_Parssing(UART_HandleTypeDef* huart, UART_T* uart)
 {
 	HAL_UART_Receive_IT(huart, uart->rxByte, 1);
 
