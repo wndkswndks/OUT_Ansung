@@ -160,6 +160,36 @@ uint8_t CMD_GetCCLK()
 	if(OK_Check() == ERR)return ERR;
 }
 
+
+uint32_t GetWateTime()
+{
+	uint32_t wateTime = 0;
+	int hour = 0;
+	int min = 0;
+	int sec = 0;
+
+	
+	while(hour == 0 && min == 0 && sec == 0)
+	{
+		AT_CMD("AT+CCLK?");	
+
+		char* ptr = strstr((char*)rxBuff1,"+CCLK:");
+		int str[10] = {0,};
+		sscanf(ptr,"+CCLK: \"%d/%d/%d,%d:%d:%d+%d\"\r\n",str, str+1, str+2, str+3, str+4, str+5, str+6); //?¾ëª„??ë¿??????äºŒì‡°??
+
+		hour = str[3];
+		min = str[4];
+		sec = str[5];
+		
+		HAL_Delay(1000);
+		Rx_Buff1Clear();
+	}
+	wateTime = CalculateWateTime(hour, min, sec);
+	
+	return wateTime;	
+
+}
+
 void CMD_GetRSSI()
 {
 	AT_CMD("AT%MEAS=\"8\"");	//
@@ -243,7 +273,7 @@ void Basic_Config()
 char ipAdd[30] = {0,};
 uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾? 
 {
-	uint32_t startTime = HAL_GetTick();
+	uint32_t timestemp = HAL_GetTick();
 	while(1)
 	{
 		memset(dstAdd,0,30);
@@ -263,7 +293,7 @@ uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd) // ????ªè‡¾?
 		}
 
 		
-		if(HAL_GetTick() - startTime >10000)
+		if(HAL_GetTick() - timestemp >10000)
 		{
 			PCPuts("GetIPAddr FAIL!!\r\n");
 			Debug_UartBuff();
@@ -780,7 +810,7 @@ void API_Write(char* str, uint8_t add, char* buff)
 uint8_t OK_Check()
 {
 	int i;
-	uint32_t startTime = HAL_GetTick();
+	uint32_t timestemp = HAL_GetTick();
 	
 	while(1)
 	{
@@ -798,7 +828,7 @@ uint8_t OK_Check()
 			Rx_Buff1Clear();
 			return OK;
 		}
-		if(HAL_GetTick() - startTime >8000)
+		if(HAL_GetTick() - timestemp >8000)
 		{
 			PCPuts("FAIL CMD!!\r\n");
 			Debug_UartBuff();

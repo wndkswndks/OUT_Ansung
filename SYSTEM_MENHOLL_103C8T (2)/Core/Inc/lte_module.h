@@ -58,6 +58,8 @@ void CMD_GetCIMI();
 void CMD_GetIMEI();
 void CMD_GetCGMR();
 uint8_t CMD_GetCCLK();
+uint32_t GetWateTime();
+
 void CMD_GetRSSI();
 void CMD_GetRSRP();
 void CMD_GetRSRQ();

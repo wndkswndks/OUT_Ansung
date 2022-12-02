@@ -244,6 +244,19 @@ int compare(const void *a, const void *b)    // 오름차순 비교 함수 구�
     
     return 0;    // a와 b가 같을 때는 0 반환
 }
+int compare_32(const void *a, const void *b)    // 오름차순 비교 함수 구현
+{
+    uint32_t num1 = *(uint32_t *)a;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
+    uint32_t num2 = *(uint32_t *)b;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
+
+    if (num1 < num2)    // a가 b보다 작을 때는
+        return -1;      // -1 반환
+    
+    if (num1 > num2)    // a가 b보다 클 때는
+        return 1;       // 1 반환
+    
+    return 0;    // a와 b가 같을 때는 0 반환
+}
 
 uint16_t mq_vu = 0;
 float Get_MQ_Sensor(uint8_t AIN_num, float R0_MQ)

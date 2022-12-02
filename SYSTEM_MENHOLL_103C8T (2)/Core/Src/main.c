@@ -135,8 +135,9 @@ int main(void)
 	  SX1276_RX_Entry(2000);
   }
 
-  LTE_Init();
+  //LTE_Init();
 
+  //CMD_GetCCLK();
 
 // if(m_status.gpsEnable)
 //  GPS_config();
@@ -290,32 +291,31 @@ void SystemClock_Config(void)
 //	HAL_Delay(100);
 //	//Error_Config();
 //}
-extern uint8_t eventFlag;
 extern char buffer[512];
 uint8_t ddFFlag = 0;
 void Main_config()
 {	
-	static uint32_t startTime = 0;
+	static uint32_t timestemp = 0;
 
-//	if(HAL_GetTick()-startTime>60000)
+//	if(HAL_GetTick()-timestemp>60000)
 //	{
-		//Eco_Config();
+		Eco_Config();
 		
-		//if(m_status.adcEnable) Battery_Config();
-		//Menholl_Open_Config(); 
-		//Pump_Active_Config();
-		//if(m_status.o2Enable) O2_Sensor();
-		//Event_Config(m_sx1276.buffCh3 ,2);
-		//HAL_Delay(2000);
+		if(m_status.adcEnable) Battery_Config();
+		Menholl_Open_Config(); 
+		Pump_Active_Config();
+		if(m_status.o2Enable) O2_Sensor();
+		Event_Config(m_sx1276.buffCh3 ,2);
+		HAL_Delay(2000);
 		
-//		startTime = HAL_GetTick();
+//		timestemp = HAL_GetTick();
 //	}
 
 
-//		if(HAL_GetTick()-startTime>15000)
+//		if(HAL_GetTick()-timestemp>15000)
 //		{
 //			GPS_config();
-//			startTime = HAL_GetTick();
+//			timestemp = HAL_GetTick();
 //		}
 
 
@@ -326,18 +326,18 @@ void Main_config()
 
 void Test_Event(char ch)
 {
-	static uint32_t startTime = 0;
+	static uint32_t timestemp = 0;
 	uint16_t buff[8] = {0,};
 			
-	startTime = HAL_GetTick();
-	buff[0] = startTime/1000;
-	buff[1] = startTime/1000+1;
-	buff[2] = startTime/1000+2;
-	buff[3] = startTime/1000+3;
-	buff[4] = startTime/1000+4;
-	buff[5] = startTime/1000+5;
-	buff[6] = startTime/1000+6;
-	buff[7] = startTime/1000+7;
+	timestemp = HAL_GetTick();
+	buff[0] = timestemp/1000;
+	buff[1] = timestemp/1000+1;
+	buff[2] = timestemp/1000+2;
+	buff[3] = timestemp/1000+3;
+	buff[4] = timestemp/1000+4;
+	buff[5] = timestemp/1000+5;
+	buff[6] = timestemp/1000+6;
+	buff[7] = timestemp/1000+7;
 
 	switch(ch)
 	{
@@ -351,7 +351,7 @@ void Test_Event(char ch)
 
 uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 {
-	static uint32_t startTime = 0;
+	static uint32_t timestemp = 0;
 	uint8_t onGoing = 1;
 	int delay = 0;
 	static uint8_t step = STEP1;
@@ -363,18 +363,18 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 			switch(step)
 			{
 				case STEP1:
-					eventFlag = 1;
-					startTime = HAL_GetTick();
+					m_sx1276.event = 1;
+					timestemp = HAL_GetTick();
 					delay = rand()%5;
 					step = STEP2;
 				break;
 				case STEP2:
 					if(strlen(buffer) != 0)
 					{
-						startTime = HAL_GetTick();
+						timestemp = HAL_GetTick();
 						memset(buffer,0,512);
 					}	
-					if(HAL_GetTick()-startTime>4000+(delay *1000))
+					if(HAL_GetTick()-timestemp>4000+(delay *1000))
 					{
 						step = STEP3;
 					}
@@ -411,7 +411,7 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 
 				case STEP4:
 					memset(buffCh, 0 , 8*2);
-					eventFlag = 0;
+					m_sx1276.event = 0;
 					step = STEP1;
 					onGoing = 0;
 				break;

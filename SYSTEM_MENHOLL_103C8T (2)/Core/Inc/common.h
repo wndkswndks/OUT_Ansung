@@ -95,19 +95,9 @@ typedef enum
 } COMPLETE_E;
 typedef enum
 {
-	SEC_5 =  5000,
-	SEC_10 = 10000,
-	SEC_20 = 20000,
-	SEC_30 = 30000,
-	SEC_40 = 40000,
-	SEC_50 = 50000,
-	SEC_60 = 60000,
-	SEC_70 = 70000,
-	SEC_80 = 80000,
-	SEC_90 = 90000,
-	SEC_100 = 100000,
-	SEC_110 = 110000,
-	SEC_120 = 1200000,
+	SEC_1 = 1000,
+	MIN_1 = 60000,
+	HOUR_1 = 3600000,
 } SEC_E;
 /*  			enum end  				*/
 

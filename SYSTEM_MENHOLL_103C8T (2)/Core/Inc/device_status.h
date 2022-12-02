@@ -168,6 +168,9 @@ void Flash_Write(uint16_t data, uint16_t add);
 uint32_t Flash_Read(uint16_t add);
 char* IntToStr(int data);
 uint8_t Get_Size(uint16_t* buff);
+uint32_t timeToMs(uint8_t hour, uint8_t min, uint8_t sec);
+uint32_t CalculateWateTime(uint8_t hour, uint8_t min, uint8_t sec);
+uint32_t Time_Pass(uint32_t preTime);
 
 
 /*  			function end  			*/

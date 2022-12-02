@@ -101,7 +101,7 @@ uint32_t MY_2;
 uint32_t MY_3;
 
 
-void My_Device()
+void My_Device()//
 {
 
 	
@@ -143,50 +143,46 @@ void Error_Config()
 	static uint8_t onFlag = 0;
 	uint8_t errStatus = 0;
 	static uint8_t cnt = 0;
-	uint32_t timeSave = 0;
 
 	Set_Error(ERR0R_1);
 	Set_Error(ERR0R_3);
 	Set_Error(ERR0R_5);
 
-	if(HAL_GetTick() > timeSave +1000)
-	{
-		if(onFlag==1)
-		{
-			onFlag = 0;
-			for(int i = cnt ;i < 8;i++)
-			{
-				if(m_status.err_status[i] ==1)
-				{
-					errStatus = i;
-					cnt = i+1;
-					cnt %= 8;
-					break;
-				}
-			}
-			
-			switch(errStatus)
-			{
-				case ERR0R_0:	LED1_OFF;	LED2_OFF;	LED3_OFF;	break;//000
-				case ERR0R_1:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//001					
-				case ERR0R_2:	LED1_OFF;	LED2_ON;	LED3_OFF;	break;//010
-				case ERR0R_3:	LED1_OFF;	LED2_ON;	LED3_ON;	break;//011
-				case ERR0R_4:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//100
-				case ERR0R_5:	LED1_ON;	LED2_OFF;	LED3_ON;	break;//101
-				case ERR0R_6:	LED1_ON;	LED2_ON;	LED3_OFF;	break;//110					
-				case ERR0R_7:	LED1_ON;	LED2_ON;	LED3_ON;	break;//111
-			}
-		}
-		else
-		{
-			onFlag = 1;
-			LED1_OFF;
-			LED2_OFF;
-			LED3_OFF;
-		}
 
-		timeSave = HAL_GetTick();
+	if(onFlag==1)
+	{
+		onFlag = 0;
+		for(int i = cnt ;i < 8;i++)
+		{
+			if(m_status.err_status[i] ==1)
+			{
+				errStatus = i;
+				cnt = i+1;
+				cnt %= 8;
+				break;
+			}
+		}
+		
+		switch(errStatus)
+		{
+			case ERR0R_0:	LED1_OFF;	LED2_OFF;	LED3_OFF;	break;//000
+			case ERR0R_1:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//001					
+			case ERR0R_2:	LED1_OFF;	LED2_ON;	LED3_OFF;	break;//010
+			case ERR0R_3:	LED1_OFF;	LED2_ON;	LED3_ON;	break;//011
+			case ERR0R_4:	LED1_ON;	LED2_OFF;	LED3_OFF;	break;//100
+			case ERR0R_5:	LED1_ON;	LED2_OFF;	LED3_ON;	break;//101
+			case ERR0R_6:	LED1_ON;	LED2_ON;	LED3_OFF;	break;//110					
+			case ERR0R_7:	LED1_ON;	LED2_ON;	LED3_ON;	break;//111
+		}
 	}
+	else
+	{
+		onFlag = 1;
+		LED1_OFF;
+		LED2_OFF;
+		LED3_OFF;
+	}
+
 }
 void Set_Error(ERROR_E error)
 {
@@ -267,4 +263,49 @@ uint8_t Get_Size(uint16_t* buff)
 		}
 	}
       return 0;
+}
+
+uint32_t timeToMs(uint8_t hour, uint8_t min, uint8_t sec)
+{
+	return(hour*HOUR_1 + min*MIN_1 + sec*SEC_1);
+}
+
+
+
+uint32_t CalculateWateTime(uint8_t hour, uint8_t min, uint8_t sec)
+{
+	uint32_t wateTime,nowTime,targetTime = 0;
+	uint32_t timeBuff[5] = {0,};
+
+	nowTime = timeToMs(hour,min,sec);
+	timeBuff[0] = timeToMs(0,0,0);
+	timeBuff[1] = timeToMs(6,0,0);
+	timeBuff[2] = timeToMs(12,0,0);
+	timeBuff[3] = timeToMs(18,0,0);
+	timeBuff[4] = nowTime;
+	
+	qsort(timeBuff, sizeof(timeBuff) / sizeof(uint32_t), sizeof(uint32_t), compare_32); 
+
+	for(int i =0 ;i < 5;i++)
+	{
+		if(timeBuff[i] == nowTime)
+		{
+			targetTime = timeBuff[(i+1)%5];
+		}
+	}
+	
+	if(nowTime<targetTime) wateTime =targetTime - nowTime; 
+	else wateTime =HOUR_1*24 + targetTime- nowTime;
+		
+	PCPrintf("wateTime = %u \r\n",wateTime);
+
+	return wateTime;
+}
+
+uint32_t Time_Pass(uint32_t preTime)
+{
+	uint32_t nowTime = 0;
+	
+	nowTime = HAL_GetTick();
+	return (nowTime- preTime);
 }

@@ -403,17 +403,17 @@ void Pc_Command_Response()
 		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TM"))
 		{
 			
-			//CMD_GetCCLK();
-			if(num==1)
-			{
-				GPS_Enable();
-				PCPuts("uart2 enable \r\n");
-			}
-			else if(num==2)
-			{
-				GPS_Disable();
-				PCPuts("uart2 disable \r\n");
-			}	
+			GetWateTime();
+//			if(num==1)
+//			{
+//				GPS_Enable();
+//				PCPuts("uart2 enable \r\n");
+//			}
+//			else if(num==2)
+//			{
+//				GPS_Disable();
+//				PCPuts("uart2 disable \r\n");
+//			}	
 
 		}
 		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "RU"))
@@ -490,6 +490,8 @@ uint32_t String_To_Hex(char* str)
 {
 	uint32_t hex = 0;
 	int len = strlen(str);
+
+	if(len>4)return 0;
 	for(int i =0 ;i < len;i++)
 	{
 		hex |= (str[(len-1)-i]<<i*8);

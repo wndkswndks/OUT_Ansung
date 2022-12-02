@@ -174,7 +174,6 @@ void vTask2(void* pvPrameters)
 		osDelay(100);
 	}
 }
-extern uint8_t eventFlag;
 
 void vTask3(void* pvPrameters)
 {

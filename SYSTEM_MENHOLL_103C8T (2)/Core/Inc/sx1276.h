@@ -686,6 +686,7 @@ typedef struct
 	uint16_t buffCh2[8];
 	uint16_t buffCh3[8];
 	uint8_t direction;
+	uint8_t event;
 
 } SX1276_T;
 
@@ -717,13 +718,14 @@ void SX1276_Calculrate_SNR_Rssi();
 void Lora_config();
 void Lora_Send_Msg(char* msg, uint16_t data);
 void Lora_Event_Send_Msg(char num, uint16_t data);
-void Lora_Event_Send_Msg2(char ch, uint16_t* buff);
 
 void SX1276_Change_rx_tx(uint8_t mode);
 void SX1276_Control_SF(uint8_t   data);
 
 void Master_Pass();
 void Master_poling();
+uint8_t Check_Send_Server(int node, int* txLteMsg);
+
 
 void Master_Event();
 void Master_Event_Clear();
@@ -731,11 +733,10 @@ void Master_Event_Clear();
 void Gateway_Pass();
 void Node_Pass();
 uint8_t Node_event(char   num, uint16_t data);
-uint8_t Node_event2(char   ch, uint16_t* buff);
+
 
 
 void Node_Nomal_Response();
-void Node_Nomal_Response2();
 
 void Node_Rute_Response();
 
