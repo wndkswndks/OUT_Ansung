@@ -107,31 +107,56 @@ void My_Device()//
 	
 	if(!SW4_STATUS)
 	{
+		PCPuts("### MASTER ### \r\n");
 		m_status.device = MASTER_DEVICE;		
-		m_status.maxNodeNum = Flash_Read(0);
-		m_status.minNodeNum = Flash_Read(1);
 
 		m_status.nodeNum = (int)m_status.minNodeNum;
 
+		m_status.maxNodeNum = Flash_Read(0);
 		PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
-		HAL_Delay(100);
+		
+		m_status.minNodeNum = Flash_Read(1);
 		PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
-		HAL_Delay(100);
 
-
+		m_status.masterFolingEnable = Flash_Read(2);
+		PCPrintf("masterFolingEnable = %u \r\n",m_status.masterFolingEnable );
 		API_Read();
 
 	}
 	else
 	{
+		PCPuts("### NODE ### \r\n");
 		m_status.myNodeNameInt = Flash_Read(2);
 		memcpy(m_status.myNodeName,IntToStr(m_status.myNodeNameInt),strlen(IntToStr(m_status.myNodeNameInt)));
 		PCPrintf("myNodeNameInt = %u \r\n",m_status.myNodeNameInt );
-	}
+		
+		m_status.o2Enable = Flash_Read(3);
+		PCPrintf("o2Enable = %u \r\n",m_status.o2Enable );
+		
+		m_status.adcEnable = Flash_Read(4);
+		PCPrintf("adcEnable = %u \r\n",m_status.adcEnable );	
 
-	if(!SW1_STATUS) m_status.gpsEnable = 1;
-	if(!SW2_STATUS) m_status.adcEnable = 1;
-	if(!SW3_STATUS) m_status.o2Enable = 1;
+
+		m_status.mqEnable = Flash_Read(5);
+		PCPrintf("mqEnable = %u \r\n",m_status.mqEnable );
+		
+		m_status.menhollEnable = Flash_Read(6);
+		PCPrintf("menhollEnable = %u \r\n",m_status.menhollEnable );
+		
+		m_status.pumpEnable = Flash_Read(7); // 68 is last memory
+		PCPrintf("pumpEnable = %u \r\n",m_status.pumpEnable );
+
+		if(!SW1_STATUS) 
+		{
+			m_status.gpsEnable = 1;
+		}
+		else
+		{
+			m_status.gpsEnable = 0;
+		}	
+		PCPrintf("gpsEnable = %u \r\n",m_status.gpsEnable );
+	}
+	
 	
 	m_status.txTimeOut =  1000;
 	m_status.txWateTime = 20000;

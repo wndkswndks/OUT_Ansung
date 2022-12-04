@@ -76,7 +76,7 @@ uint8_t CMD_Reset()
 
 }
 //==============================
-void APN_Config()
+void APN_Config(uint8_t num)
 {
 	PCPuts("APN Setting START \r\n");
 	CMD_Reset();
@@ -87,7 +87,7 @@ void APN_Config()
 	CMD_Set_CFUN();
 	HAL_Delay(3000);
 	
-	CMD_Set_APN();
+	CMD_Set_APN(num);
 	
 	CMD_Reset();
 	HAL_Delay(2000);
@@ -107,7 +107,7 @@ uint8_t CMD_Set_CFUN()
 	if(OK_Check() == ERR)return ERR;
 }
 
-uint8_t CMD_Set_APN()
+uint8_t CMD_Set_APN(uint8_t num)
 {
 	AT_CMD("AT%NWOPER=\"DEFAULT\"");	
 	if(OK_Check() == ERR)return ERR;
@@ -115,7 +115,11 @@ uint8_t CMD_Set_APN()
 	if(OK_Check() == ERR)return ERR;
 	AT_CMD("AT%SETSYSCFG=\"sw_cfg.nb_vendor_scan_plan.plmn_sel_mode\",\"STANDARD\"");
 	if(OK_Check() == ERR)return ERR;
-	AT_CMD("AT%APNN=\"connect.cxn\"");	
+	if(num==1)
+		AT_CMD("AT%APNN=\"connect.cxn\"");	//old apn
+	else if(num==2)
+		AT_CMD("AT%APNN=\"simplio.apn\"");  //new apn 
+
 	if(OK_Check() == ERR)return ERR;
 }
 
@@ -138,26 +142,36 @@ uint8_t CMD_CanConnect()
 	return OK;
 }
 
-void CMD_GetCIMI()
+uint8_t CMD_GetCIMI()
 {
 	AT_CMD("AT+CIMI");
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
-void CMD_GetIMEI()
+uint8_t CMD_GetIMEI()
 {
 	AT_CMD("AT+CGSN");
-	
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;	
 }
 
-void CMD_GetCGMR()
+uint8_t CMD_GetCGMR()
 {
 	AT_CMD("AT+CGMR");	
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;	
 }
 
 uint8_t CMD_GetCCLK()
 {
 	AT_CMD("AT+CCLK?");	
 	if(OK_Check() == ERR)return ERR;
+
+	return OK;
 }
 
 
@@ -190,34 +204,52 @@ uint32_t GetWateTime()
 
 }
 
-void CMD_GetRSSI()
+uint8_t CMD_GetRSSI()
 {
 	AT_CMD("AT%MEAS=\"8\"");	//
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
-void CMD_GetRSRP()
+uint8_t CMD_GetRSRP()
 {
 	AT_CMD("AT%MEAS=\"8\"");	//
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
-void CMD_GetRSRQ()
+uint8_t CMD_GetRSRQ()
 {
 	AT_CMD("AT%MEAS=\"8\"");	//
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
-void CMD_GetSINR()
+uint8_t CMD_GetSINR()
 {
 	AT_CMD("AT%MEAS=\"8\"");//
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
-void CMD_GetServingCell()
+uint8_t CMD_GetServingCell()
 {
 	AT_CMD("AT%LBSCMD=\"MLIDS\"");	//
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
-void CMD_GetTxPower()
+uint8_t CMD_GetTxPower()
 {
 	AT_CMD("AT%MEAS=\"4\"");	
+	if(OK_Check() == ERR)return ERR;
+
+	return OK;		
 }
 
 #define CMD_DELAY	500
@@ -227,43 +259,53 @@ void Basic_Config()
 	//setup
 	CMD_Reset();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<1>\r\n");
 	
 	CMD_Init();
 	CMD_CanConnect();
-
 	HAL_Delay(CMD_DELAY);
-
+	PCPuts("<2>\r\n");
 
 	//loop
 	CMD_GetCIMI();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<3>\r\n");
 	
 	CMD_GetIMEI();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<4>\r\n");
 		
 	CMD_GetCGMR();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<5>\r\n");
 	
 	CMD_GetCCLK();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<6>\r\n");
 	
 	CMD_GetRSSI();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<7>\r\n");
 	
 	CMD_GetRSRP();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<8>\r\n");
 
 	CMD_GetRSRQ();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<9>\r\n");
 	
 	CMD_GetSINR();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<10>\r\n");
 	
 	CMD_GetServingCell();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<11>\r\n");
 	
 	CMD_GetTxPower();
 	HAL_Delay(CMD_DELAY);
+	PCPuts("<12>\r\n");
 
 }
 
@@ -592,7 +634,7 @@ uint8_t HTTP_Config(uint8_t channel, int* txBuff)
 			{
 				switch(channel)
 				{
-					case 1 :  memcpy(WApiKey, m_status.apiKey1,16 );  break;
+					case 1 :  memcpy(WApiKey, m_status.apiKey1,16 );  		  break;
 					case 2 :  memcpy(WApiKey, m_status.apiKey2,16 );  		  break;
 					case 3 :  memcpy(WApiKey, m_status.apiKey3,16 );  		  break;
 					case 4 :  memcpy(WApiKey, m_status.apiKey4,16 );  		  break;
@@ -756,7 +798,7 @@ void API_Read()
 			ptr[i] = (char)Flash_Read(((3+j*16)+i)); 
 			HAL_Delay(10);
 			//if(j==3&&i==12)break;
-		}
+		}//63까지 플래시 사용
 		
 		PCPrintf("API %d = %s \r\n",j+1,ptr );
 		switch(j)

@@ -209,7 +209,7 @@ void Lora_config()
 {
 	if(m_sx1276.device == TX_DEVICE)
 	{
-		LED2_TOGGLE;
+		LED1_TOGGLE;
 		HAL_Delay(1000);
 		message_length = sprintf(buffer, "Hello %d", message);
 
@@ -320,7 +320,7 @@ void Master_Pass()//
 	
 	if(m_sx1276.event !=2)Master_Event();
 
-	//if(event !=1)Master_poling();
+	if(m_sx1276.event !=1 && m_status.masterFolingEnable)Master_poling3();
 
 
 
@@ -341,12 +341,12 @@ void Master_poling()
 	switch(step)
 	{	
 		case STEP1:
-			LED2_TOGGLE;
 			
 			strcat(txBuff, "N");
 			strcat(txBuff, IntToStr(m_status.nodeNum));
 			strcat(txBuff, "NO");	
 			
+			LED1_TOGGLE;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
@@ -377,7 +377,7 @@ void Master_poling()
 			}
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK))
 			{
-				LED1_TOGGLE;
+				LED2_TOGGLE;
 				failRxCnt = 0;
 				int checkNode = 0;
 				sscanf(buffer,"&LN%d(OK)",&checkNode);
@@ -452,13 +452,13 @@ void Master_poling2()
 	switch(step)
 	{	
 		case STEP1:
-			LED2_TOGGLE;
 			if(m_status.nodeNum>m_status.maxNodeNum) m_status.nodeNum = m_status.minNodeNum;
 			
 			strcat(txBuff, "N");
 			strcat(txBuff, IntToStr(m_status.nodeNum));
 			strcat(txBuff, "NO");	
 			
+			LED1_TOGGLE;
 			Lora_Send_Msg(txBuff, NONE_VALUE);
 			timestemp = HAL_GetTick();
 			step = STEP2;
@@ -494,7 +494,7 @@ void Master_poling2()
 			}
 			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK)) //good
 			{
-				LED1_TOGGLE;
+				LED2_TOGGLE;
 				failRxCnt = 0;
 				int checkNode = 0;
 				sscanf(buffer,"&LN%d(OK)",&checkNode);
@@ -540,6 +540,126 @@ void Master_poling2()
 				
 				if(sendFlag==2) wateTime = GetWateTime();
 				else wateTime = m_status.txWateTime;
+				
+				sendFlag = 0;
+					
+				timestemp = HAL_GetTick();
+				step = STEP4;
+			}
+		break;
+
+		case STEP4:
+			if(Time_Pass(timestemp) >wateTime)
+			{
+				step = STEP1;
+			}
+		break;
+	}	
+}
+
+
+void Master_poling3()
+{
+	static uint8_t step = STEP1;
+	static uint32_t timestemp = 0;
+	static uint32_t wateTime = 0;
+	char txBuff[20] = {0,};
+	static int failRxCnt = 0;
+	static int txLteMsg[8] = {0,};
+	static uint8_t sendFlag = 0;
+	static int failNodeCnt = 0;
+	//uint32_t callbackTime= 0;
+	//static int txRxBuff[8] = {0,};
+	//static int successRxBuff[8] = {0,};
+
+	switch(step)
+	{	
+		case STEP1:
+			if(m_status.nodeNum>m_status.maxNodeNum) m_status.nodeNum = m_status.minNodeNum;
+			
+			strcat(txBuff, "N");
+			strcat(txBuff, IntToStr(m_status.nodeNum));
+			strcat(txBuff, "NO");	
+			
+			LED1_TOGGLE;
+			Lora_Send_Msg(txBuff, NONE_VALUE);
+			timestemp = HAL_GetTick();
+			step = STEP2;
+			//txRxBuff[m_status.nodeNum]++;
+		break;
+
+		case STEP2:
+			if(Time_Pass(timestemp) >m_status.txTimeOut) //fail
+			{
+				failRxCnt++;
+
+				if(failRxCnt>20)
+				{
+					failRxCnt = 0;
+				 //PCPrintf("Lora fail node : %d  \r\n", m_status.nodeNum);
+
+					txLteMsg[0] = m_status.nodeNum;
+					txLteMsg[1] = 22; 
+					m_sx1276.event = 2;
+					lteOngoing = 1;
+					step = STEP3;
+						
+					m_status.nodeNum++; 
+				}
+				else step = STEP1;
+				
+			}
+			if(Is_Include_ThisStr( buffer, 0, NODE_LORA_OK)) //good
+			{
+				LED2_TOGGLE;
+				failRxCnt = 0;
+				int checkNode = 0;
+				sscanf(buffer,"&LN%d(OK)",&checkNode);
+				//memcpy(readMag,buffer,50);
+				memset(buffer,0,512);
+
+
+				if((checkNode<m_status.minNodeNum) ||(m_status.maxNodeNum <checkNode)) return;
+
+				
+				//successRxBuff[m_status.nodeNum]++;
+				//callbackTime = HAL_GetTick() - timestemp;
+				//PCPrintf("%s tx:%d rx:%d T:%d\r\n", buffer+2, txRxBuff[m_status.nodeNum], successRxBuff[m_status.nodeNum], callbackTime);
+				
+
+				if(m_status.nodeNum == m_status.maxNodeNum) 
+				{
+					txLteMsg[0] = m_status.maxNodeNum;
+					txLteMsg[1] = 11; 
+					m_sx1276.event = 2;
+					lteOngoing = 1;
+					step = STEP3;
+				}
+				else
+				{
+					timestemp = HAL_GetTick();
+					wateTime = m_status.txWateTime;
+					step = STEP4;
+				}
+				
+				m_status.nodeNum++; 
+			}
+
+		break;
+
+		case STEP3:
+			if(HTTP_Config(4, txLteMsg) == COMPLETE) 
+			{
+				m_sx1276.event = 0;
+				lteOngoing = 0;
+				LTE_Init();
+				
+				if(txLteMsg[1]==11) wateTime = GetWateTime();
+				else wateTime = m_status.txWateTime;
+				
+				memset(txLteMsg, 0, 4*8);
+				failNodeCnt = 0;
+				
 				
 				sendFlag = 0;
 					
@@ -643,6 +763,7 @@ void Master_Event()
 				strcat(txBuff, IntToStr(eventNode));
 				
 				HAL_Delay(100);
+				LED1_TOGGLE;
 				Lora_Send_Msg(txBuff, NONE_VALUE);
 	
 				
@@ -773,7 +894,7 @@ void Node_Pass()
 
 }
 
-uint8_t Node_event(char   num, uint16_t data)
+uint8_t Node_event(char num, uint16_t data)
 {
 	
 	static uint8_t step = STEP1;
@@ -787,7 +908,7 @@ uint8_t Node_event(char   num, uint16_t data)
 		{
 			
 			case STEP1 :
-				LED2_TOGGLE;
+				LED1_TOGGLE;
 				Lora_Event_Send_Msg(num, data); //
 				timestemp = HAL_GetTick();
 				step = STEP2;
@@ -811,6 +932,7 @@ uint8_t Node_event(char   num, uint16_t data)
 				{
 					if(Is_Include_ThisStr( buffer, 3, m_status.myNodeName))
 					{
+						LED2_TOGGLE;
 						memset(buffer,0,512);
 						step = STEP1;
 						return OK;
@@ -847,8 +969,7 @@ void Node_Rute_Response()
 void Node_Nomal_Response()
 {
 	char txBuff[50] = {0,};
-
-	LED1_TOGGLE;
+	LED2_TOGGLE;
 	HAL_Delay(LORA_DELAY);
 	strcat(txBuff,NODE_LORA_OK);
 	strcat(txBuff,"N");
@@ -858,6 +979,7 @@ void Node_Nomal_Response()
 	strcat(txBuff,")");
 	memcpy(readMag,txBuff,50);
 	while(m_sx1276.direction ==TX_MODE);
+	LED1_TOGGLE;
 	Lora_Send_Msg(txBuff, NONE_VALUE);
 	
 

@@ -126,9 +126,12 @@ typedef struct
 	uint8_t MenhollOpenFlag;
 	uint8_t PumpActiveFlag;
 	uint8_t device;
-	uint8_t o2Enable;
-	uint8_t adcEnable;
-	uint8_t gpsEnable;
+	uint32_t o2Enable;
+	uint32_t adcEnable;
+	uint32_t gpsEnable;
+	uint32_t mqEnable;
+	uint32_t menhollEnable;
+	uint32_t pumpEnable;
 	uint8_t err_status[8];
 	uint8_t event_flag;
 	
@@ -146,6 +149,7 @@ typedef struct
 	uint16_t txTimeOut;
 	uint32_t maxNodeNum;
 	uint32_t minNodeNum;
+	uint32_t masterFolingEnable;
 	int nodeNum;
 	int myNodeNameInt;
 } STATUS_T;

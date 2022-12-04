@@ -724,6 +724,8 @@ void SX1276_Control_SF(uint8_t   data);
 
 void Master_Pass();
 void Master_poling();
+void Master_poling3();
+
 uint8_t Check_Send_Server(int node, int* txLteMsg);
 
 

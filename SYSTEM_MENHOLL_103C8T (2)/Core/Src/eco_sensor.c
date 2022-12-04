@@ -135,8 +135,10 @@ uint16_t MQ_ADC_Read(uint8_t AIN_num)
 		if(HAL_GetTick()-pastTime >200)
 		{
 			LED1_ON;
+			LED2_ON;
+			LED3_ON;
 			os = 1;
-			Error_Watchdog(ERR0R_1);
+			//Error_Watchdog(ERR0R_1);
 		}
 	}
 	

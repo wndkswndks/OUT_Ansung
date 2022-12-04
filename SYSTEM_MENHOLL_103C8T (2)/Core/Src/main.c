@@ -119,7 +119,7 @@ int main(void)
   
   if(m_status.device != MASTER_DEVICE)
   {
-  	  Eco_Init();
+  	  if(m_status.mqEnable)Eco_Init();
   	  
 	  if(m_status.o2Enable)HAL_UART_Transmit(&huart1, "M 1\r\n", 5,1000);
   }	
@@ -129,13 +129,13 @@ int main(void)
   {
 	  SX1276_TX_Entry(16, 2000);
 	  Lora_Send_Msg("Device_start",NONE_VALUE);
+	  LTE_Init();
   }
   else
   {
 	  SX1276_RX_Entry(2000);
   }
 
-  //LTE_Init();
 
   //CMD_GetCCLK();
 
@@ -299,13 +299,17 @@ void Main_config()
 
 //	if(HAL_GetTick()-timestemp>60000)
 //	{
-		Eco_Config();
+		if(m_status.mqEnable)Eco_Config();
 		
 		if(m_status.adcEnable) Battery_Config();
-		Menholl_Open_Config(); 
-		Pump_Active_Config();
+		if(m_status.menhollEnable) Menholl_Open_Config(); 
+		if(m_status.pumpEnable) Pump_Active_Config();
 		if(m_status.o2Enable) O2_Sensor();
-		Event_Config(m_sx1276.buffCh3 ,2);
+		
+		if(m_status.adcEnable ||m_status.menhollEnable ||m_status.pumpEnable ||m_status.o2Enable) 
+		{
+			Event_Config(m_sx1276.buffCh3 ,2);
+		}
 		HAL_Delay(2000);
 		
 //		timestemp = HAL_GetTick();
@@ -317,12 +321,10 @@ void Main_config()
 //			GPS_config();
 //			timestemp = HAL_GetTick();
 //		}
-
-
-
-
 	
 }
+
+
 
 void Test_Event(char ch)
 {
@@ -363,6 +365,7 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 			switch(step)
 			{
 				case STEP1:
+					LED3_ON;
 					m_sx1276.event = 1;
 					timestemp = HAL_GetTick();
 					delay = rand()%5;
@@ -371,7 +374,7 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 				case STEP2:
 					if(strlen(buffer) != 0)
 					{
-						timestemp = HAL_GetTick();
+						timestemp = HAL_GetTick(); // Time reset
 						memset(buffer,0,512);
 					}	
 					if(HAL_GetTick()-timestemp>4000+(delay *1000))
@@ -383,7 +386,7 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 
 				case STEP3:
 					
-					Lora_Send_Msg("1234567", NONE_VALUE); // ?çîÎØ?
+					Lora_Send_Msg("1234567", NONE_VALUE); // dumy
 					HAL_Delay(1000);
 					
 					for(int i =0 ;i < 8;i++)
@@ -410,6 +413,7 @@ uint8_t Event_Config(uint16_t* buffCh, uint8_t chAdd)
 				break;
 
 				case STEP4:
+					LED3_OFF;
 					memset(buffCh, 0 , 8*2);
 					m_sx1276.event = 0;
 					step = STEP1;

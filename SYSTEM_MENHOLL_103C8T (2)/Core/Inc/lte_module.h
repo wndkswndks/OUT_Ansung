@@ -47,25 +47,25 @@ uint8_t CMD_Init();
 uint8_t CMD_Reset();
 
 
-void APN_Config();
+void APN_Config(uint8_t num);
 uint8_t CMD_Set_CFUN();
-uint8_t CMD_Set_APN();
+uint8_t CMD_Set_APN(uint8_t num);
 uint8_t CMD_Get_APN();
 
 
 uint8_t CMD_CanConnect();
-void CMD_GetCIMI();
-void CMD_GetIMEI();
-void CMD_GetCGMR();
+uint8_t CMD_GetCIMI();
+uint8_t CMD_GetIMEI();
+uint8_t CMD_GetCGMR();
 uint8_t CMD_GetCCLK();
 uint32_t GetWateTime();
 
-void CMD_GetRSSI();
-void CMD_GetRSRP();
-void CMD_GetRSRQ();
-void CMD_GetSINR();
-void CMD_GetServingCell();
-void CMD_GetTxPower();
+uint8_t CMD_GetRSSI();
+uint8_t CMD_GetRSRP();
+uint8_t CMD_GetRSRQ();
+uint8_t CMD_GetSINR();
+uint8_t CMD_GetServingCell();
+uint8_t CMD_GetTxPower();
 
 uint8_t CMD_GetIPAddr(char* scrAdd, char* dstAdd);
 uint8_t CMD_SoketCreate(char* ipAdd,uint8_t port);

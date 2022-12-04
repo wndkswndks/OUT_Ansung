@@ -276,26 +276,28 @@ void Pc_Command_Response()
 	uint16_t num = 0;
 	char rxLen = 0;
 	uint8_t errFlag = 0;
+	uint8_t cmd[5] = {0,};
 	
 	rxLen = strlen(m_cmd.msgBuff);
 
-	if(rxLen != NULL)
+	if(rxLen == NULL) return;
+	
+	if(m_cmd.msgBuff[DIVISION_POS] !='_') return;
+	
+	if(atoi(m_cmd.msgBuff+VALUE_POS) != 0)
 	{
-		if(m_cmd.msgBuff[DIVISION_POS] !='_') return;
-		
-		if(atoi(m_cmd.msgBuff+VALUE_POS) != 0)
+		num = atoi(m_cmd.msgBuff+VALUE_POS);
+	}
+
+
+	if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "SF"))
+	{
+		if(SF_07<= num && num<= SF_12 )
 		{
-			num = atoi(m_cmd.msgBuff+VALUE_POS);
-		}
-		
-		if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "SF"))
-		{
-			if(SF_07<= num && num<= SF_12 )
-			{
-				Lora_Send_Msg("SF",num);
-				HAL_Delay(100);
-				SX1276_Control_SF((uint8_t)num);	
-				PCPrintf("SF = %u \r\n",num);
+			Lora_Send_Msg("SF",num);
+			HAL_Delay(100);
+			SX1276_Control_SF((uint8_t)num);	
+			PCPrintf("SF = %u \r\n",num);
 
 //				switch(num)
 //				{
@@ -306,102 +308,176 @@ void Pc_Command_Response()
 //					case SF_11 :	m_status.txTimeOut = 694 + 10;	break;
 //					case SF_12 :	m_status.txTimeOut = 1221 +10;	break;										
 //				}
-			}										
+		}										
+	}
+	
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "WT"))
+	{
+		m_status.txWateTime = num;
+		PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
+	}	
+
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TO"))
+	{
+		m_status.txTimeOut = num;	
+		PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );		
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MX"))
+	{
+		m_status.maxNodeNum = num;	
+		PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
+		Flash_Write(num,0);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MN"))
+	{
+		m_status.minNodeNum = num;	
+		PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
+		Flash_Write(num,1);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "O2"))
+	{
+		if(m_status.device == MASTER_DEVICE)
+		{
+			PCPuts("only Node mode \r\n");
+			return;
+		}
+		m_status.o2Enable = num;	
+		PCPrintf("o2Enable = %u \r\n",m_status.o2Enable );
+		Flash_Write(num,3);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "DC"))
+	{
+		if(m_status.device == MASTER_DEVICE)
+		{
+			PCPuts("only Node mode \r\n");
+			return;
+		}
+		m_status.adcEnable = num;	
+		PCPrintf("adcEnable = %u \r\n",m_status.adcEnable );
+		Flash_Write(num,4);
+	}
+
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MQ"))
+	{
+		if(m_status.device == MASTER_DEVICE)
+		{
+			PCPuts("only Node mode \r\n");
+			return;
+		}
+		m_status.mqEnable = num;	
+		PCPrintf("mqEnable = %u \r\n",m_status.mqEnable );
+		Flash_Write(num,5);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "ME"))
+	{
+		if(m_status.device == MASTER_DEVICE)
+		{
+			PCPuts("only Node mode \r\n");
+			return;
+		}
+		m_status.menhollEnable = num;	
+		PCPrintf("menhollEnable = %u \r\n",m_status.menhollEnable );
+		Flash_Write(num,6);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "PU"))
+	{
+		if(m_status.device == MASTER_DEVICE)
+		{
+			PCPuts("only Node mode \r\n");
+			return;
+		}
+		m_status.pumpEnable = num;	
+		PCPrintf("pumpEnable = %u \r\n",m_status.pumpEnable );
+		Flash_Write(num,7);
+	}	
+	
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "NO"))
+	{
+		m_status.myNodeNameInt = num;
+					
+		memset(m_status.myNodeName,0,strlen(m_status.myNodeName));
+		
+		memcpy(m_status.myNodeName,IntToStr(num),strlen(IntToStr(num)));
+		
+		PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
+		Flash_Write(num,2);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "A"))
+	{			
+		char apiNum = 0;
+		if(m_status.device != MASTER_DEVICE)
+		{
+			PCPuts("only Master mode \r\n");
+			return;
+		}
+		sscanf(m_cmd.msgBuff, "A%d_%s",&apiNum, str );
+		switch(apiNum)
+		{
+			case 1:	API_Write(str, 0, m_status.apiKey1);  break;
+			case 2:	API_Write(str, 1, m_status.apiKey2);  break;
+			case 3:	API_Write(str, 2, m_status.apiKey3);  break;
+			case 4:	API_Write(str, 3, m_status.apiKey4);  break;
 		}
 		
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "WT"))
+	
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "X"))
+	{
+		if(m_status.device != MASTER_DEVICE)
 		{
-			m_status.txWateTime = num;
-			PCPrintf("txWateTime = %u \r\n",m_status.txWateTime );
-		}	
+			PCPuts("only Master mode \r\n");
+			return;
+		}
+		char chChannel = 0;
+		int chCmd[8] = {0,};
+		sscanf(m_cmd.msgBuff, "X%d_%d,%d,%d,%d,%d,%d,%d,%d,",&chChannel, chCmd,chCmd+1,chCmd+2,chCmd+3,chCmd+4,chCmd+5,chCmd+6,chCmd+7 );
+		for(int i =0 ;i < 8;i++)
+		{
 
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TO"))
-		{
-			m_status.txTimeOut = num;	
-			PCPrintf("txTimeOut = %u \r\n",m_status.txTimeOut );		
+			PCPrintf("chCmd[%d] = %d\r\n",i,chCmd[i]);
 		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MX"))
+	   while(1)
+	   {
+	  	 if(HTTP_Config(chChannel, chCmd)==COMPLETE)break;
+	   }
+	}
+
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "E"))
+	{
+		if(m_status.device == MASTER_DEVICE)
 		{
-			m_status.maxNodeNum = num;	
-			PCPrintf("maxNodeNum = %u \r\n",m_status.maxNodeNum );
-			Flash_Write(num,0);
+			PCPuts("only node mode \r\n");
+			return;
 		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MN"))
+		char Channel = 0;
+		sscanf(m_cmd.msgBuff, "E%d_,", &Channel);
+		Test_Event(Channel);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "PN"))
+	{
+		if(m_status.device != MASTER_DEVICE)
 		{
-			m_status.minNodeNum = num;	
-			PCPrintf("minNodeNum = %u \r\n",m_status.minNodeNum );
-			Flash_Write(num,1);
+			PCPuts("only Master mode \r\n");
+			return;
 		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "NO"))
+		APN_Config(num);
+		//Basic_Config();
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "MF"))
+	{
+		if(m_status.device != MASTER_DEVICE)
 		{
-			m_status.myNodeNameInt = num;
-						
-			memset(m_status.myNodeName,0,strlen(m_status.myNodeName));
-			
-			memcpy(m_status.myNodeName,IntToStr(num),strlen(IntToStr(num)));
-			
-			PCPrintf("myNodeName = %s \r\n",m_status.myNodeName );
-			Flash_Write(num,2);
+			PCPuts("only Master mode \r\n");
+			return;
 		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "A"))
-		{			
-			char apiNum = 0;
-			sscanf(m_cmd.msgBuff, "A%d_%s",&apiNum, str );
-			switch(apiNum)
-			{
-				case 1:	API_Write(str, 0, m_status.apiKey1);  break;
-				case 2:	API_Write(str, 1, m_status.apiKey2);  break;
-				case 3:	API_Write(str, 2, m_status.apiKey3);  break;
-				case 4:	API_Write(str, 3, m_status.apiKey4);  break;
-			}
-			
+		m_status.masterFolingEnable = num;	
+		PCPrintf("masterFolingEnable = %u \r\n",m_status.masterFolingEnable );
+		Flash_Write(num,2);
+	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TM"))
+	{
 		
-		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "X"))
-		{
-			if(m_status.device != MASTER_DEVICE)
-			{
-				PCPuts("only Master mode \r\n");
-				return;
-			}
-			char chChannel = 0;
-			int chCmd[8] = {0,};
-			sscanf(m_cmd.msgBuff, "X%d_%d,%d,%d,%d,%d,%d,%d,%d,",&chChannel, chCmd,chCmd+1,chCmd+2,chCmd+3,chCmd+4,chCmd+5,chCmd+6,chCmd+7 );
-			for(int i =0 ;i < 8;i++)
-			{
-
-				PCPrintf("chCmd[%d] = %d\r\n",i,chCmd[i]);
-			}
-		   while(1)
-		   {
-		  	 if(HTTP_Config(chChannel, chCmd)==COMPLETE)break;
-		   }
-		}
-
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "E"))
-		{
-			if(m_status.device == MASTER_DEVICE)
-			{
-				PCPuts("only node mode \r\n");
-				return;
-			}
-			char Channel = 0;
-			sscanf(m_cmd.msgBuff, "E%d_,", &Channel);
-			Test_Event(Channel);
-		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "PN"))
-		{
-			if(m_status.device != MASTER_DEVICE)
-			{
-				PCPuts("only Master mode \r\n");
-				return;
-			}
-			APN_Config();
-		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "TM"))
-		{
-			
-			GetWateTime();
+		GetWateTime();
 //			if(num==1)
 //			{
 //				GPS_Enable();
@@ -413,13 +489,12 @@ void Pc_Command_Response()
 //				PCPuts("uart2 disable \r\n");
 //			}	
 
-		}
-		else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "RU"))
-		{				
-			Rute_Cmd(m_cmd.msgBuff);
-		}
-		memset(m_cmd.msgBuff, 0, 30);
 	}
+	else if(Is_Include_ThisStr( m_cmd.msgBuff, 0, "RU"))
+	{				
+		Rute_Cmd(m_cmd.msgBuff);
+	}
+	memset(m_cmd.msgBuff, 0, 30);
 }
 void Rute_Cmd(char* msg)
 {
